@@ -9,6 +9,7 @@ public class PlayerCollison : MonoBehaviour
         if (collision.gameObject.tag == "Obstacle")
         {
             Destroy(gameObject);
+            GameManager.Instance.GameOver();
         }
     }
 }
