@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded = false;
     private bool isJumping = false;
+    private bool wasCrouching = false;
     private float jumpTimer;
 
     private void Update()
@@ -51,7 +52,14 @@ public class PlayerMovement : MonoBehaviour
         
         #region CROUCHING
 
-        if (isGrounded && Input.GetButton("Crouch"))
+        bool isCrouching = isGrounded && Input.GetButton("Crouch");
+
+        if (isCrouching && !wasCrouching)
+        {
+            AudioManager.Instance?.PlayCrouchSfx();
+        }
+
+        if (isCrouching)
         {
             GFX.localScale = new Vector3(GFX.localScale.x, crouchHeight, GFX.localScale.z);
             if (isJumping)
@@ -64,6 +72,8 @@ public class PlayerMovement : MonoBehaviour
         {
             GFX.localScale = new Vector3(GFX.localScale.x, 1f, GFX.localScale.z);
         }
+
+        wasCrouching = isCrouching;
 
         #endregion
     }

@@ -11,6 +11,7 @@ public class AudioManager : MonoBehaviour
     [Header("SFX Clips")]
     [SerializeField] private AudioClip jumpSfx;
     [SerializeField] private AudioClip hitSfx;
+    [SerializeField] private AudioClip crouchSfx;
     [SerializeField] private AudioClip gameOverSfx;
     [SerializeField] private AudioClip buttonClickSfx;
 
@@ -46,6 +47,11 @@ public class AudioManager : MonoBehaviour
     public void PlayHitSfx()
     {
         PlaySfx(hitSfx);
+    }
+
+    public void PlayCrouchSfx()
+    {
+        PlaySfx(crouchSfx);
     }
 
     public void PlayGameOverSfx()

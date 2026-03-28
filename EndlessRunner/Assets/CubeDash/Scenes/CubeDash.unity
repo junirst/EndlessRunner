@@ -2817,6 +2817,7 @@ MonoBehaviour:
   bgmSource: {fileID: 1517542728}
   jumpSfx: {fileID: 8300000, guid: 21d25dfb0f28bf045aa540adca897c45, type: 3}
   hitSfx: {fileID: 8300000, guid: dcead1192691e2244b5f8e9198ab9b69, type: 3}
+  crouchSfx: {fileID: 8300000, guid: 1b72e31d5ef276f43be869565c5f2bc6, type: 3}
   gameOverSfx: {fileID: 8300000, guid: 18b71b72244ba95479ea2d5cbd3325f6, type: 3}
   buttonClickSfx: {fileID: 8300000, guid: bc60c61036f668143be948a253efa487, type: 3}
   gameplayBgm: {fileID: 8300000, guid: 3c6b7f90428861749ad60af9433ff467, type: 3}
