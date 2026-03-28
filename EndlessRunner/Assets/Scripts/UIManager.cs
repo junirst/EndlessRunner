@@ -6,15 +6,35 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreUI;
+    [SerializeField] private GameObject startMenuUi;
+    [SerializeField] private GameObject gameOverUi;
+
+    [SerializeField] private TextMeshProUGUI gameOverScoreUI;
+
+    [SerializeField] private TextMeshProUGUI gameOverHighscoreUI;
 
     GameManager gm;
     private void Start()
     {
         gm = GameManager.Instance;
+        gm.onGameOver.AddListener(ActivateGameOverUI);
+    }
+
+    public void PlayButtonHandler () 
+    {
+        gm.StartGame();
+        startMenuUi.SetActive(false);
+    }
+
+    public void ActivateGameOverUI () 
+    {
+        gameOverUi.SetActive(true);
+        gameOverScoreUI.text = "Score: " + gm.PrettyScore();
+        gameOverHighscoreUI.text = "Highscore: " + gm.PrettyHighscore();
     }
 
     private void OnGUI()
     {
-        scoreUI.text = GameManager.Instance.PrettyScore();
+        scoreUI.text = gm.PrettyScore();
     }
 }
