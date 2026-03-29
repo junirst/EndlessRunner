@@ -56,6 +56,8 @@ public class MenuBall : MonoBehaviour
             return;
         }
 
+        MiniGolfAudioManager.Instance?.PlayShotSfx();
+
         Vector2 dir = (Vector2)transform.position - pos;
 
         rb.velocity = Vector2.ClampMagnitude(dir * power, maxPower);
@@ -68,6 +70,8 @@ public class MenuBall : MonoBehaviour
 
         GameObject fx = Instantiate(goalFX, transform.position, Quaternion.identity);
         Destroy(fx, 2f);
+
+        MiniGolfAudioManager.Instance?.PlayGoalSfx();
     }
 
     private void OnTriggerEnter2D(Collider2D other)

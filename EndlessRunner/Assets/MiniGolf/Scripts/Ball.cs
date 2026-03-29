@@ -69,6 +69,7 @@ public class Ball : MonoBehaviour
         }
 
         LevelManager.main.IncreaseStroke();
+        MiniGolfAudioManager.Instance?.PlayShotSfx();
 
         Vector2 dir = (Vector2)transform.position - pos;
 
@@ -88,6 +89,8 @@ public class Ball : MonoBehaviour
 
             GameObject fx = Instantiate(goalFX, transform.position, Quaternion.identity);
             Destroy(fx, 2f);
+
+            MiniGolfAudioManager.Instance?.PlayGoalSfx();
 
             LevelManager.main.LevelComplete();
         }

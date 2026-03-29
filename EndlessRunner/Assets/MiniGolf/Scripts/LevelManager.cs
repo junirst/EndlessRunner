@@ -46,6 +46,7 @@ public class LevelManager : MonoBehaviour
     public void LevelComplete()
     {
         levelCompleted = true;
+        MiniGolfAudioManager.Instance?.PlayLevelCompleteSfx();
         
         levelCompleteStrokeUI.text = strokes > 1 ? "You putted in " + strokes + " strokes" : "You got a hole in one!";
 
@@ -54,6 +55,7 @@ public class LevelManager : MonoBehaviour
 
     public void GameOver()
     {
+        MiniGolfAudioManager.Instance?.PlayGameOverSfx();
         GameOverUI.SetActive(true);
     }
 
