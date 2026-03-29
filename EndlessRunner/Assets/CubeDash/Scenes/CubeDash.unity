@@ -1377,7 +1377,7 @@ MonoBehaviour:
   obstacleParent: {fileID: 740779554}
   obstacleSpawnTime: 3
   obstacleSpawnTimeFactor: 0.1
-  obstacleSpeed: 4
+  obstacleSpeed: 5
   obstacleSpeedFactor: 0.2
 --- !u!4 &698728496
 Transform:

@@ -8,4 +8,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/CubeDash/Scenes/CubeDash.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/MiniGolf/Scene/MiniGolf-Level1.unity
+    guid: fa949e234f1f344429b642a76befacae
+  - enabled: 1
+    path: Assets/MiniGolf/Scene/MiniGolf-Level2.unity
+    guid: de2bdd12c66ba674fa052e0b45a43c99
+  - enabled: 1
+    path: Assets/MiniGolf/Scene/MiniGolf-Level3.unity
+    guid: 65242b59d3000f940941ece346beadd7
   m_configObjects: {}

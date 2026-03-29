@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Obstacle
+  - Goal
+  - Level
+  - Ball
   layers:
   - Default
   - TransparentFX
@@ -41,4 +44,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Ball
+    uniqueID: 1294220701
+    locked: 0
+  - name: Goal
+    uniqueID: 961787701
     locked: 0
