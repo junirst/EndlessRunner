@@ -8,6 +8,8 @@ TagManager:
   - Goal
   - Level
   - Ball
+  - Bullet
+  - EnemyBullet
   layers:
   - Default
   - TransparentFX
@@ -18,7 +20,7 @@ TagManager:
   - Ground
   - Player
   - Obstacle
-  - 
+  - Minimap
   - 
   - 
   - 

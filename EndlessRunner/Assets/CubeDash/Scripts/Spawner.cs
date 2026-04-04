@@ -20,13 +20,13 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.onGameOver.AddListener(ClearObstacles);
-        GameManager.Instance.onPlay.AddListener(ResetFactors);
+        CubeGameManager.Instance.onGameOver.AddListener(ClearObstacles);
+        CubeGameManager.Instance.onPlay.AddListener(ResetFactors);
     }
 
     private void Update()
     {
-        if (GameManager.Instance.isPlaying)
+        if (CubeGameManager.Instance.isPlaying)
         {
             timeAlive += Time.deltaTime;
             calculateFactors();

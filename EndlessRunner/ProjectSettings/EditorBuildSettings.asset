@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level3.unity
     guid: 65242b59d3000f940941ece346beadd7
+  - enabled: 1
+    path: Assets/TopDownShooter/Scene/Menu.unity
+    guid: cad420f4c60c74349b8b4e2a5e4660b6
+  - enabled: 1
+    path: Assets/TopDownShooter/Scene/Game.unity
+    guid: 45e3145f5f2fb3d40be61dc51a5e7d47
   m_configObjects: {}

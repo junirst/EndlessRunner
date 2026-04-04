@@ -13,10 +13,10 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI gameOverHighscoreUI;
 
-    GameManager gm;
+    CubeGameManager gm;
     private void Start()
     {
-        gm = GameManager.Instance;
+        gm = CubeGameManager.Instance;
         gm.onGameOver.AddListener(ActivateGameOverUI);
     }
 

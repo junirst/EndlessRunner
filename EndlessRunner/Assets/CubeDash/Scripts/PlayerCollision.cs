@@ -6,7 +6,7 @@ public class PlayerCollison : MonoBehaviour
 {
     private void Start()
     {
-        GameManager.Instance.onPlay.AddListener(ActivatePlayer);
+        CubeGameManager.Instance.onPlay.AddListener(ActivatePlayer);
     }
     private void ActivatePlayer () 
     {
@@ -18,7 +18,7 @@ public class PlayerCollison : MonoBehaviour
         {
             AudioManager.Instance?.PlayHitSfx();
             gameObject.SetActive(false);
-            GameManager.Instance.GameOver();
+            CubeGameManager.Instance.GameOver();
         }
     }
 }
