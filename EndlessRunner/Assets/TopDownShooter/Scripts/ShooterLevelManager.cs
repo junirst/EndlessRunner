@@ -61,7 +61,15 @@ public class ShooterLevelManager : MonoBehaviour
     public void BackToMenu()
     {
         ShooterAudioManager.Instance?.PlayButtonClickSfx();
+        ShooterAudioManager.Instance?.StopBgm();
         SceneManager.LoadScene("Menu");
+    }
+
+    public void BackToTitleScreen()
+    {
+        ShooterAudioManager.Instance?.PlayButtonClickSfx();
+        ShooterAudioManager.Instance?.StopBgm();
+        SceneManager.LoadScene("TitleScreen");
     }
 
     public void InscreaseScore(int amount)

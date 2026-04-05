@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -32,6 +33,12 @@ public class UIManager : MonoBehaviour
         gameOverUi.SetActive(true);
         gameOverScoreUI.text = "Score: " + gm.PrettyScore();
         gameOverHighscoreUI.text = "Highscore: " + gm.PrettyHighscore();
+    }
+
+    public void BackToTitleScreen()
+    {
+        AudioManager.Instance?.PlayButtonClickSfx();
+        SceneManager.LoadScene("TitleScreen");
     }
 
     private void OnGUI()

@@ -17,4 +17,10 @@ public class StateManager : MonoBehaviour
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
     }
 
+    public void BackToTitleScreen()
+    {
+        MiniGolfAudioManager.Instance?.PlayButtonClickSfx();
+        SceneManager.LoadSceneAsync("TitleScreen", LoadSceneMode.Single);
+    }
+
 }
