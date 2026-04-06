@@ -9,6 +9,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreUI;
     [SerializeField] private GameObject startMenuUi;
     [SerializeField] private GameObject gameOverUi;
+    [SerializeField] private GameObject pauseMenuUi;
+    [SerializeField] private TextMeshProUGUI pauseScoreUI;
+    [SerializeField] private TextMeshProUGUI pauseHighscoreUI;
 
     [SerializeField] private TextMeshProUGUI gameOverScoreUI;
 
@@ -19,6 +22,9 @@ public class UIManager : MonoBehaviour
     {
         gm = CubeGameManager.Instance;
         gm.onGameOver.AddListener(ActivateGameOverUI);
+        gm.onPause.AddListener(ActivatePauseUI);
+        gm.onResume.AddListener(HidePauseUI);
+        HidePauseUI();
     }
 
     public void PlayButtonHandler () 
@@ -30,14 +36,50 @@ public class UIManager : MonoBehaviour
 
     public void ActivateGameOverUI () 
     {
+        HidePauseUI();
         gameOverUi.SetActive(true);
         gameOverScoreUI.text = "Score: " + gm.PrettyScore();
         gameOverHighscoreUI.text = "Highscore: " + gm.PrettyHighscore();
     }
 
+    public void ActivatePauseUI()
+    {
+        if (pauseMenuUi == null)
+        {
+            return;
+        }
+
+        pauseMenuUi.SetActive(true);
+
+        if (pauseScoreUI != null)
+        {
+            pauseScoreUI.text = "Score: " + gm.PrettyScore();
+        }
+
+        if (pauseHighscoreUI != null)
+        {
+            pauseHighscoreUI.text = "Highscore: " + gm.PrettyHighscore();
+        }
+    }
+
+    public void HidePauseUI()
+    {
+        if (pauseMenuUi != null)
+        {
+            pauseMenuUi.SetActive(false);
+        }
+    }
+
+    public void ContinueButtonHandler()
+    {
+        AudioManager.Instance?.PlayButtonClickSfx();
+        gm.ResumeGame();
+    }
+
     public void BackToTitleScreen()
     {
         AudioManager.Instance?.PlayButtonClickSfx();
+        Time.timeScale = 1f;
         SceneManager.LoadScene("TitleScreen");
     }
 

@@ -19,6 +19,11 @@ public class Ball : MonoBehaviour
 
     private void Update()
     {
+        if (!LevelManager.main.CanAcceptInput())
+        {
+            return;
+        }
+
         PlayerInput();
 
         if (LevelManager.main.outOfStrokes && rb.velocity.magnitude <= 0.2f && !LevelManager.main.levelCompleted)

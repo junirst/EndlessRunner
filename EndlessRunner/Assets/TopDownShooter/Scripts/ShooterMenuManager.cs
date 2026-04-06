@@ -8,13 +8,23 @@ public class ShooterMenuManager : MonoBehaviour
     {
         ShooterAudioManager.Instance?.PlayButtonClickSfx();
         ShooterAudioManager.Instance?.StopBgm();
+        Time.timeScale = 1f;
         SceneManager.LoadScene(name);
+    }
+
+    public void BackToMenu()
+    {
+        ShooterAudioManager.Instance?.PlayButtonClickSfx();
+        ShooterAudioManager.Instance?.StopBgm();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Menu");
     }
 
     public void BackToTitleScreen()
     {
         ShooterAudioManager.Instance?.PlayButtonClickSfx();
         ShooterAudioManager.Instance?.StopBgm();
+        Time.timeScale = 1f;
         SceneManager.LoadScene("TitleScreen");
     }
 }

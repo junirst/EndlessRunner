@@ -26,6 +26,13 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (!ShooterLevelManager.manager.CanAcceptInput())
+        {
+            mx = 0f;
+            my = 0f;
+            return;
+        }
+
         mx = Input.GetAxisRaw("Horizontal");
         my = Input.GetAxisRaw("Vertical");
         mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
