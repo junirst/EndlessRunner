@@ -11,7 +11,15 @@ public class CubeGameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            LoadData();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     #endregion
@@ -29,12 +37,21 @@ public class CubeGameManager : MonoBehaviour
 
     private void Start() 
     {
+        if (data == null)
+        {
+            LoadData();
+        }
+    }
+
+    private void LoadData()
+    {
         string loadedData = SaveSystem.Load("save");
-        if (loadedData != null) 
+        if (!string.IsNullOrEmpty(loadedData))
         {
             data = JsonUtility.FromJson<Data>(loadedData);
         }
-        else 
+
+        if (data == null)
         {
             data = new Data();
         }
@@ -67,6 +84,11 @@ public class CubeGameManager : MonoBehaviour
         if (isPaused)
         {
             ResumeGame();
+        }
+
+        if (data == null)
+        {
+            LoadData();
         }
 
         if (data.highscore < currentScore) 
@@ -131,6 +153,11 @@ public class CubeGameManager : MonoBehaviour
 
     public string PrettyHighscore () 
     {
+        if (data == null)
+        {
+            return "0";
+        }
+
         return Mathf.RoundToInt(data.highscore).ToString();
     }
 }

@@ -23,7 +23,7 @@ public class StateManager : MonoBehaviour
     {
         MiniGolfAudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
-        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
+        SceneManager.LoadSceneAsync("TitleScreen", LoadSceneMode.Single);
     }
 
 }

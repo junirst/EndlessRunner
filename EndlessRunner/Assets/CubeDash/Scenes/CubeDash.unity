@@ -1868,7 +1868,7 @@ MonoBehaviour:
   pauseScoreUI: {fileID: 366606883}
   pauseHighscoreUI: {fileID: 264808675}
   gameOverScoreUI: {fileID: 2017699265}
-  gameOverHighscoreUI: {fileID: 264808675}
+  gameOverHighscoreUI: {fileID: 1433367030}
 --- !u!114 &634654153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1988,6 +1988,8 @@ MonoBehaviour:
   - {fileID: 5659951453687712205, guid: 3fea961db4fedbe44bf25d37976b70d2, type: 3}
   - {fileID: 4536643649388453062, guid: 41df83285df6c8e4ba50bb43e4c02cd2, type: 3}
   - {fileID: 7628796524482334812, guid: b6b77580e595fd043b9f86bee6bc86f1, type: 3}
+  - {fileID: 5659951453687712205, guid: 3fea961db4fedbe44bf25d37976b70d2, type: 3}
+  - {fileID: 5659951453687712205, guid: 57eb3b7c8743c344092135f475150b57, type: 3}
   obstacleParent: {fileID: 740779554}
   obstacleSpawnTime: 3
   obstacleSpawnTimeFactor: 0.1
@@ -2553,7 +2555,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.01643534, y: -0.06574147}
+  m_Offset: {x: -0.00015804172, y: -0.14170238}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2564,7 +2566,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.4521555, y: 0.6165091}
+  m_Size: {x: 0.4847101, y: 0.46458727}
   m_EdgeRadius: 0
 --- !u!212 &1123399959
 SpriteRenderer:

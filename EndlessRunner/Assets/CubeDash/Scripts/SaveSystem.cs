@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class SaveSystem 
 {
-    public static readonly string SAVE_FOLDER = Application.persistentDataPath + "/saves/";
+    public static readonly string SAVE_FOLDER = Application.persistentDataPath + "/cubesaves/";
     public static readonly string FILE_EXT = ".json";
 
     public static void Save(string fileName, string dataToSave)

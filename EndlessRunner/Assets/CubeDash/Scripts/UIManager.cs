@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour
         gm.onPause.AddListener(ActivatePauseUI);
         gm.onResume.AddListener(HidePauseUI);
         HidePauseUI();
+        RefreshHighscoreText();
     }
 
     public void PlayButtonHandler () 
@@ -32,6 +33,7 @@ public class UIManager : MonoBehaviour
         AudioManager.Instance?.PlayButtonClickSfx();
         gm.StartGame();
         startMenuUi.SetActive(false);
+        RefreshHighscoreText();
     }
 
     public void ActivateGameOverUI () 
@@ -39,7 +41,7 @@ public class UIManager : MonoBehaviour
         HidePauseUI();
         gameOverUi.SetActive(true);
         gameOverScoreUI.text = "Score: " + gm.PrettyScore();
-        gameOverHighscoreUI.text = "Highscore: " + gm.PrettyHighscore();
+        RefreshHighscoreText();
     }
 
     public void ActivatePauseUI()
@@ -56,10 +58,7 @@ public class UIManager : MonoBehaviour
             pauseScoreUI.text = "Score: " + gm.PrettyScore();
         }
 
-        if (pauseHighscoreUI != null)
-        {
-            pauseHighscoreUI.text = "Highscore: " + gm.PrettyHighscore();
-        }
+        RefreshHighscoreText();
     }
 
     public void HidePauseUI()
@@ -85,6 +84,24 @@ public class UIManager : MonoBehaviour
 
     private void OnGUI()
     {
-        scoreUI.text = gm.PrettyScore();
+        if (scoreUI != null && gm != null)
+        {
+            scoreUI.text = gm.PrettyScore();
+        }
+    }
+
+    private void RefreshHighscoreText()
+    {
+        string highscore = "Highscore: " + gm.PrettyHighscore();
+
+        if (pauseHighscoreUI != null)
+        {
+            pauseHighscoreUI.text = highscore;
+        }
+
+        if (gameOverHighscoreUI != null)
+        {
+            gameOverHighscoreUI.text = highscore;
+        }
     }
 }
