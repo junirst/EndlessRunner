@@ -11,6 +11,8 @@ public class Dot : MonoBehaviour
     public int targetX;
     public int targetY;
     public bool isMatched = false;
+
+    private FindMatches findMatches;
     private Board board;
     private GameObject otherDot;
     private Vector2 firstTouchPosition;
@@ -23,7 +25,7 @@ public class Dot : MonoBehaviour
     {
         // Updated to the modern Unity method to find the Board script
         board = Object.FindFirstObjectByType<Board>();
-
+        findMatches = FindObjectOfType<FindMatches>();
         //targetX = (int)transform.position.x;
         //targetY = (int)transform.position.y;
         //row = targetY;
@@ -34,7 +36,7 @@ public class Dot : MonoBehaviour
 
     void Update()
     {
-        FindMatches();
+        //FindMatches();
         if (isMatched)
         {
             SpriteRenderer mySprite = GetComponent<SpriteRenderer>();
@@ -51,6 +53,8 @@ public class Dot : MonoBehaviour
             {
                 board.allDots[column, row] = this.gameObject;
             }
+
+            findMatches.FindAllMatches();
         }
         else
         {
