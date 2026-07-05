@@ -13,11 +13,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpTime = 0.3f;
     [SerializeField] private float crouchHeight = 0.5f;
     [SerializeField] private AnimatorController animatorController;
+    [SerializeField] private float doubleJumpDuration = 8f;
 
     private bool isGrounded = false;
     private bool isJumping = false;
     private bool wasCrouching = false;
     private float jumpTimer;
+    private float doubleJumpTimeRemaining;
+    private int jumpsUsed;
 
     private void Start()
     {
@@ -32,12 +35,34 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
+        bool isStableGrounded = isGrounded && rb.velocity.y <= 0.05f;
+
+        if (isStableGrounded)
+        {
+            jumpsUsed = 0;
+            isJumping = false;
+            jumpTimer = 0f;
+        }
+
+        if (doubleJumpTimeRemaining > 0f)
+        {
+            doubleJumpTimeRemaining -= Time.deltaTime;
+
+            if (doubleJumpTimeRemaining <= 0f)
+            {
+                doubleJumpTimeRemaining = 0f;
+            }
+        }
 
         #region JUMPING
 
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        int maxJumps = doubleJumpTimeRemaining > 0f ? 2 : 1;
+
+        if (Input.GetButtonDown("Jump") && jumpsUsed < maxJumps)
         {
             isJumping = true;
+            jumpsUsed++;
+            jumpTimer = 0f;
             rb.velocity = Vector2.up * jumpForce;
             AudioManager.Instance?.PlayJumpSfx();
         }
@@ -63,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
         
         #region CROUCHING
 
-        bool isCrouching = isGrounded && Input.GetButton("Crouch");
+        bool isCrouching = isStableGrounded && Input.GetButton("Crouch");
 
         if (isCrouching && !wasCrouching)
         {
@@ -116,6 +141,16 @@ public class PlayerMovement : MonoBehaviour
         {
             animatorController.SetAnimationState(AnimatorController.AnimationState.Running);
         }
+    }
+
+    public void ApplyDoubleJump(float duration)
+    {
+        if (duration <= 0f)
+        {
+            return;
+        }
+
+        doubleJumpTimeRemaining = Mathf.Max(doubleJumpTimeRemaining, duration);
     }
 }
 

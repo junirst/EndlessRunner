@@ -18,19 +18,23 @@ public class PowerUpSpawner : MonoBehaviour
 
     private float timeAlive;
     private float timeUntilPowerUpSpawn;
+    private bool wasPlaying;
 
     private void Start()
+    {
+        ResetFactors();
+    }
+
+    private void OnEnable()
     {
         if (CubeGameManager.Instance != null)
         {
             CubeGameManager.Instance.onGameOver.AddListener(ClearPowerUps);
             CubeGameManager.Instance.onPlay.AddListener(ResetFactors);
         }
-
-        ResetFactors();
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         if (CubeGameManager.Instance != null)
         {
@@ -41,11 +45,24 @@ public class PowerUpSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (CubeGameManager.Instance != null && CubeGameManager.Instance.isPlaying)
+        bool isPlaying = CubeGameManager.Instance != null && CubeGameManager.Instance.isPlaying;
+
+        if (isPlaying && !wasPlaying)
+        {
+            ResetFactors();
+        }
+
+        wasPlaying = isPlaying;
+
+        if (isPlaying)
         {
             timeAlive += Time.deltaTime;
             CalculateFactors();
             SpawnLoop();
+        }
+        else
+        {
+            timeUntilPowerUpSpawn = 0f;
         }
     }
 
