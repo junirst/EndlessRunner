@@ -36,46 +36,38 @@ public class Dot : MonoBehaviour
 
     void Update()
     {
-        //FindMatches();
         if (isMatched)
         {
             SpriteRenderer mySprite = GetComponent<SpriteRenderer>();
-            mySprite.color = new Color(1f, 1f, 1f, .2f);
+            if (mySprite != null)
+            {
+                mySprite.color = new Color(1f, 1f, 1f, .2f);
+            }
         }
+
         targetX = column;
         targetY = row;
-        if (Mathf.Abs(targetX - transform.position.x) > .1)
-        {
-            // Move towards the target
-            tempPosition = new Vector2(targetX, transform.position.y);
-            transform.position = Vector2.Lerp(transform.position, tempPosition, .6f);
-            if (board.allDots[column, row] != this.gameObject)
-            {
-                board.allDots[column, row] = this.gameObject;
-            }
 
-            findMatches.FindAllMatches();
+        // Smoothly slide horizontally to targetX
+        if (Mathf.Abs(targetX - transform.position.x) > .05f)
+        {
+            tempPosition = new Vector2(targetX, transform.position.y);
+            transform.position = Vector2.Lerp(transform.position, tempPosition, .100f);
         }
         else
         {
-            // Directly set the position to the target
-            tempPosition = new Vector2(targetX, transform.position.y);
-            transform.position = tempPosition;
-            board.allDots[column, row] = this.gameObject;
+            transform.position = new Vector2(targetX, transform.position.y);
         }
 
-        if (Mathf.Abs(targetY - transform.position.y) > .1)
+        // Smoothly slide vertically to targetY
+        if (Mathf.Abs(targetY - transform.position.y) > .05f)
         {
-            // Move towards the target
             tempPosition = new Vector2(transform.position.x, targetY);
-            transform.position = Vector2.Lerp(transform.position, tempPosition, .6f);
+            transform.position = Vector2.Lerp(transform.position, tempPosition, .100f);
         }
         else
         {
-            // Directly set the position to the target
-            tempPosition = new Vector2(transform.position.x, targetY);
-            transform.position = tempPosition;
-            board.allDots[column, row] = this.gameObject;
+            transform.position = new Vector2(transform.position.x, targetY);
         }
     }
 
@@ -84,8 +76,9 @@ public class Dot : MonoBehaviour
         yield return new WaitForSeconds(.5f);
         if (otherDot != null)
         {
-            FindMatches();
-            otherDot.GetComponent<Dot>().FindMatches();
+            // FIX: Trigger the flawless global match scanner
+            findMatches.FindAllMatches();
+
             if (!isMatched && !otherDot.GetComponent<Dot>().isMatched)
             {
                 otherDot.GetComponent<Dot>().row = row;
@@ -98,7 +91,6 @@ public class Dot : MonoBehaviour
 
                 yield return new WaitForSeconds(.5f);
                 board.currentState = GameState.move;
-
             }
             else
             {

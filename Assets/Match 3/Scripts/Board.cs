@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
     public GameObject tilePrefab;
     public GameObject[] dots;
     public GameObject[,] allDots;
+    public GameObject destroyEffect;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
 
@@ -34,30 +35,27 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                Vector2 tempPosition = new Vector2(i, j +offSet);
-                GameObject backgroundTile = Instantiate(tilePrefab, tempPosition, Quaternion.identity);
+                // 1. Background tiles stay down at normal grid positions (No offset!)
+                Vector2 tilePosition = new Vector2(i, j);
+                GameObject backgroundTile = Instantiate(tilePrefab, tilePosition, Quaternion.identity);
                 backgroundTile.transform.parent = this.transform;
                 backgroundTile.name = "( " + i + ", " + j + " )";
                 allTiles[i, j] = backgroundTile.GetComponent<BackgroundTile>();
-                // Pick a random number between 0 and the total number of fruits/dots you have
+
+                // Pick a random fruit
                 int dotToUse = Random.Range(0, dots.Length);
                 int MaxIterations = 0;
                 while (MatchesAt(i, j, dots[dotToUse]) && MaxIterations < 100)
                 {
                     dotToUse = Random.Range(0, dots.Length);
                     MaxIterations++;
-                    Debug.Log(MaxIterations);
                 }
-                MaxIterations = 0; // Reset the counter for the next dot
-                                   // Spawn the random dots at the exact position of this background tile
-                GameObject dot = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
-                dot.GetComponent<Dot>().row = j;
-                dot.GetComponent<Dot>().column = i;
 
-                // Make the fruit a child of the background tile to keep the hierarchy organized
+                // 2. Dots spawn high up in the sky and fall down into the tiles
+                Vector2 dotSpawnPosition = new Vector2(i, j + offSet);
+                GameObject dot = Instantiate(dots[dotToUse], dotSpawnPosition, Quaternion.identity);
+
                 dot.transform.parent = this.transform;
-
-                // Give the fruit the same name as the tile (optional, helps with debugging)
                 dot.name = "( " + i + ", " + j + " )";
 
                 Dot dotComponent = dot.GetComponent<Dot>();
@@ -80,6 +78,7 @@ public class Board : MonoBehaviour
 
     private bool MatchesAt(int column, int row, GameObject piece)
     {
+        // 1. Independent Horizontal Check
         if (column > 1)
         {
             if (allDots[column - 1, row] != null && allDots[column - 2, row] != null)
@@ -88,41 +87,21 @@ public class Board : MonoBehaviour
                 {
                     return true;
                 }
+            }
+        }
+
+        // 2. Independent Vertical Check
         if (row > 1)
-                {
-                    if (allDots[column, row - 1] != null && allDots[column, row - 2] != null)
-                    {
-                        if (allDots[column, row - 1].tag == piece.tag && allDots[column, row - 2].tag == piece.tag)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        else if (column <= 1 || row <= 1)
         {
-            if (row > 1)
+            if (allDots[column, row - 1] != null && allDots[column, row - 2] != null)
             {
-                if (allDots[column, row - 1] != null && allDots[column, row - 2] != null)
+                if (allDots[column, row - 1].tag == piece.tag && allDots[column, row - 2].tag == piece.tag)
                 {
-                    if (allDots[column, row - 1].tag == piece.tag && allDots[column, row - 2].tag == piece.tag)
-                    {
-                        return true;
-                    }
-                }
-            }
-            if (column > 1)
-            {
-                if (allDots[column - 1, row] != null && allDots[column - 2, row] != null)
-                {
-                    if (allDots[column - 1, row].tag == piece.tag && allDots[column - 2, row].tag == piece.tag)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -141,11 +120,25 @@ public class Board : MonoBehaviour
     }
     private void DestroyMatchesAt(int column, int row)
     {
-        if (allDots[column, row].GetComponent<Dot>().isMatched)
+        if (allDots[column, row] != null)
         {
-            findMatches.currentMatches.Remove(allDots[column, row]);
-            Destroy(allDots[column, row]);
-            allDots[column, row] = null;
+            Dot dotComponent = allDots[column, row].GetComponent<Dot>();
+            if (dotComponent != null && dotComponent.isMatched)
+            {
+                if (findMatches != null && findMatches.currentMatches.Contains(allDots[column, row]))
+                {
+                    findMatches.currentMatches.Remove(allDots[column, row]);
+                }
+
+                if (destroyEffect != null)
+                {
+                    GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
+                    Destroy(particle, .5f);
+                }
+
+                Destroy(allDots[column, row]);
+                allDots[column, row] = null;
+            }
         }
     }
 
@@ -166,24 +159,31 @@ public class Board : MonoBehaviour
 
     private IEnumerator DecreaseRowCo()
     {
-        int nullCount = 0;
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
                 if (allDots[i, j] == null)
                 {
-                    nullCount++;
-                }
-                else if (nullCount > 0)
-                {
-                    allDots[i, j].GetComponent<Dot>().row -= nullCount;
-                    allDots[i, j] = null;
+                    for (int k = j + 1; k < height; k++)
+                    {
+                        if (allDots[i, k] != null)
+                        {
+                            allDots[i, j] = allDots[i, k];
+                            allDots[i, k] = null;
+
+                            Dot dotComponent = allDots[i, j].GetComponent<Dot>();
+                            if (dotComponent != null)
+                            {
+                                dotComponent.row = j;
+                            }
+                            break;
+                        }
+                    }
                 }
             }
-            nullCount = 0;
         }
-        yield return new WaitForSeconds(.4f);
+        yield return new WaitForSeconds(.25f);
         StartCoroutine(FillBoardCo());
     }
 
@@ -191,24 +191,29 @@ public class Board : MonoBehaviour
     {
         for (int i = 0; i < width; i++)
         {
+            int missingPiecesCount = 0;
+
             for (int j = 0; j < height; j++)
             {
                 if (allDots[i, j] == null)
                 {
-                    Vector2 tempPosition = new Vector2(i, j + offSet);
+                    Vector2 tempPosition = new Vector2(i, height + missingPiecesCount);
+                    missingPiecesCount++;
+
                     int dotToUse = Random.Range(0, dots.Length);
                     GameObject piece = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
-
-                    Dot dotComponent = piece.GetComponent<Dot>();
-                    dotComponent.column = i;
-                    dotComponent.row = j;
 
                     piece.transform.parent = this.transform;
                     piece.name = "( " + i + ", " + j + " )";
 
+                    Dot dotComponent = piece.GetComponent<Dot>();
+                    if (dotComponent != null)
+                    {
+                        dotComponent.column = i;
+                        dotComponent.row = j;
+                    }
+
                     allDots[i, j] = piece;
-                    piece.GetComponent<Dot>().row = j;
-                    piece.GetComponent<Dot>().column = i;
                 }
             }
         }
@@ -236,14 +241,19 @@ public class Board : MonoBehaviour
     private IEnumerator FillBoardCo()
     {
         RefillBoard();
+
         yield return new WaitForSeconds(.5f);
 
-        while (MatchesOnBoard())
+        if (MatchesOnBoard())
         {
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(.25f);
+
             DestroyMatches();
         }
-        yield return new WaitForSeconds(.5f);
-        currentState = GameState.move;
+        else
+        {
+            yield return new WaitForSeconds(.25f);
+            currentState = GameState.move;
+        }
     }
 }
