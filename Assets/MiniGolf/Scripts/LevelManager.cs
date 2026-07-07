@@ -75,6 +75,7 @@ public class LevelManager : MonoBehaviour
         levelCompleted = true;
         int starRating = levelStarRating != null ? levelStarRating.GetStarRating(strokes) : 1;
         levelStarRating?.SetStarDisplay(starRating);
+        global::MiniGolfTotalStarsManager.RegisterLevelStars(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, starRating);
         MiniGolfAudioManager.Instance?.PlayLevelCompleteSfx();
 
         string strokeMessage = strokes > 1 ? "You putted in " + strokes + " strokes" : "You got a hole in one!";
