@@ -55,6 +55,8 @@ public class PauseManager : MonoBehaviour
         if (pauseMenu != null)
             pauseMenu.SetActive(true);
         ScoreUIManager.Instance?.SetVisible(false);
+        if (PowerUpUI.Instance != null)
+            PowerUpUI.Instance.gameObject.SetActive(false);
     }
 
     public void Resume()
@@ -67,6 +69,8 @@ public class PauseManager : MonoBehaviour
         if (settingsUI != null)
             settingsUI.SetActive(false);
         ScoreUIManager.Instance?.SetVisible(true);
+        if (PowerUpUI.Instance != null)
+            PowerUpUI.Instance.gameObject.SetActive(true);
     }
 
     public void ContinueButton()

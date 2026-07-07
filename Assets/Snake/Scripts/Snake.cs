@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -14,7 +15,21 @@ public class Snake : MonoBehaviour
 
     private readonly List<Transform> segments = new List<Transform>();
     private Vector2Int input;
+    private Vector2Int? autoInput;
     private float nextUpdate;
+    private float permanentSpeedBonus;
+
+    [SerializeField] private float permanentSpeedIncrease = 0.05f;
+
+    private Coroutine speedCoroutine;
+
+    public IReadOnlyList<Transform> Segments => segments;
+    public Vector2Int CurrentDirection => direction;
+
+    public void SetAutoInput(Vector2Int dir)
+    {
+        autoInput = dir;
+    }
 
     private void Start()
     {
@@ -23,37 +38,37 @@ public class Snake : MonoBehaviour
 
     private void Update()
     {
-        if (direction.x != 0f)
+        if (autoInput.HasValue)
         {
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) {
+            input = autoInput.Value;
+            autoInput = null;
+        }
+        else if (direction.x != 0f)
+        {
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
                 input = Vector2Int.up;
-            } else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) {
+            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
                 input = Vector2Int.down;
-            }
         }
         else if (direction.y != 0f)
         {
-            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) {
+            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
                 input = Vector2Int.right;
-            } else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) {
+            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
                 input = Vector2Int.left;
-            }
         }
     }
 
     private void FixedUpdate()
     {
-        if (Time.time < nextUpdate) {
+        if (Time.time < nextUpdate)
             return;
-        }
 
-        if (input != Vector2Int.zero) {
+        if (input != Vector2Int.zero)
             direction = input;
-        }
 
-        for (int i = segments.Count - 1; i > 0; i--) {
+        for (int i = segments.Count - 1; i > 0; i--)
             segments[i].position = segments[i - 1].position;
-        }
 
         int x = Mathf.RoundToInt(transform.position.x) + direction.x;
         int y = Mathf.RoundToInt(transform.position.y) + direction.y;
@@ -71,51 +86,112 @@ public class Snake : MonoBehaviour
 
         transform.position = new Vector2(x, y);
 
-        nextUpdate = Time.time + (1f / (speed * speedMultiplier));
+        nextUpdate = Time.time + (1f / (speed * (1f + permanentSpeedBonus) * speedMultiplier));
     }
 
     public void Grow()
     {
         Transform segment = Instantiate(segmentPrefab);
         segment.position = segments[segments.Count - 1].position;
+        segment.tag = "Body";
         segments.Add(segment);
+    }
+
+    public void Shrink(int count)
+    {
+        count = Mathf.Min(count, segments.Count - 1);
+        for (int i = 0; i < count; i++)
+        {
+            Transform tail = segments[segments.Count - 1];
+            segments.RemoveAt(segments.Count - 1);
+            Destroy(tail.gameObject);
+        }
     }
 
     public void ResetState()
     {
+        StopAllCoroutines();
+        speedCoroutine = null;
+        speedMultiplier = 1f;
+        permanentSpeedBonus = 0f;
+        ScoreManager.Instance.ResetMultiplier();
+        PowerUpUI.Instance?.ClearAll();
+
         direction = Vector2Int.right;
         transform.position = Vector3.zero;
 
-        for (int i = 1; i < segments.Count; i++) {
+        for (int i = 1; i < segments.Count; i++)
             Destroy(segments[i].gameObject);
-        }
 
         segments.Clear();
         segments.Add(transform);
 
-        for (int i = 0; i < initialSize - 1; i++) {
+        for (int i = 0; i < initialSize - 1; i++)
             Grow();
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Food"))
+        if (other.CompareTag("Food"))
         {
-            Grow();
-            ScoreManager.Instance.OnFoodEaten();
+            Food food = other.GetComponent<Food>();
+            switch (food.Type)
+            {
+                case Food.FoodType.Normal:
+                    Grow();
+                    ScoreManager.Instance.AddScore(food.ScoreValue);
+                    break;
+                case Food.FoodType.Golden:
+                    ScoreManager.Instance.AddScore(food.ScoreValue);
+                    break;
+                case Food.FoodType.Shrink:
+                    if (segments.Count > 4) Shrink(1);
+                    break;
+                case Food.FoodType.Speed:
+                    SetSpeedMultiplier(1.5f, food.Duration);
+                    break;
+                case Food.FoodType.Slow:
+                    SetSpeedMultiplier(0.5f, food.Duration);
+                    break;
+                case Food.FoodType.ScoreMultiplier:
+                    ScoreManager.Instance.SetMultiplier(2f, food.Duration);
+                    break;
+            }
+            permanentSpeedBonus += permanentSpeedIncrease;
             SnakeAudioManager.Instance?.PlayEatSfx();
+            food.Reposition();
         }
-        else if (other.gameObject.CompareTag("Obstacle"))
+        else if (other.CompareTag("Obstacle"))
         {
             GameManager.Instance.GameOver();
         }
-        else if (other.gameObject.CompareTag("Wall"))
+        else if (other.CompareTag("Wall"))
         {
-            if (moveThroughWalls > 0f) {
-                return;
-            }
+            if (moveThroughWalls > 0f) return;
             ResetState();
         }
+        else if (other.CompareTag("Body"))
+        {
+            GameManager.Instance.GameOver();
+        }
+    }
+
+    private void SetSpeedMultiplier(float value, float duration)
+    {
+        if (speedCoroutine != null)
+            StopCoroutine(speedCoroutine);
+        speedCoroutine = StartCoroutine(SpeedRoutine(value, duration));
+    }
+
+    private IEnumerator SpeedRoutine(float value, float duration)
+    {
+        speedMultiplier = value;
+        PowerUpUI.Instance?.ShowPowerUp(
+            value > 1f ? Food.FoodType.Speed : Food.FoodType.Slow,
+            duration
+        );
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        speedCoroutine = null;
     }
 }

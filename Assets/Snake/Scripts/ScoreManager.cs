@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
@@ -8,6 +9,8 @@ public class ScoreManager : MonoBehaviour
 
     private int score;
     private int highScore;
+    private float multiplier = 1f;
+    private Coroutine multiplierCoroutine;
 
     public int Score => score;
     public int HighScore
@@ -29,9 +32,35 @@ public class ScoreManager : MonoBehaviour
         LoadHighScore();
     }
 
-    public void OnFoodEaten()
+    public void AddScore(int points)
     {
-        score += basePoints;
+        score += Mathf.RoundToInt(points * multiplier);
+    }
+
+    public void SetMultiplier(float value, float duration)
+    {
+        if (multiplierCoroutine != null)
+            StopCoroutine(multiplierCoroutine);
+        multiplierCoroutine = StartCoroutine(MultiplierRoutine(value, duration));
+    }
+
+    public void ResetMultiplier()
+    {
+        if (multiplierCoroutine != null)
+        {
+            StopCoroutine(multiplierCoroutine);
+            multiplierCoroutine = null;
+        }
+        multiplier = 1f;
+    }
+
+    private IEnumerator MultiplierRoutine(float value, float duration)
+    {
+        multiplier = value;
+        PowerUpUI.Instance?.ShowPowerUp(Food.FoodType.ScoreMultiplier, duration);
+        yield return new WaitForSeconds(duration);
+        multiplier = 1f;
+        multiplierCoroutine = null;
     }
 
     public void SaveHighScore()
@@ -48,5 +77,6 @@ public class ScoreManager : MonoBehaviour
     public void Reset()
     {
         score = 0;
+        ResetMultiplier();
     }
 }

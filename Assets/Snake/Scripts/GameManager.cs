@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instance = this;
+        Application.runInBackground = true;
     }
 
     private void Start()
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
         if (PauseManager.Instance != null && PauseManager.Instance.IsPaused)
             PauseManager.Instance.Resume();
 
+        PowerUpUI.Instance?.ClearAll();
         SnakeAudioManager.Instance?.StopBgm();
         SnakeAudioManager.Instance?.PlayGameOverSfx();
     }
