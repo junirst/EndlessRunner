@@ -8,10 +8,12 @@ public class SnakeAutoPlay : MonoBehaviour
 
     private Food food;
     private BoxCollider2D gridArea;
+    private BoxCollider2D snakeCollider;
 
     private void Awake()
     {
         if (snake == null) snake = GetComponent<Snake>();
+        snakeCollider = snake.GetComponent<BoxCollider2D>();
         food = FindObjectOfType<Food>();
         GameObject grid = GameObject.Find("GridArea");
         if (grid != null)
@@ -64,59 +66,17 @@ public class SnakeAutoPlay : MonoBehaviour
     private Vector2Int GetBestDirection(Vector2Int head, Vector2Int target)
     {
         Vector2Int currentDir = snake.CurrentDirection;
-        Vector2Int[] dirs = {
-            Vector2Int.up,
-            Vector2Int.down,
-            Vector2Int.left,
-            Vector2Int.right
-        };
 
-        Vector2Int fallback = Vector2Int.zero;
-        Vector2Int safeFallback = Vector2Int.zero;
-        float bestScore = float.MinValue;
-        float safeScore = float.MinValue;
-        Vector2Int best = Vector2Int.zero;
-
-        int wrappedDx = WrappedAxisDelta(head.x, target.x, true);
-        int wrappedDy = WrappedAxisDelta(head.y, target.y, false);
-
-        foreach (Vector2Int dir in dirs)
+        List<Vector2Int> path = AStar(head, target);
+        if (path != null && path.Count > 0)
         {
-            if (dir == -currentDir) continue;
-
-            Vector2Int rawNext = head + dir;
-            Vector2Int nextPos = UsesWrapping ? WrapPos(rawNext) : rawNext;
-            bool safe = IsSafe(nextPos);
-
-            if (safe && CanReachFood(nextPos, target))
-            {
-                float score = ScoreDirection(nextPos, target, wrappedDx, wrappedDy, dir, currentDir);
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    best = dir;
-                }
-            }
-            else if (safe)
-            {
-                float score = ScoreDirection(nextPos, target, wrappedDx, wrappedDy, dir, currentDir);
-                if (score > safeScore)
-                {
-                    safeScore = score;
-                    safeFallback = dir;
-                }
-            }
-
-            if (fallback == Vector2Int.zero)
-                fallback = dir;
+            Vector2Int next = path[0];
+            Vector2Int dir = next - head;
+            if (dir != -currentDir)
+                return dir;
         }
 
-        if (best == Vector2Int.zero)
-            best = safeFallback;
-        if (best == Vector2Int.zero)
-            best = fallback;
-
-        return best;
+        return SmartFallback(head, currentDir, target);
     }
 
     private int WrappedAxisDelta(int from, int to, bool isX)
@@ -135,27 +95,21 @@ public class SnakeAutoPlay : MonoBehaviour
         return wrapped;
     }
 
-    private float ScoreDirection(Vector2Int nextPos, Vector2Int target, int wrappedDx, int wrappedDy, Vector2Int dir, Vector2Int currentDir)
+    private int Manhattan(Vector2Int a, Vector2Int b)
     {
-        int nx = UsesWrapping ? WrappedAxisDelta(nextPos.x, target.x, true) : target.x - nextPos.x;
-        int ny = UsesWrapping ? WrappedAxisDelta(nextPos.y, target.y, false) : target.y - nextPos.y;
-        float dist = Mathf.Sqrt(nx * nx + ny * ny);
-        float score = -dist;
-
-        if (dir == currentDir)
-            score += 0.5f;
-
-        if (wrappedDx > 0 && dir == Vector2Int.right) score += 0.3f;
-        else if (wrappedDx < 0 && dir == Vector2Int.left) score += 0.3f;
-        if (wrappedDy > 0 && dir == Vector2Int.up) score += 0.3f;
-        else if (wrappedDy < 0 && dir == Vector2Int.down) score += 0.3f;
-
-        return score;
+        if (UsesWrapping)
+        {
+            int dx = Mathf.Abs(WrappedAxisDelta(a.x, b.x, true));
+            int dy = Mathf.Abs(WrappedAxisDelta(a.y, b.y, false));
+            return dx + dy;
+        }
+        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
 
     private bool IsSafe(Vector2Int pos)
     {
         if (IsOnBody(pos)) return false;
+        if (IsOnObstacle(pos)) return false;
         if (!IsInBounds(pos)) return false;
         return true;
     }
@@ -197,6 +151,21 @@ public class SnakeAutoPlay : MonoBehaviour
         return false;
     }
 
+    private bool IsOnObstacle(Vector2Int pos)
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+            new Vector2(pos.x, pos.y),
+            snakeCollider.size,
+            0f
+        );
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.CompareTag("Obstacle"))
+                return true;
+        }
+        return false;
+    }
+
     private bool IsInBounds(Vector2Int pos)
     {
         if (UsesWrapping)
@@ -211,23 +180,135 @@ public class SnakeAutoPlay : MonoBehaviour
                pos.y <= Mathf.RoundToInt(bounds.max.y);
     }
 
-    private bool CanReachFood(Vector2Int start, Vector2Int target, int maxSteps = 50)
+    private List<Vector2Int> AStar(Vector2Int start, Vector2Int goal)
+    {
+        var openSet = new List<(Vector2Int pos, int g, int h)>();
+        var closedSet = new HashSet<Vector2Int>();
+        var cameFrom = new Dictionary<Vector2Int, Vector2Int>();
+        var gScore = new Dictionary<Vector2Int, int>();
+
+        openSet.Add((start, 0, Manhattan(start, goal)));
+        gScore[start] = 0;
+
+        int maxSteps = 3000;
+        int iterations = 0;
+
+        while (openSet.Count > 0 && iterations < maxSteps)
+        {
+            iterations++;
+
+            int bestIdx = 0;
+            int bestF = openSet[0].g + openSet[0].h;
+            for (int i = 1; i < openSet.Count; i++)
+            {
+                int f = openSet[i].g + openSet[i].h;
+                if (f < bestF)
+                {
+                    bestF = f;
+                    bestIdx = i;
+                }
+            }
+
+            var current = openSet[bestIdx];
+            openSet.RemoveAt(bestIdx);
+
+            if (current.pos == goal)
+            {
+                var path = new List<Vector2Int>();
+                Vector2Int p = goal;
+                while (p != start)
+                {
+                    path.Add(p);
+                    p = cameFrom[p];
+                }
+                path.Reverse();
+                return path;
+            }
+
+            closedSet.Add(current.pos);
+
+            Vector2Int[] dirs = {
+                Vector2Int.up, Vector2Int.down,
+                Vector2Int.left, Vector2Int.right
+            };
+
+            foreach (Vector2Int dir in dirs)
+            {
+                Vector2Int next = UsesWrapping ? WrapPos(current.pos + dir) : current.pos + dir;
+
+                if (closedSet.Contains(next)) continue;
+                if (!IsInBounds(next)) continue;
+                if (IsOnObstacle(next)) continue;
+                if (IsOnBodyForBFS(next)) continue;
+
+                int tentativeG = current.g + 1;
+                if (!gScore.ContainsKey(next) || tentativeG < gScore[next])
+                {
+                    gScore[next] = tentativeG;
+                    cameFrom[next] = current.pos;
+                    openSet.Add((next, tentativeG, Manhattan(next, goal)));
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Vector2Int SmartFallback(Vector2Int head, Vector2Int currentDir, Vector2Int target)
+    {
+        Vector2Int bestDir = Vector2Int.zero;
+        int bestDist = int.MaxValue;
+        int bestSpace = -1;
+
+        Vector2Int[] dirs = {
+            Vector2Int.up, Vector2Int.down,
+            Vector2Int.left, Vector2Int.right
+        };
+
+        foreach (Vector2Int dir in dirs)
+        {
+            if (dir == -currentDir) continue;
+
+            Vector2Int next = UsesWrapping ? WrapPos(head + dir) : head + dir;
+            if (!IsSafe(next)) continue;
+
+            int dist = Manhattan(next, target);
+            int space = CountReachableSpace(next, 100);
+
+            if (dist < bestDist || (dist == bestDist && space > bestSpace))
+            {
+                bestDist = dist;
+                bestSpace = space;
+                bestDir = dir;
+            }
+        }
+
+        if (bestDir != Vector2Int.zero)
+            return bestDir;
+
+        foreach (Vector2Int dir in dirs)
+        {
+            if (dir == -currentDir) continue;
+            Vector2Int next = UsesWrapping ? WrapPos(head + dir) : head + dir;
+            if (IsSafe(next))
+                return dir;
+        }
+
+        return Vector2Int.zero;
+    }
+
+    private int CountReachableSpace(Vector2Int start, int maxCount)
     {
         HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
         Queue<Vector2Int> queue = new Queue<Vector2Int>();
         queue.Enqueue(start);
         visited.Add(start);
 
-        Vector2Int wrappedTarget = UsesWrapping ? WrapPos(target) : target;
-
-        int steps = 0;
-        while (queue.Count > 0 && steps < maxSteps)
+        int count = 0;
+        while (queue.Count > 0 && count < maxCount)
         {
             Vector2Int current = queue.Dequeue();
-            steps++;
-
-            if (current == wrappedTarget)
-                return true;
+            count++;
 
             Vector2Int[] dirs = {
                 Vector2Int.up, Vector2Int.down,
@@ -238,14 +319,12 @@ public class SnakeAutoPlay : MonoBehaviour
             {
                 Vector2Int next = UsesWrapping ? WrapPos(current + dir) : current + dir;
                 if (visited.Contains(next)) continue;
-                if (!IsInBounds(next)) continue;
-                if (IsOnBodyForBFS(next)) continue;
-
+                if (!IsSafe(next)) continue;
                 visited.Add(next);
                 queue.Enqueue(next);
             }
         }
 
-        return false;
+        return count;
     }
 }

@@ -59,7 +59,7 @@ public class Food : MonoBehaviour
             float y = Mathf.Round(Random.Range(bounds.min.y, bounds.max.y));
             transform.position = new Vector3(x, y, 0f);
 
-            if (!IsOnSnake())
+            if (!IsOnSnake() && !IsOnObstacle())
                 return;
         }
     }
@@ -84,6 +84,20 @@ public class Food : MonoBehaviour
         foreach (Transform seg in snake.Segments)
         {
             if (Vector3.Distance(transform.position, seg.position) < 0.1f)
+                return true;
+        }
+        return false;
+    }
+    private bool IsOnObstacle()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+            transform.position,
+            snake.GetComponent<BoxCollider2D>().size,
+            0f
+        );
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.CompareTag("Obstacle"))
                 return true;
         }
         return false;
