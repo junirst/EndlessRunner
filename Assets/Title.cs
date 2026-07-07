@@ -9,6 +9,7 @@ public class TitleScript : MonoBehaviour
     [SerializeField] private string cubeDashSceneName = "CubeDash";
     [SerializeField] private string miniGolfSceneName = "MainMenu";
     [SerializeField] private string topDownShooterSceneName = "Menu";
+    [SerializeField] private string snakeSceneName = "SnakeGame";
 
     private void Start()
     {
@@ -36,6 +37,12 @@ public class TitleScript : MonoBehaviour
         SceneManager.LoadScene(topDownShooterSceneName);
     }
 
+        public void PlaySnakeGame()
+    {
+        TitleAudioManager.Instance?.PlayButtonClickSfx();
+        TitleAudioManager.Instance?.StopBgm();
+        SceneManager.LoadScene(snakeSceneName);
+    }
     public void LoadSceneByName(string sceneName)
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();

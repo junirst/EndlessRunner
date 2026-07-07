@@ -30,6 +30,8 @@ EditorBuildSettings:
     path: Assets/TopDownShooter/Scene/Game.unity
     guid: 45e3145f5f2fb3d40be61dc51a5e7d47
   - enabled: 1
+    path: Assets/Snake/Scenes/Infinite.unity
+    guid: 3862e9655523f8b48b13ea38d2a236ce
     path: Assets/MiniGolf/Scene/MiniGolf-Level4.unity
     guid: e101650daa3f3de4086e46f00fb4c84c
   - enabled: 1
