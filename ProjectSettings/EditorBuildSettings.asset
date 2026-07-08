@@ -32,8 +32,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Snake/Scenes/Infinite.unity
     guid: 3862e9655523f8b48b13ea38d2a236ce
-    path: Assets/MiniGolf/Scene/MiniGolf-Level4.unity
-    guid: e101650daa3f3de4086e46f00fb4c84c
   - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level5.unity
     guid: 00c44b8ce06b9354fbe0998b5c1d44cf
