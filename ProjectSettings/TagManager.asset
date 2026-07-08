@@ -3,7 +3,16 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Obstacle
+  - Goal
+  - Level
+  - Ball
+  - Bullet
+  - EnemyBullet
+  - Food
+  - Wall
+  - Body
   layers:
   - Default
   - TransparentFX
