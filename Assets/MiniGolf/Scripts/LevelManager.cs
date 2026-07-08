@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-[RequireComponent(typeof(LevelStarRating))]
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager main;
@@ -22,7 +21,6 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private int maxStrokes;
 
     private int strokes;
-    private LevelStarRating levelStarRating;
     [HideInInspector] public bool outOfStrokes;
     [HideInInspector] public bool levelCompleted;
     [HideInInspector] public bool isPaused;
@@ -32,7 +30,6 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         main = this;
-        levelStarRating = GetComponent<LevelStarRating>();
     }
 
     private void Start()
@@ -42,7 +39,6 @@ public class LevelManager : MonoBehaviour
         {
             pauseMenuUI.SetActive(false);
         }
-
         updateStrokeUI();
     }
 
@@ -73,17 +69,9 @@ public class LevelManager : MonoBehaviour
         }
 
         levelCompleted = true;
-        int starRating = levelStarRating != null ? levelStarRating.GetStarRating(strokes) : 1;
-        levelStarRating?.SetStarDisplay(starRating);
-        global::MiniGolfTotalStarsManager.RegisterLevelStars(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, starRating);
         MiniGolfAudioManager.Instance?.PlayLevelCompleteSfx();
-
-        string strokeMessage = strokes > 1 ? "You putted in " + strokes + " strokes" : "You got a hole in one!";
-        string completionHint = levelStarRating != null ? levelStarRating.GetCompletionHintText(strokes) : string.Empty;
-        if (levelCompleteStrokeUI != null)
-        {
-            levelCompleteStrokeUI.text = string.IsNullOrEmpty(completionHint) ? strokeMessage : strokeMessage + "\n" + completionHint;
-        }
+        
+        levelCompleteStrokeUI.text = strokes > 1 ? "You putted in " + strokes + " strokes" : "You got a hole in one!";
 
         levelCompleteUI.SetActive(true);
     }
@@ -159,10 +147,6 @@ public class LevelManager : MonoBehaviour
     {
         MiniGolfAudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
-        if (levelCompleteUI != null)
-        {
-            levelCompleteUI.SetActive(false);
-        }
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 
