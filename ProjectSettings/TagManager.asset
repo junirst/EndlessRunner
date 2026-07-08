@@ -12,6 +12,7 @@ TagManager:
   - EnemyBullet
   - Food
   - Wall
+  - Body
   layers:
   - Default
   - TransparentFX
