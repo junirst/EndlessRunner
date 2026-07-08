@@ -140,9 +140,12 @@ MonoBehaviour:
   targetX: 0
   targetY: 0
   isMatched: 0
+  otherDot: {fileID: 0}
   swipeAngle: 0
   swipeResist: 1
+  isColorBomb: 0
   isColumnBomb: 0
   isRowBomb: 0
   rowArrow: {fileID: 8020970655630224495, guid: 75cb7f23334ebc04fa18a5166cd29dad, type: 3}
   columnArrow: {fileID: 8944003336532751581, guid: 07f51b1d05e7aab488aa346928956e53, type: 3}
+  colorBomb: {fileID: 7581571504688384611, guid: 65d7d465c46c48445afb05fa30f386f4, type: 3}

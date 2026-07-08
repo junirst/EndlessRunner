@@ -25,10 +25,12 @@ public class Dot : MonoBehaviour
     public float swipeResist = 1f;
 
     [Header("Powerup Stuff")]
+    public bool isColorBomb;
     public bool isColumnBomb;
     public bool isRowBomb;
     public GameObject rowArrow;
     public GameObject columnArrow;
+    public GameObject colorBomb;
 
     void Start()
     {
@@ -50,9 +52,9 @@ public class Dot : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            isRowBomb = true;
-            GameObject arrow = Instantiate(rowArrow, transform.position, Quaternion.identity);
-            arrow.transform.parent = this.transform;
+            isColorBomb = true;
+            GameObject color = Instantiate(colorBomb, transform.position, Quaternion.identity);
+            color.transform.parent = this.transform;
         }
     }
 
@@ -96,11 +98,40 @@ public class Dot : MonoBehaviour
 
     public IEnumerator CheckMoveCo()
     {
+        if (isColorBomb)
+        {
+            // This piece is a color bomb, and the other piece is the color to destroy
+            findMatches.MatchPiecesOfColor(otherDot.tag);
+            isMatched = true;
+
+            // Add this color bomb to the list so it gets destroyed too
+            if (!findMatches.currentMatches.Contains(this.gameObject))
+            {
+                findMatches.currentMatches.Add(this.gameObject);
+            }
+        }
+        else if (otherDot.GetComponent<Dot>().isColorBomb)
+        {
+            // The other piece is a color bomb, and this piece is the color to destroy
+            findMatches.MatchPiecesOfColor(this.gameObject.tag);
+            otherDot.GetComponent<Dot>().isMatched = true;
+
+            // Add the other color bomb to the list so it gets destroyed too
+            if (!findMatches.currentMatches.Contains(otherDot))
+            {
+                findMatches.currentMatches.Add(otherDot);
+            }
+        }
+
         yield return new WaitForSeconds(.5f);
+
         if (otherDot != null)
         {
-            // FIX: Trigger the flawless global match scanner
-            findMatches.FindAllMatches();
+            //Only run the regular match scanner if NO color bomb was used
+            if (!isColorBomb && !otherDot.GetComponent<Dot>().isColorBomb)
+            {
+                findMatches.FindAllMatches();
+            }
 
             if (!isMatched && !otherDot.GetComponent<Dot>().isMatched)
             {
@@ -120,7 +151,6 @@ public class Dot : MonoBehaviour
             {
                 board.DestroyMatches();
             }
-            //otherDot = null;
         }
     }
 

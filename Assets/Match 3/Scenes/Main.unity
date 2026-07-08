@@ -166,6 +166,7 @@ MonoBehaviour:
   - {fileID: 5672745417645662302, guid: f096e7d3cde6bb544a3cc768c89c43c7, type: 3}
   - {fileID: 7699030190074433584, guid: 256041c28ed13634fa51353a37911300, type: 3}
   - {fileID: 3650170970904041254, guid: e9387049322054e4fbb853bfc615226d, type: 3}
+  currentDot: {fileID: 0}
   destroyEffect: {fileID: 8906777064576354654, guid: d2247ac48d6c28d4088fad6c771a5c09, type: 3}
 --- !u!4 &434682204
 Transform:
