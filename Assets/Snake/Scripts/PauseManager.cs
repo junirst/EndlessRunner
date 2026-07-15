@@ -57,6 +57,7 @@ public class PauseManager : MonoBehaviour
         ScoreUIManager.Instance?.SetVisible(false);
         if (PowerUpUI.Instance != null)
             PowerUpUI.Instance.gameObject.SetActive(false);
+        CubeGameManager.Instance?.PauseGame();
     }
 
     public void Resume()
@@ -71,6 +72,7 @@ public class PauseManager : MonoBehaviour
         ScoreUIManager.Instance?.SetVisible(true);
         if (PowerUpUI.Instance != null)
             PowerUpUI.Instance.gameObject.SetActive(true);
+        CubeGameManager.Instance?.ResumeGame();
     }
 
     public void ContinueButton()
