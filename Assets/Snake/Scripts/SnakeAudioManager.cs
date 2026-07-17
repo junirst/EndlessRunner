@@ -18,23 +18,23 @@ public class SnakeAudioManager : MonoBehaviour
     public float BGMVolume
     {
         get => bgmSource.volume;
-        set
-        {
-            bgmSource.volume = value;
-            PlayerPrefs.SetFloat(BGMVolumeKey, value);
-            PlayerPrefs.Save();
-        }
+        set => bgmSource.volume = value;
     }
 
     public float SFXVolume
     {
         get => sfxSource.volume;
-        set
-        {
-            sfxSource.volume = value;
-            PlayerPrefs.SetFloat(SFXVolumeKey, value);
-            PlayerPrefs.Save();
-        }
+        set => sfxSource.volume = value;
+    }
+
+    public void SetBGMVolume(float value)
+    {
+        bgmSource.volume = value;
+    }
+
+    public void SetSFXVolume(float value)
+    {
+        sfxSource.volume = value;
     }
 
     private void Awake()

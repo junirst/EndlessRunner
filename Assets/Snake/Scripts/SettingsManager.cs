@@ -16,6 +16,8 @@ public class SettingsManager : MonoBehaviour
     private const string ScreenModeKey = "SnakeScreenMode";
     private const string ResolutionWidthKey = "SnakeResolutionWidth";
     private const string ResolutionHeightKey = "SnakeResolutionHeight";
+    private const string BGMVolumeKey = "SnakeBGMVolume";
+    private const string SFXVolumeKey = "SnakeSFXVolume";
 
     private void Awake()
     {
@@ -30,24 +32,7 @@ public class SettingsManager : MonoBehaviour
     private void Start()
     {
         PopulateResolutionDropdown();
-
-        int savedScreenMode = PlayerPrefs.GetInt(ScreenModeKey, 0);
-        int savedResWidth = PlayerPrefs.GetInt(ResolutionWidthKey, Screen.width);
-        int savedResHeight = PlayerPrefs.GetInt(ResolutionHeightKey, Screen.height);
-
-        if (bgmSlider != null)
-            bgmSlider.value = PlayerPrefs.GetFloat("SnakeBGMVolume", 0.5f);
-        if (sfxSlider != null)
-            sfxSlider.value = PlayerPrefs.GetFloat("SnakeSFXVolume", 0.5f);
-
-        if (screenModeDropdown != null)
-            screenModeDropdown.value = savedScreenMode;
-        ApplyScreenMode(savedScreenMode);
-
-        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
-        if (resolutionDropdown != null)
-            resolutionDropdown.value = resIndex >= 0 ? resIndex : 0;
-        ApplyResolution(resolutionDropdown != null ? resolutionDropdown.value : 0);
+        LoadFromPlayerPrefs();
 
         if (screenModeDropdown != null)
             screenModeDropdown.onValueChanged.AddListener(ApplyScreenMode);
@@ -57,6 +42,44 @@ public class SettingsManager : MonoBehaviour
             bgmSlider.onValueChanged.AddListener(SetBGMVolume);
         if (sfxSlider != null)
             sfxSlider.onValueChanged.AddListener(SetSFXVolume);
+    }
+
+    public void LoadFromPlayerPrefs()
+    {
+        int savedScreenMode = PlayerPrefs.GetInt(ScreenModeKey, 0);
+        int savedResWidth = PlayerPrefs.GetInt(ResolutionWidthKey, Screen.width);
+        int savedResHeight = PlayerPrefs.GetInt(ResolutionHeightKey, Screen.height);
+
+        if (bgmSlider != null)
+            bgmSlider.value = PlayerPrefs.GetFloat(BGMVolumeKey, 0.5f);
+        if (sfxSlider != null)
+            sfxSlider.value = PlayerPrefs.GetFloat(SFXVolumeKey, 0.5f);
+
+        if (screenModeDropdown != null)
+            screenModeDropdown.value = savedScreenMode;
+        ApplyScreenMode(savedScreenMode);
+
+        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
+        if (resolutionDropdown != null)
+            resolutionDropdown.value = resIndex >= 0 ? resIndex : 0;
+        ApplyResolution(resolutionDropdown != null ? resolutionDropdown.value : 0);
+    }
+
+    public void SaveToPlayerPrefs()
+    {
+        if (screenModeDropdown != null)
+            PlayerPrefs.SetInt(ScreenModeKey, screenModeDropdown.value);
+        if (resolutionDropdown != null && availableResolutions != null)
+        {
+            Resolution res = availableResolutions[resolutionDropdown.value];
+            PlayerPrefs.SetInt(ResolutionWidthKey, res.width);
+            PlayerPrefs.SetInt(ResolutionHeightKey, res.height);
+        }
+        if (bgmSlider != null)
+            PlayerPrefs.SetFloat(BGMVolumeKey, bgmSlider.value);
+        if (sfxSlider != null)
+            PlayerPrefs.SetFloat(SFXVolumeKey, sfxSlider.value);
+        PlayerPrefs.Save();
     }
 
     private void PopulateResolutionDropdown()
@@ -104,8 +127,6 @@ public class SettingsManager : MonoBehaviour
         Screen.fullScreenMode = mode;
         if (resolutionDropdown != null)
             ApplyResolution(resolutionDropdown.value);
-        PlayerPrefs.SetInt(ScreenModeKey, index);
-        PlayerPrefs.Save();
     }
 
     public void ApplyResolution(int index)
@@ -113,25 +134,42 @@ public class SettingsManager : MonoBehaviour
         if (availableResolutions == null || index < 0 || index >= availableResolutions.Length) return;
         Resolution res = availableResolutions[index];
         Screen.SetResolution(res.width, res.height, Screen.fullScreenMode);
-        PlayerPrefs.SetInt(ResolutionWidthKey, res.width);
-        PlayerPrefs.SetInt(ResolutionHeightKey, res.height);
-        PlayerPrefs.Save();
     }
 
     private void SetBGMVolume(float value)
     {
         if (SnakeAudioManager.Instance != null)
-            SnakeAudioManager.Instance.BGMVolume = value;
+            SnakeAudioManager.Instance.SetBGMVolume(value);
     }
 
     private void SetSFXVolume(float value)
     {
         if (SnakeAudioManager.Instance != null)
-            SnakeAudioManager.Instance.SFXVolume = value;
+            SnakeAudioManager.Instance.SetSFXVolume(value);
+    }
+
+    public void RevertToPlayerPrefs()
+    {
+        int savedScreenMode = PlayerPrefs.GetInt(ScreenModeKey, 0);
+        int savedResWidth = PlayerPrefs.GetInt(ResolutionWidthKey, Screen.width);
+        int savedResHeight = PlayerPrefs.GetInt(ResolutionHeightKey, Screen.height);
+
+        if (SnakeAudioManager.Instance != null)
+        {
+            SnakeAudioManager.Instance.SetBGMVolume(PlayerPrefs.GetFloat(BGMVolumeKey, 0.5f));
+            SnakeAudioManager.Instance.SetSFXVolume(PlayerPrefs.GetFloat(SFXVolumeKey, 0.5f));
+        }
+
+        ApplyScreenMode(savedScreenMode);
+
+        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
+        if (resIndex >= 0)
+            ApplyResolution(resIndex);
     }
 
     public void BackButton()
     {
+        SaveToPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         PauseManager.Instance?.HideSettings();
     }

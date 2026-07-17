@@ -69,6 +69,10 @@ public class PauseManager : MonoBehaviour
     public void Resume()
     {
         if (!IsPaused) return;
+
+        if (settingsUI != null && settingsUI.activeSelf)
+            SettingsManager.Instance?.RevertToPlayerPrefs();
+
         IsPaused = false;
         Time.timeScale = 1f;
         if (pauseMenu != null)
@@ -89,6 +93,7 @@ public class PauseManager : MonoBehaviour
 
     public void ShowSettings()
     {
+        SettingsManager.Instance?.LoadFromPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         if (pauseMenu != null)
             pauseMenu.SetActive(false);
@@ -106,6 +111,7 @@ public class PauseManager : MonoBehaviour
 
     public void LoadMainMenu()
     {
+        SettingsManager.Instance?.RevertToPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
         SceneManager.LoadScene(mainMenuSceneName);
