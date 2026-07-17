@@ -17,6 +17,8 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI gameOverHighscoreUI;
 
+    [SerializeField] private string mainMenuSceneName = "TitleScreen";
+
     CubeGameManager gm;
     private void Start()
     {
@@ -79,7 +81,7 @@ public class UIManager : MonoBehaviour
     {
         AudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 
     private void OnGUI()

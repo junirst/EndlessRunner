@@ -8,6 +8,8 @@ public class PauseManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject settingsUI;
 
+    [SerializeField] private string mainMenuSceneName = "TitleScreen";
+
     public bool IsPaused { get; private set; }
 
     private void Awake()
@@ -50,6 +52,10 @@ public class PauseManager : MonoBehaviour
     public void Pause()
     {
         if (IsPaused) return;
+
+        if (CubeGameManager.Instance != null && !CubeGameManager.Instance.isPlaying)
+            return;
+
         IsPaused = true;
         Time.timeScale = 0f;
         if (pauseMenu != null)
@@ -102,6 +108,6 @@ public class PauseManager : MonoBehaviour
     {
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }
