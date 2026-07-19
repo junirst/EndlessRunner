@@ -199,6 +199,14 @@ public class TitleScript : MonoBehaviour
         StartCoroutine(LoadSceneAfterDelay(sceneName));
     }
 
+    public void BackToTitleScreen()
+    {
+        TitleAudioManager.Instance?.PlayButtonClickSfx();
+        TitleAudioManager.Instance?.StopBgm();
+        Time.timeScale = 1f;
+        StartCoroutine(LoadSceneAfterDelay("TitleScreen"));
+    }
+
     public void ExitGame()
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();

@@ -55,13 +55,8 @@ public class ScreenReplacerEditor : EditorWindow
             string path = AssetDatabase.GUIDToAssetPath(guid);
             string name = Path.GetFileNameWithoutExtension(path);
 
-            bool needsWork = false;
-            foreach (var kw in new[] { "Level1", "Level2", "Infinite", "MiniGolf-Level", "Game" })
-            {
-                if (kw == "Game" && name == "Game") { needsWork = true; break; }
-                if (name == kw) { needsWork = true; break; }
-                if (name.StartsWith("MiniGolf-Level")) { needsWork = true; break; }
-            }
+            bool needsWork = name == "Level1" || name == "Level2" || name == "Infinite"
+                          || name.StartsWith("MiniGolf-Level") || name == "Game";
             if (!needsWork) continue;
 
             Log($"Processing: {path}");
@@ -98,9 +93,9 @@ public class ScreenReplacerEditor : EditorWindow
         if (pauseManager == null || gameManager == null) return false;
 
         Transform ct = canvas.transform;
-        bool changed = DestroyOld(ct, "PauseScreen")
-                     | DestroyOld(ct, "SettingScreen")
-                     | DestroyOld(ct, "GameOverScreen");
+        bool changed = DestroyAll(ct, "PauseScreen")
+                     | DestroyAll(ct, "SettingScreen")
+                     | DestroyAll(ct, "GameOverScreen");
 
         var pausePfb = LoadPrefab("PauseScreen");
         var settingPfb = LoadPrefab("SettingScreen");
@@ -114,6 +109,7 @@ public class ScreenReplacerEditor : EditorWindow
             pauseInst.name = "PauseScreen";
             pauseInst.SetActive(false);
             SetPrivateField(pauseManager, "pauseMenu", pauseInst);
+            WirePauseScreenButtons(pauseInst, pauseManager);
             Log("  Added PauseScreen");
             changed = true;
         }
@@ -124,6 +120,7 @@ public class ScreenReplacerEditor : EditorWindow
             settingInst.SetActive(false);
             SetPrivateField(pauseManager, "settingsUI", settingInst);
             WireSettingsManager(settingInst);
+            WireSettingScreenButtons(settingInst);
             Log("  Added SettingScreen");
             changed = true;
         }
@@ -135,6 +132,8 @@ public class ScreenReplacerEditor : EditorWindow
             SetPrivateField(gameManager, "gameOverScreen", gameOverInst);
             var scoreText = gameOverInst.GetComponentInChildren<TextMeshProUGUI>(true);
             SetPrivateField(gameManager, "finalScoreText", scoreText);
+            WireGameOverButton(gameOverInst, "StartButton", gameManager, "Retry");
+            WireGameOverButton(gameOverInst, "BackToMenuButton", gameManager, "LoadMainMenu");
             Log("  Added GameOver");
             changed = true;
         }
@@ -142,9 +141,6 @@ public class ScreenReplacerEditor : EditorWindow
         AddScreenNav(pauseInst, "ArrowIndicator?");
         AddScreenNav(settingInst, "ArrowIndicator?");
         AddScreenNav(gameOverInst, "ArrowIndicator");
-
-        WireGameOverButton(gameOverInst, "StartButton", gameManager, "Retry");
-        WireGameOverButton(gameOverInst, "BackToMenuButton", gameManager, "LoadMainMenu");
         return changed;
     }
 
@@ -154,7 +150,7 @@ public class ScreenReplacerEditor : EditorWindow
         if (gameManager == null) return false;
 
         Transform ct = canvas.transform;
-        bool changed = DestroyOld(ct, "GameOverScreen");
+        bool changed = DestroyAll(ct, "GameOverScreen");
 
         var pfb = LoadPrefab("GameOver");
         if (pfb != null)
@@ -165,11 +161,11 @@ public class ScreenReplacerEditor : EditorWindow
             SetPrivateField(gameManager, "gameOverScreen", inst);
             var scoreText = inst.GetComponentInChildren<TextMeshProUGUI>(true);
             SetPrivateField(gameManager, "finalScoreText", scoreText);
+            WireGameOverButton(inst, "StartButton", gameManager, "Retry");
+            WireGameOverButton(inst, "BackToMenuButton", gameManager, "LoadMainMenu");
             Log("  Added GameOver");
             changed = true;
             AddScreenNav(inst, "ArrowIndicator");
-            WireGameOverButton(inst, "StartButton", gameManager, "Retry");
-            WireGameOverButton(inst, "BackToMenuButton", gameManager, "LoadMainMenu");
         }
         return changed;
     }
@@ -182,8 +178,10 @@ public class ScreenReplacerEditor : EditorWindow
         AddPauseSystemIfMissing();
 
         Transform ct = canvas.transform;
-        bool changed = DestroyOld(ct, "pauseMenuUI")
-                     | DestroyOld(ct, "GameOverUI");
+        bool changed = DestroyAll(ct, "PauseMenu")
+                     | DestroyAll(ct, "PauseScreen")
+                     | DestroyAll(ct, "SettingScreen")
+                     | DestroyAll(ct, "GameOverUI");
 
         var pausePfb = LoadPrefab("PauseScreen");
         var settingPfb = LoadPrefab("SettingScreen");
@@ -191,12 +189,20 @@ public class ScreenReplacerEditor : EditorWindow
 
         GameObject pauseInst = null, settingInst = null, gameOverInst = null;
 
+        var pm = FindObjectOfType<PauseManager>();
+        var sm = FindObjectOfType<SettingsManager>();
+
         if (pausePfb != null)
         {
             pauseInst = PrefabUtility.InstantiatePrefab(pausePfb, ct) as GameObject;
             pauseInst.name = "PauseScreen";
             pauseInst.SetActive(false);
             SetPrivateField(levelManager, "pauseMenuUI", pauseInst);
+            if (pm != null)
+            {
+                SetPrivateField(pm, "pauseMenu", pauseInst);
+                WirePauseScreenButtons(pauseInst, pm);
+            }
             Log("  Added PauseScreen");
             changed = true;
         }
@@ -205,7 +211,9 @@ public class ScreenReplacerEditor : EditorWindow
             settingInst = PrefabUtility.InstantiatePrefab(settingPfb, ct) as GameObject;
             settingInst.name = "SettingScreen";
             settingInst.SetActive(false);
+            if (pm != null) SetPrivateField(pm, "settingsUI", settingInst);
             WireSettingsManager(settingInst);
+            WireSettingScreenButtons(settingInst);
             Log("  Added SettingScreen");
             changed = true;
         }
@@ -215,6 +223,8 @@ public class ScreenReplacerEditor : EditorWindow
             gameOverInst.name = "GameOverUI";
             gameOverInst.SetActive(false);
             SetPrivateField(levelManager, "GameOverUI", gameOverInst);
+            WireGameOverButton(gameOverInst, "StartButton", levelManager, "ReplayButtonHandler");
+            WireGameOverButton(gameOverInst, "BackToMenuButton", levelManager, "BackToMenuButtonHandler");
             Log("  Added GameOver");
             changed = true;
         }
@@ -222,10 +232,6 @@ public class ScreenReplacerEditor : EditorWindow
         AddScreenNav(pauseInst, "ArrowIndicator?");
         AddScreenNav(settingInst, "ArrowIndicator?");
         AddScreenNav(gameOverInst, "ArrowIndicator");
-
-        WireGameOverButton(gameOverInst, "StartButton", levelManager, "ReplayButtonHandler");
-        WireGameOverButton(gameOverInst, "BackToMenuButton", levelManager, "BackToMenuButtonHandler");
-        WirePauseManagerRefs();
         return changed;
     }
 
@@ -237,8 +243,9 @@ public class ScreenReplacerEditor : EditorWindow
         AddPauseSystemIfMissing();
 
         Transform ct = canvas.transform;
-        bool changed = DestroyOld(ct, "pauseMenu")
-                     | DestroyOld(ct, "deathScreen");
+        bool changed = DestroyAll(ct, "pauseMenu")
+                     | DestroyAll(ct, "deathScreen")
+                     | DestroyAll(ct, "SettingScreen");
 
         var pausePfb = LoadPrefab("PauseScreen");
         var settingPfb = LoadPrefab("SettingScreen");
@@ -246,12 +253,19 @@ public class ScreenReplacerEditor : EditorWindow
 
         GameObject pauseInst = null, settingInst = null, gameOverInst = null;
 
+        var pm = FindObjectOfType<PauseManager>();
+
         if (pausePfb != null)
         {
             pauseInst = PrefabUtility.InstantiatePrefab(pausePfb, ct) as GameObject;
             pauseInst.name = "pauseMenu";
             pauseInst.SetActive(false);
             slm.pauseMenu = pauseInst;
+            if (pm != null)
+            {
+                SetPrivateField(pm, "pauseMenu", pauseInst);
+                WirePauseScreenButtons(pauseInst, pm);
+            }
             Log("  Added PauseScreen");
             changed = true;
         }
@@ -260,7 +274,9 @@ public class ScreenReplacerEditor : EditorWindow
             settingInst = PrefabUtility.InstantiatePrefab(settingPfb, ct) as GameObject;
             settingInst.name = "SettingScreen";
             settingInst.SetActive(false);
+            if (pm != null) SetPrivateField(pm, "settingsUI", settingInst);
             WireSettingsManager(settingInst);
+            WireSettingScreenButtons(settingInst);
             Log("  Added SettingScreen");
             changed = true;
         }
@@ -270,7 +286,9 @@ public class ScreenReplacerEditor : EditorWindow
             gameOverInst.name = "deathScreen";
             gameOverInst.SetActive(false);
             slm.deathScreen = gameOverInst;
-            WireTDSDeathTexts(slm);
+            WireTDSDeathTexts(slm, gameOverInst);
+            WireGameOverButton(gameOverInst, "StartButton", slm, "ReplayGame");
+            WireGameOverButton(gameOverInst, "BackToMenuButton", slm, "BackToMenu");
             Log("  Added GameOver");
             changed = true;
         }
@@ -278,11 +296,101 @@ public class ScreenReplacerEditor : EditorWindow
         AddScreenNav(pauseInst, "ArrowIndicator?");
         AddScreenNav(settingInst, "ArrowIndicator?");
         AddScreenNav(gameOverInst, "ArrowIndicator");
-        WireGameOverButton(gameOverInst, "StartButton", slm, "ReplayGame");
-        WireGameOverButton(gameOverInst, "BackToMenuButton", slm, "BackToMenu");
-        WirePauseManagerRefs();
         return changed;
     }
+
+    // ── Button wiring helpers ──────────────────────────────────────────
+
+    private void WirePauseScreenButtons(GameObject pauseInst, PauseManager pm)
+    {
+        if (pauseInst == null || pm == null) return;
+
+        var buttons = pauseInst.GetComponentsInChildren<Button>(true);
+        foreach (var btn in buttons)
+        {
+            string method = null;
+            switch (btn.name)
+            {
+                case "Continue": method = "ContinueButton"; break;
+                case "Restart":  method = "RestartGame";    break;
+                case "SettingButton": method = "ShowSettings"; break;
+                case "MenuButton":    method = "LoadMainMenu"; break;
+            }
+            if (method != null)
+                SetOnClickTarget(btn, pm, method);
+        }
+        Log($"  Wired PauseScreen buttons -> PauseManager");
+    }
+
+    private void WireSettingScreenButtons(GameObject settingInst)
+    {
+        if (settingInst == null) return;
+
+        var sm = FindObjectOfType<SettingsManager>();
+        var pm = FindObjectOfType<PauseManager>();
+
+        var buttons = settingInst.GetComponentsInChildren<Button>(true);
+        foreach (var btn in buttons)
+        {
+            if (btn.name == "Save" && sm != null)
+                SetOnClickTarget(btn, sm, "Save");
+            else if (btn.name == "MenuButton" && sm != null)
+                SetOnClickTarget(btn, sm, "Back");
+            else if (btn.name == "MenuButton (1)" && pm != null)
+                SetOnClickTarget(btn, pm, "LoadMainMenu");
+        }
+        Log($"  Wired SettingScreen buttons -> SettingsManager / PauseManager");
+    }
+
+    private void WireGameOverButton(GameObject gameOverRoot, string buttonName, Object target, string methodName)
+    {
+        if (gameOverRoot == null || target == null) return;
+
+        var buttons = gameOverRoot.GetComponentsInChildren<Button>(true);
+        Button targetButton = null;
+        foreach (var b in buttons)
+            if (b.name == buttonName) { targetButton = b; break; }
+
+        if (targetButton == null) { Log($"    Button '{buttonName}' not found on GameOver"); return; }
+
+        SetOnClickTarget(targetButton, target, methodName);
+        Log($"    Wired GameOver '{buttonName}' -> {target.GetType().Name}.{methodName}");
+    }
+
+    private void SetOnClickTarget(Button btn, Object target, string methodName)
+    {
+        SerializedObject so = new SerializedObject(btn);
+        SerializedProperty onClickProp = so.FindProperty("m_OnClick");
+        if (onClickProp == null) return;
+
+        SerializedProperty calls = onClickProp.FindPropertyRelative("m_PersistentCalls")
+                                            .FindPropertyRelative("m_Calls");
+
+        calls.ClearArray();
+
+        // Pre-fill with the correct method name from the prefab's existing data
+        calls.arraySize = 1;
+        SerializedProperty call = calls.GetArrayElementAtIndex(0);
+
+        call.FindPropertyRelative("m_Target").objectReferenceValue = target;
+        call.FindPropertyRelative("m_TargetAssemblyTypeName").stringValue =
+            target.GetType().FullName + ", Assembly-CSharp";
+        call.FindPropertyRelative("m_MethodName").stringValue = methodName;
+        call.FindPropertyRelative("m_Mode").intValue = 1;
+
+        var args = call.FindPropertyRelative("m_Arguments");
+        args.FindPropertyRelative("m_ObjectArgument").objectReferenceValue = null;
+        args.FindPropertyRelative("m_ObjectArgumentAssemblyTypeName").stringValue = "UnityEngine.Object, UnityEngine";
+        args.FindPropertyRelative("m_IntArgument").intValue = 0;
+        args.FindPropertyRelative("m_FloatArgument").floatValue = 0;
+        args.FindPropertyRelative("m_StringArgument").stringValue = "";
+        args.FindPropertyRelative("m_BoolArgument").boolValue = false;
+        call.FindPropertyRelative("m_CallState").intValue = 2;
+
+        so.ApplyModifiedProperties();
+    }
+
+    // ── Manager ref wiring ─────────────────────────────────────────────
 
     private void WireSettingsManager(GameObject settingScreen)
     {
@@ -307,19 +415,8 @@ public class ScreenReplacerEditor : EditorWindow
         }
     }
 
-    private void WirePauseManagerRefs()
+    private void WireTDSDeathTexts(ShooterLevelManager slm, GameObject death)
     {
-        var pm = FindObjectOfType<PauseManager>();
-        if (pm == null) return;
-        var pause = GameObject.Find("PauseScreen");
-        var setting = GameObject.Find("SettingScreen");
-        if (pause != null) SetPrivateField(pm, "pauseMenu", pause);
-        if (setting != null) SetPrivateField(pm, "settingsUI", setting);
-    }
-
-    private void WireTDSDeathTexts(ShooterLevelManager slm)
-    {
-        var death = GameObject.Find("deathScreen");
         if (death == null) return;
         var allText = death.GetComponentsInChildren<TextMeshProUGUI>(true);
         foreach (var t in allText)
@@ -340,18 +437,22 @@ public class ScreenReplacerEditor : EditorWindow
         }
     }
 
-    private bool DestroyOld(Transform parent, string name)
+    // ── Screen / GameObject helpers ────────────────────────────────────
+
+    private bool DestroyAll(Transform parent, string name)
     {
-        foreach (Transform child in parent)
+        bool found = false;
+        var allChildren = parent.GetComponentsInChildren<Transform>(true);
+        foreach (var child in allChildren)
         {
-            if (child.name == name)
+            if (child != parent && child.name == name)
             {
                 DestroyImmediate(child.gameObject);
                 Log($"  Removed old {name}");
-                return true;
+                found = true;
             }
         }
-        return false;
+        return found;
     }
 
     private GameObject LoadPrefab(string name)
@@ -373,6 +474,8 @@ public class ScreenReplacerEditor : EditorWindow
         Log($"  Added ScreenNav to {go.name}");
     }
 
+    // ── Reflection helpers ─────────────────────────────────────────────
+
     private void SetPrivateField(Object obj, string fieldName, Object value)
     {
         var field = obj.GetType().GetField(fieldName,
@@ -380,42 +483,11 @@ public class ScreenReplacerEditor : EditorWindow
         if (field != null) field.SetValue(obj, value);
     }
 
-    private void WireGameOverButton(GameObject gameOverRoot, string buttonName, Object target, string methodName)
+    private Object GetPrivateField(Object obj, string fieldName)
     {
-        if (gameOverRoot == null || target == null) return;
-
-        // Find the button in GameOver prefab children
-        var buttons = gameOverRoot.GetComponentsInChildren<Button>(true);
-        Button targetButton = null;
-        foreach (var b in buttons)
-        {
-            if (b.name == buttonName) { targetButton = b; break; }
-        }
-        if (targetButton == null) { Log($"    Button '{buttonName}' not found on GameOver"); return; }
-
-        // Clear existing calls and add new one via SerializedObject
-        SerializedObject so = new SerializedObject(targetButton);
-        SerializedProperty onClickProp = so.FindProperty("m_OnClick");
-        SerializedProperty persistentCalls = onClickProp.FindPropertyRelative("m_PersistentCalls");
-        SerializedProperty calls = persistentCalls.FindPropertyRelative("m_Calls");
-
-        calls.ClearArray();
-        calls.arraySize = 1;
-        SerializedProperty call = calls.GetArrayElementAtIndex(0);
-
-        call.FindPropertyRelative("m_Target").objectReferenceValue = target;
-        call.FindPropertyRelative("m_TargetAssemblyTypeName").stringValue = target.GetType().FullName + ", Assembly-CSharp";
-        call.FindPropertyRelative("m_MethodName").stringValue = methodName;
-        call.FindPropertyRelative("m_Mode").intValue = 1;
-        call.FindPropertyRelative("m_Arguments").FindPropertyRelative("m_ObjectArgument").objectReferenceValue = null;
-        call.FindPropertyRelative("m_Arguments").FindPropertyRelative("m_ObjectArgumentAssemblyTypeName").stringValue = "UnityEngine.Object, UnityEngine";
-        call.FindPropertyRelative("m_Arguments").FindPropertyRelative("m_IntArgument").intValue = 0;
-        call.FindPropertyRelative("m_Arguments").FindPropertyRelative("m_FloatArgument").floatValue = 0;
-        call.FindPropertyRelative("m_Arguments").FindPropertyRelative("m_StringArgument").stringValue = "";
-        call.FindPropertyRelative("m_Arguments").FindPropertyRelative("m_BoolArgument").boolValue = false;
-        call.FindPropertyRelative("m_CallState").intValue = 2;
-
-        so.ApplyModifiedProperties();
-        Log($"    Wired GameOver '{buttonName}' -> {target.GetType().Name}.{methodName}");
+        var field = obj.GetType().GetField(fieldName,
+            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        if (field != null) return (Object)field.GetValue(obj);
+        return null;
     }
 }
