@@ -167,9 +167,15 @@ public class SettingsManager : MonoBehaviour
             ApplyResolution(resIndex);
     }
 
-    public void BackButton()
+    public void Save()
     {
         SaveToPlayerPrefs();
+        SnakeAudioManager.Instance?.PlayButtonClickSfx();
+        PauseManager.Instance?.HideSettings();
+    }
+
+    public void Back()
+    {
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         PauseManager.Instance?.HideSettings();
     }

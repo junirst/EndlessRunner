@@ -109,6 +109,13 @@ public class PauseManager : MonoBehaviour
             settingsUI.SetActive(false);
     }
 
+    public void RestartGame()
+    {
+        SnakeAudioManager.Instance?.PlayButtonClickSfx();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     public void LoadMainMenu()
     {
         SettingsManager.Instance?.RevertToPlayerPrefs();

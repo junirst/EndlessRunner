@@ -77,6 +77,13 @@ public class UIManager : MonoBehaviour
         gm.ResumeGame();
     }
 
+    public void RestartGame()
+    {
+        AudioManager.Instance?.PlayButtonClickSfx();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     public void BackToTitleScreen()
     {
         AudioManager.Instance?.PlayButtonClickSfx();

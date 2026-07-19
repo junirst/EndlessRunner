@@ -3104,7 +3104,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 210008105768801998, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.000011444092
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 210008105768801998, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -3173,6 +3173,18 @@ PrefabInstance:
     - target: {fileID: 2478594499290194025, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -229.47327
+      objectReference: {fileID: 0}
+    - target: {fileID: 2493173229606494848, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8680587461381441071}
+    - target: {fileID: 2493173229606494848, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Back
+      objectReference: {fileID: 0}
+    - target: {fileID: 2493173229606494848, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: SettingsManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2994150241488837887, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchorMax.y
@@ -3342,6 +3354,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 8680587461381441071}
+    - target: {fileID: 6407979268279897584, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Save
+      objectReference: {fileID: 0}
     - target: {fileID: 6983725278226445241, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3569,6 +3585,14 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 661423846}
+    - target: {fileID: 2302435853174869582, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7137777649327519073}
+    - target: {fileID: 2302435853174869582, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ContinueButton
+      objectReference: {fileID: 0}
     - target: {fileID: 2403732518999972667, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_Name
       value: PauseScreen
@@ -3576,6 +3600,14 @@ PrefabInstance:
     - target: {fileID: 2403732518999972667, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2436206584938667927, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: m_Name
+      value: Continue
+      objectReference: {fileID: 0}
+    - target: {fileID: 4481605103260334631, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: m_Name
+      value: Restart
       objectReference: {fileID: 0}
     - target: {fileID: 4971764273401114040, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_Material
@@ -3593,6 +3625,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 7137777649327519073}
+    - target: {fileID: 8818411707972528692, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: RestartGame
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
