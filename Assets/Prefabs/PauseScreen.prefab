@@ -238,7 +238,7 @@ RectTransform:
   m_GameObject: {fileID: 1197413987184409530}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8365062, y: 1.9635, z: 1.9635}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 236860873538524366}
@@ -358,7 +358,7 @@ MonoBehaviour:
   normalColor: {r: 0.96, g: 0.93, b: 0.82, a: 1}
   hoverColor: {r: 0.5647059, g: 0.45882356, b: 0.50980395, a: 1}
   pressedColor: {r: 0.41960788, g: 0.28627452, b: 0.41960788, a: 1}
-  hoverScale: {x: 1.08, y: 1.08, z: 1}
+  hoverScale: {x: 2.16, y: 2.16, z: 1}
   pressedScale: {x: 0.94, y: 0.94, z: 1}
   transitionDuration: 0.1
 --- !u!1 &1433473582212321164
@@ -680,7 +680,7 @@ RectTransform:
   m_GameObject: {fileID: 2436206584938667927}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8365062, y: 1.9635, z: 1.9635}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7137260793514830554}
@@ -801,7 +801,7 @@ MonoBehaviour:
   normalColor: {r: 0.96, g: 0.93, b: 0.82, a: 1}
   hoverColor: {r: 0.5647059, g: 0.45882356, b: 0.50980395, a: 1}
   pressedColor: {r: 0.41960788, g: 0.28627452, b: 0.41960788, a: 1}
-  hoverScale: {x: 1.08, y: 1.08, z: 1}
+  hoverScale: {x: 2.16, y: 2.16, z: 1}
   pressedScale: {x: 0.94, y: 0.94, z: 1}
   transitionDuration: 0.1
 --- !u!1 &2618035719911090772
@@ -908,7 +908,7 @@ RectTransform:
   m_GameObject: {fileID: 2759462677336946703}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8365062, y: 1.9635, z: 1.9635}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1029500356247135016}
@@ -1028,7 +1028,7 @@ MonoBehaviour:
   normalColor: {r: 0.96, g: 0.93, b: 0.82, a: 1}
   hoverColor: {r: 0.5647059, g: 0.45882356, b: 0.50980395, a: 1}
   pressedColor: {r: 0.43921572, g: 0.34901962, b: 0.43921572, a: 1}
-  hoverScale: {x: 1.08, y: 1.08, z: 1}
+  hoverScale: {x: 2.16, y: 2.16, z: 1}
   pressedScale: {x: 0.94, y: 0.94, z: 1}
   transitionDuration: 0.1
 --- !u!1 &4481605103260334631
@@ -1060,7 +1060,7 @@ RectTransform:
   m_GameObject: {fileID: 4481605103260334631}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8365062, y: 1.9635, z: 1.9635}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7147311619238919124}
@@ -1181,7 +1181,7 @@ MonoBehaviour:
   normalColor: {r: 0.96, g: 0.93, b: 0.82, a: 1}
   hoverColor: {r: 0.5647059, g: 0.45882356, b: 0.50980395, a: 1}
   pressedColor: {r: 0.41960788, g: 0.28627452, b: 0.41960788, a: 1}
-  hoverScale: {x: 1.08, y: 1.08, z: 1}
+  hoverScale: {x: 2.16, y: 2.16, z: 1}
   pressedScale: {x: 0.94, y: 0.94, z: 1}
   transitionDuration: 0.1
 --- !u!1 &4684181534035511001
