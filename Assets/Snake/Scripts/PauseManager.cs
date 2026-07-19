@@ -42,6 +42,10 @@ public class PauseManager : MonoBehaviour
                 return;
             }
 
+            if ((LevelManager.main != null && LevelManager.main.outOfStrokes) ||
+                (ShooterLevelManager.manager != null && ShooterLevelManager.manager.isGameOver))
+                return;
+
             if (IsPaused)
                 Resume();
             else

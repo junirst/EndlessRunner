@@ -48,7 +48,7 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        if (CanTogglePause() && Input.GetKeyDown(KeyCode.Escape))
+        if (CanTogglePause() && Input.GetKeyDown(KeyCode.Escape) && PauseManager.Instance == null)
         {
             TogglePause();
         }

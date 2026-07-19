@@ -176,7 +176,13 @@ public class SettingsManager : MonoBehaviour
 
     public void Back()
     {
+        RevertToPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         PauseManager.Instance?.HideSettings();
+    }
+
+    public void BackButton()
+    {
+        Back();
     }
 }

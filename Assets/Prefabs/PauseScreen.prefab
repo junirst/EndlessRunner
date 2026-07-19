@@ -332,7 +332,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: PauseManager, Assembly-CSharp
         m_MethodName: LoadMainMenu
         m_Mode: 1
         m_Arguments:
@@ -665,7 +665,7 @@ GameObject:
   - component: {fileID: 2302435853174869582}
   - component: {fileID: 5193928826460766474}
   m_Layer: 5
-  m_Name: Replay
+  m_Name: Continue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -776,7 +776,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PauseManager, Assembly-CSharp
-        m_MethodName: ContinueButton
+        m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1045,7 +1045,7 @@ GameObject:
   - component: {fileID: 8818411707972528692}
   - component: {fileID: 6109155630695327466}
   m_Layer: 5
-  m_Name: ContinueButton
+  m_Name: Restart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1430,7 +1430,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 3.517, y: -0.0000041453}
-  m_SizeDelta: {x: 792, y: 9}
+  m_SizeDelta: {x: 792, y: 986}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6464495183299034596
 CanvasRenderer:
