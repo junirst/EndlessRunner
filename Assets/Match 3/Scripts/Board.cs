@@ -7,6 +7,22 @@ public enum GameState
     move
 }
 
+public enum TileKind
+{
+    Normal,
+    Breakable,
+    Blank
+}
+
+[System.Serializable]
+public class tileType
+{
+    public int x;
+    public int y;
+    public TileKind tileKind;
+    public int breakableValue;
+}
+
 public class Board : MonoBehaviour
 {
     public GameState currentState = GameState.move;
@@ -18,6 +34,8 @@ public class Board : MonoBehaviour
     public GameObject[,] allDots;
     public Dot currentDot;
     public GameObject destroyEffect;
+    public tileType[] boardLayout;
+    private bool[,] blankSpaces;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
 
@@ -25,48 +43,87 @@ public class Board : MonoBehaviour
     void Start()
     {
         findMatches = FindObjectOfType<FindMatches>();
-        allTiles = new BackgroundTile[width, height];
+
+        // Basic validation to catch inspector misconfiguration early
+        if (width <= 0 || height <= 0)
+        {
+            Debug.LogError("Board width/height must be > 0 in the inspector.");
+            width = Mathf.Max(1, width);
+            height = Mathf.Max(1, height);
+        }
+        if (tilePrefab == null)
+        {
+            Debug.LogError("Board.tilePrefab is not assigned in the inspector.");
+        }
+        if (dots == null || dots.Length == 0)
+        {
+            Debug.LogError("Board.dots array is empty - assign at least one dot prefab.");
+        }
+
+        blankSpaces = new bool[width, height];
         allDots = new GameObject[width, height];
+        allTiles = new BackgroundTile[width, height];
+
+        if (boardLayout == null || boardLayout.Length == 0)
+        {
+            Debug.LogWarning("Board.boardLayout is empty. No blank tiles will be generated.");
+        }
+
         SetUp();
+    }
+
+    public void GenerateBlankSpaces()
+    {
+        for (int i = 0; i < boardLayout.Length; i++)
+        {
+            if (boardLayout[i].tileKind == TileKind.Blank)
+            {
+                blankSpaces[boardLayout[i].x, boardLayout[i].y] = true;
+            }
+        }
     }
 
     private void SetUp()
     {
+        GenerateBlankSpaces();
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                // 1. Background tiles stay down at normal grid positions (No offset!)
-                Vector2 tilePosition = new Vector2(i, j);
-                GameObject backgroundTile = Instantiate(tilePrefab, tilePosition, Quaternion.identity);
-                backgroundTile.transform.parent = this.transform;
-                backgroundTile.name = "( " + i + ", " + j + " )";
-                allTiles[i, j] = backgroundTile.GetComponent<BackgroundTile>();
-
-                // Pick a random fruit
-                int dotToUse = Random.Range(0, dots.Length);
-                int MaxIterations = 0;
-                while (MatchesAt(i, j, dots[dotToUse]) && MaxIterations < 100)
+                if (!blankSpaces[i, j])
                 {
-                    dotToUse = Random.Range(0, dots.Length);
-                    MaxIterations++;
+                    // 1. Background tiles stay down at normal grid positions (No offset!)
+                    Vector2 tilePosition = new Vector2(i, j);
+                    GameObject backgroundTile = Instantiate(tilePrefab, tilePosition, Quaternion.identity);
+                    backgroundTile.transform.parent = this.transform;
+                    backgroundTile.name = "( " + i + ", " + j + " )";
+                    allTiles[i, j] = backgroundTile.GetComponent<BackgroundTile>();
+
+                    // Pick a random fruit
+                    int dotToUse = Random.Range(0, dots.Length);
+                    int MaxIterations = 0;
+                    while (MatchesAt(i, j, dots[dotToUse]) && MaxIterations < 100)
+                    {
+                        dotToUse = Random.Range(0, dots.Length);
+                        MaxIterations++;
+                    }
+
+                    // 2. Dots spawn high up in the sky and fall down into the tiles
+                    Vector2 dotSpawnPosition = new Vector2(i, j + offSet);
+                    GameObject dot = Instantiate(dots[dotToUse], dotSpawnPosition, Quaternion.identity);
+
+                    dot.transform.parent = this.transform;
+                    dot.name = "( " + i + ", " + j + " )";
+
+                    Dot dotComponent = dot.GetComponent<Dot>();
+                    if (dotComponent != null)
+                    {
+                        dotComponent.column = i;
+                        dotComponent.row = j;
+                    }
+
+                    allDots[i, j] = dot;
                 }
-
-                // 2. Dots spawn high up in the sky and fall down into the tiles
-                Vector2 dotSpawnPosition = new Vector2(i, j + offSet);
-                GameObject dot = Instantiate(dots[dotToUse], dotSpawnPosition, Quaternion.identity);
-
-                dot.transform.parent = this.transform;
-                dot.name = "( " + i + ", " + j + " )";
-
-                Dot dotComponent = dot.GetComponent<Dot>();
-                if (dotComponent != null)
-                {
-                    dotComponent.column = i;
-                    dotComponent.row = j;
-                }
-
-                allDots[i, j] = dot;
             }
         }
     }
@@ -99,6 +156,19 @@ public class Board : MonoBehaviour
                 if (allDots[column, row - 1].tag == piece.tag && allDots[column, row - 2].tag == piece.tag)
                 {
                     return true;
+                }
+            }
+        }
+        else if(column <= 1 || row <= 1)
+        {
+            if (column > 1 && row > 1)
+            {
+                if (allDots[column - 1, row] != null && allDots[column, row - 2] != null)
+                {
+                    if (allDots[column - 1, row].tag == piece.tag && allDots[column, row - 2].tag == piece.tag)
+                    {
+                        return true;
+                    }
                 }
             }
         }
@@ -266,24 +336,26 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                if (allDots[i, j] == null)
-                {
-                    for (int k = j + 1; k < height; k++)
+                    // Only attempt to fill slots that are not blank spaces
+                    if (!blankSpaces[i, j] && allDots[i, j] == null)
                     {
-                        if (allDots[i, k] != null)
+                        for (int k = j + 1; k < height; k++)
                         {
-                            allDots[i, j] = allDots[i, k];
-                            allDots[i, k] = null;
-
-                            Dot dotComponent = allDots[i, j].GetComponent<Dot>();
-                            if (dotComponent != null)
+                            // find the next non-blank piece above this spot
+                            if (!blankSpaces[i, k] && allDots[i, k] != null)
                             {
-                                dotComponent.row = j;
+                                allDots[i, j] = allDots[i, k];
+                                allDots[i, k] = null;
+
+                                Dot dotComponent = allDots[i, j].GetComponent<Dot>();
+                                if (dotComponent != null)
+                                {
+                                    dotComponent.row = j;
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
-                }
             }
         }
         yield return new WaitForSeconds(.25f);
@@ -298,7 +370,8 @@ public class Board : MonoBehaviour
 
             for (int j = 0; j < height; j++)
             {
-                if (allDots[i, j] == null)
+                // Only refill positions that are not blank spaces
+                if (!blankSpaces[i, j] && allDots[i, j] == null)
                 {
                     Vector2 tempPosition = new Vector2(i, height + missingPiecesCount);
                     missingPiecesCount++;

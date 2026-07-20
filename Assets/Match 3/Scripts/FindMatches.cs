@@ -15,22 +15,22 @@ public class FindMatches : MonoBehaviour
 
     private List<GameObject> IsAdjacentBomb(Dot dot1, Dot dot2, Dot dot3)
     {
-        List<GameObject> result = new List<GameObject>();
-        // Check each dot for the adjacent bomb flag and collect surrounding pieces
+        // Use a set to avoid duplicate pieces when bombs overlap
+        HashSet<GameObject> resultSet = new HashSet<GameObject>();
         if (dot1 != null && dot1.isAdjacentBomb)
         {
-            result.AddRange(GetAdjacentPieces(dot1.column, dot1.row));
+            foreach (var g in GetAdjacentPieces(dot1.column, dot1.row)) resultSet.Add(g);
         }
         if (dot2 != null && dot2.isAdjacentBomb)
         {
-            result.AddRange(GetAdjacentPieces(dot2.column, dot2.row));
+            foreach (var g in GetAdjacentPieces(dot2.column, dot2.row)) resultSet.Add(g);
         }
         if (dot3 != null && dot3.isAdjacentBomb)
         {
-            result.AddRange(GetAdjacentPieces(dot3.column, dot3.row));
+            foreach (var g in GetAdjacentPieces(dot3.column, dot3.row)) resultSet.Add(g);
         }
 
-        return result;
+        return resultSet.ToList();
     }
 
     public void FindAllMatches()
@@ -350,11 +350,13 @@ public class FindMatches : MonoBehaviour
                     {
                         //make a row bomb
                         otherDot.MakeRowBomb();
+                        Debug.Log($"Created Row Bomb at ({otherDot.column},{otherDot.row}) (otherDot)");
                     }
                     else
                     {
                         //make a column bomb
                         otherDot.MakeColumnBomb();
+                        Debug.Log($"Created Column Bomb at ({otherDot.column},{otherDot.row}) (otherDot)");
                     }
                 }
             }
