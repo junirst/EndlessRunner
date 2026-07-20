@@ -373,7 +373,8 @@ MonoBehaviour:
   levelCompleteStrokeUI: {fileID: 1596600394}
   GameOverUI: {fileID: 1338889504}
   pauseMenuUI: {fileID: 0}
-  maxStrokes: 10
+  gameOverSfx: {fileID: 8300000, guid: 0aa03f0cfdff26440b99d90a4d851d96, type: 3}
+  maxStrokes: 1
   outOfStrokes: 0
   levelCompleted: 0
   isPaused: 0

@@ -18,6 +18,9 @@ public class LevelManager : MonoBehaviour
     [Space(10)]
     [SerializeField] private GameObject pauseMenuUI;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip gameOverSfx;
+
     [Header("Attributes")]
     [SerializeField] private int maxStrokes;
 
@@ -101,7 +104,7 @@ public class LevelManager : MonoBehaviour
         }
 
         gameOver = true;
-        MiniGolfAudioManager.Instance?.PlayGameOverSfx();
+        MiniGolfAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
         GameOverUI.SetActive(true);
     }
 

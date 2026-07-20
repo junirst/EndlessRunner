@@ -2491,6 +2491,7 @@ MonoBehaviour:
   gameOverScreen: {fileID: 85623569}
   snake: {fileID: 1804161495}
   food: {fileID: 289142869}
+  gameOverSfx: {fileID: 8300000, guid: aa14d858ff8e89042940af2c5fa234ac, type: 3}
   finalScoreText: {fileID: 85623568}
 --- !u!114 &817712367
 MonoBehaviour:

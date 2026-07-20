@@ -54,9 +54,16 @@ public class ShooterAudioManager : MonoBehaviour
         PlaySfx(enemyDeathSfx);
     }
 
-    public void PlayGameOverSfx()
+    public void PlayGameOverSfx(AudioClip clipOverride = null)
     {
-        PlaySfx(gameOverSfx);
+        AudioClip clipToPlay = clipOverride != null ? clipOverride : gameOverSfx;
+
+        if (clipToPlay == null)
+        {
+            clipToPlay = Resources.Load<AudioClip>("topdownshootergameover");
+        }
+
+        PlaySfx(clipToPlay);
     }
 
     public void PlayButtonClickSfx()

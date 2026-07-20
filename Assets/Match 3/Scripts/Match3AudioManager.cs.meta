@@ -1,10 +1,11 @@
 fileFormatVersion: 2
-guid: 9e07b477e64b16d41ad79f523c8845fd
+guid: 6de2b70fa6091f441ade368df719c218
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - gameOverSfx: {fileID: 8300000, guid: 14196dce0cc1d7f4abfebf786891ceaa, type: 3}
+  - sfxSource: {instanceID: 0}
+  - gameOverSfx: {fileID: 8300000, guid: e4ea12544763b9c44b1dcb911992fb8b, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

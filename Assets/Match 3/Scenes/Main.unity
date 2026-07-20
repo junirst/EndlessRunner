@@ -168,6 +168,7 @@ MonoBehaviour:
   - {fileID: 3650170970904041254, guid: e9387049322054e4fbb853bfc615226d, type: 3}
   currentDot: {fileID: 0}
   destroyEffect: {fileID: 8906777064576354654, guid: d2247ac48d6c28d4088fad6c771a5c09, type: 3}
+  gameOverSfx: {fileID: 8300000, guid: e4ea12544763b9c44b1dcb911992fb8b, type: 3}
 --- !u!4 &434682204
 Transform:
   m_ObjectHideFlags: 0

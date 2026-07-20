@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameOverScreen;
     [SerializeField] private Snake snake;
     [SerializeField] private Food food;
+    [SerializeField] private AudioClip gameOverSfx;
     [SerializeField] private TextMeshProUGUI finalScoreText;
 
     public bool IsGameOver { get; private set; }
@@ -51,7 +52,7 @@ public class GameManager : MonoBehaviour
 
         PowerUpUI.Instance?.ClearAll();
         SnakeAudioManager.Instance?.StopBgm();
-        SnakeAudioManager.Instance?.PlayGameOverSfx();
+        SnakeAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
     }
 
     public void Retry()

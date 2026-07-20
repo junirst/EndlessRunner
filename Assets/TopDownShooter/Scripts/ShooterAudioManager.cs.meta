@@ -3,7 +3,15 @@ guid: af1a512e3abd16a4680ced5678f03164
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - sfxSource: {instanceID: 0}
+  - bgmSource: {instanceID: 0}
+  - playerShootSfx: {instanceID: 0}
+  - enemyShootSfx: {instanceID: 0}
+  - enemyDeathSfx: {instanceID: 0}
+  - gameOverSfx: {fileID: 8300000, guid: 9771794c76d60bf4ebb388a4a8dcb484, type: 3}
+  - buttonClickSfx: {instanceID: 0}
+  - gameplayBgm: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
