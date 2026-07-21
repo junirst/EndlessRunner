@@ -1185,7 +1185,7 @@ GameObject:
   - component: {fileID: 695131527}
   - component: {fileID: 695131530}
   m_Layer: 5
-  m_Name: CubeDash
+  m_Name: EndlessRunner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1821,8 +1821,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.000015258789}
+  m_SizeDelta: {x: -60.6426, y: -55.5891}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1042136464
 MonoBehaviour:
@@ -1844,7 +1844,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: cube dash
+  m_text: Endless Runner
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e690d56c58654348a3a4fc213cb8ff2, type: 2}
   m_sharedMaterial: {fileID: 6282573208273132667, guid: 7e690d56c58654348a3a4fc213cb8ff2, type: 2}
@@ -1871,10 +1871,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 102
+  m_fontSize: 72
   m_fontSizeBase: 102
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 17
