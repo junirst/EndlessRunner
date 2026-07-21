@@ -34,6 +34,7 @@ public class PowerUpPickup : MonoBehaviour
         }
 
         isCollected = true;
+        AudioManager.Instance?.PlayPowerUpPickupSfx();
         ApplyEffect(playerMovement, playerCollison);
         Destroy(gameObject);
     }

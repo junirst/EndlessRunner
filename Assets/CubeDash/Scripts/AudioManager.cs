@@ -14,6 +14,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip crouchSfx;
     [SerializeField] private AudioClip gameOverSfx;
     [SerializeField] private AudioClip buttonClickSfx;
+    [SerializeField] private AudioClip buttonHoverSfx;
+    [SerializeField] private AudioClip powerUpPickupSfx;
 
     [Header("BGM")]
     [SerializeField] private AudioClip gameplayBgm;
@@ -62,6 +64,16 @@ public class AudioManager : MonoBehaviour
     public void PlayButtonClickSfx()
     {
         PlaySfx(buttonClickSfx);
+    }
+
+    public void PlayButtonHoverSfx()
+    {
+        PlaySfx(buttonHoverSfx);
+    }
+
+    public void PlayPowerUpPickupSfx()
+    {
+        PlaySfx(powerUpPickupSfx);
     }
 
     public void PlayBgm()
