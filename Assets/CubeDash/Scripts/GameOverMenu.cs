@@ -112,6 +112,8 @@ public class GameOverMenu : MonoBehaviour
     {
         if (!canInteract) return;
         if (selectedIndex == index) return;
+
+        AudioManager.Instance?.PlayButtonHoverSfx();
         selectedIndex = index;
         UpdateArrowPosition();
     }

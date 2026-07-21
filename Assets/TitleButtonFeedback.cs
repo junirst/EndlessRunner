@@ -54,6 +54,8 @@ public class TitleButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointer
     {
         isPointerOver = true;
 
+        TitleAudioManager.Instance?.PlayButtonHoverSfx();
+
         if (!isPointerDown)
         {
             AnimateTo(hoverColor, hoverScale);
