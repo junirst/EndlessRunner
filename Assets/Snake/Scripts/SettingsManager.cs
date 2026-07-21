@@ -34,10 +34,6 @@ public class SettingsManager : MonoBehaviour
         PopulateResolutionDropdown();
         LoadFromPlayerPrefs();
 
-        if (screenModeDropdown != null)
-            screenModeDropdown.onValueChanged.AddListener(ApplyScreenMode);
-        if (resolutionDropdown != null)
-            resolutionDropdown.onValueChanged.AddListener(ApplyResolution);
         if (bgmSlider != null)
             bgmSlider.onValueChanged.AddListener(SetBGMVolume);
         if (sfxSlider != null)
@@ -49,6 +45,7 @@ public class SettingsManager : MonoBehaviour
         int savedScreenMode = PlayerPrefs.GetInt(ScreenModeKey, 0);
         int savedResWidth = PlayerPrefs.GetInt(ResolutionWidthKey, Screen.width);
         int savedResHeight = PlayerPrefs.GetInt(ResolutionHeightKey, Screen.height);
+        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
 
         if (bgmSlider != null)
             bgmSlider.value = PlayerPrefs.GetFloat(BGMVolumeKey, 0.5f);
@@ -56,13 +53,13 @@ public class SettingsManager : MonoBehaviour
             sfxSlider.value = PlayerPrefs.GetFloat(SFXVolumeKey, 0.5f);
 
         if (screenModeDropdown != null)
-            screenModeDropdown.value = savedScreenMode;
-        ApplyScreenMode(savedScreenMode);
-
-        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
+            screenModeDropdown.SetValueWithoutNotify(savedScreenMode);
         if (resolutionDropdown != null)
-            resolutionDropdown.value = resIndex >= 0 ? resIndex : 0;
-        ApplyResolution(resolutionDropdown != null ? resolutionDropdown.value : 0);
+            resolutionDropdown.SetValueWithoutNotify(resIndex >= 0 ? resIndex : 0);
+
+        ApplyScreenMode(savedScreenMode);
+        if (resIndex >= 0)
+            ApplyResolution(resIndex);
     }
 
     public void SaveToPlayerPrefs()
@@ -119,14 +116,22 @@ public class SettingsManager : MonoBehaviour
     {
         FullScreenMode mode = index switch
         {
-            0 => FullScreenMode.ExclusiveFullScreen,
+            0 => FullScreenMode.FullScreenWindow,
             1 => FullScreenMode.Windowed,
             2 => FullScreenMode.FullScreenWindow,
             _ => FullScreenMode.FullScreenWindow,
         };
-        Screen.fullScreenMode = mode;
-        if (resolutionDropdown != null)
-            ApplyResolution(resolutionDropdown.value);
+
+        if (resolutionDropdown != null && availableResolutions != null &&
+            resolutionDropdown.value >= 0 && resolutionDropdown.value < availableResolutions.Length)
+        {
+            Resolution res = availableResolutions[resolutionDropdown.value];
+            Screen.SetResolution(res.width, res.height, mode);
+        }
+        else
+        {
+            Screen.SetResolution(Screen.width, Screen.height, mode);
+        }
     }
 
     public void ApplyResolution(int index)
@@ -153,22 +158,28 @@ public class SettingsManager : MonoBehaviour
         int savedScreenMode = PlayerPrefs.GetInt(ScreenModeKey, 0);
         int savedResWidth = PlayerPrefs.GetInt(ResolutionWidthKey, Screen.width);
         int savedResHeight = PlayerPrefs.GetInt(ResolutionHeightKey, Screen.height);
+        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
+
+        if (screenModeDropdown != null)
+            screenModeDropdown.SetValueWithoutNotify(savedScreenMode);
+        if (resolutionDropdown != null)
+            resolutionDropdown.SetValueWithoutNotify(resIndex >= 0 ? resIndex : 0);
 
         if (SnakeAudioManager.Instance != null)
         {
             SnakeAudioManager.Instance.SetBGMVolume(PlayerPrefs.GetFloat(BGMVolumeKey, 0.5f));
             SnakeAudioManager.Instance.SetSFXVolume(PlayerPrefs.GetFloat(SFXVolumeKey, 0.5f));
         }
-
-        ApplyScreenMode(savedScreenMode);
-
-        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
-        if (resIndex >= 0)
-            ApplyResolution(resIndex);
     }
 
     public void Save()
     {
+        if (screenModeDropdown != null)
+            ApplyScreenMode(screenModeDropdown.value);
+        if (resolutionDropdown != null && resolutionDropdown.value >= 0 && availableResolutions != null &&
+            resolutionDropdown.value < availableResolutions.Length)
+            ApplyResolution(resolutionDropdown.value);
+
         SaveToPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         PauseManager.Instance?.HideSettings();
