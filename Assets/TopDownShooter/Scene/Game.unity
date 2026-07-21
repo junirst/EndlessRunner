@@ -318,6 +318,7 @@ MonoBehaviour:
   highscoreText: {fileID: 605122155}
   pauseScoreText: {fileID: 0}
   pauseHighscoreText: {fileID: 0}
+  gameOverSfx: {fileID: 8300000, guid: 9771794c76d60bf4ebb388a4a8dcb484, type: 3}
   data:
     highscore: 0
   score: 0
@@ -422,7 +423,7 @@ MonoBehaviour:
   playerShootSfx: {fileID: 8300000, guid: 0f2c7d555db47f24dbd0f295e5e2e0b3, type: 3}
   enemyShootSfx: {fileID: 8300000, guid: 259547bb672555d4290d22f4d22c2517, type: 3}
   enemyDeathSfx: {fileID: 8300000, guid: dcead1192691e2244b5f8e9198ab9b69, type: 3}
-  gameOverSfx: {fileID: 8300000, guid: 18b71b72244ba95479ea2d5cbd3325f6, type: 3}
+  gameOverSfx: {fileID: 8300000, guid: 9771794c76d60bf4ebb388a4a8dcb484, type: 3}
   buttonClickSfx: {fileID: 8300000, guid: bc60c61036f668143be948a253efa487, type: 3}
   gameplayBgm: {fileID: 8300000, guid: 57ee920534949dc46811474902f83138, type: 3}
   playBgmOnStart: 0

@@ -38,6 +38,7 @@ public class Board : MonoBehaviour
     private bool[,] blankSpaces;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
+    [SerializeField] private AudioClip gameOverSfx;
 
     // Start is called before the first frame update
     void Start()
@@ -433,5 +434,11 @@ public class Board : MonoBehaviour
             yield return new WaitForSeconds(.25f);
             currentState = GameState.move;
         }
+    }
+
+    // Call this when the match-3 game should trigger a game-over (assign clip per-scene in Inspector)
+    public void TriggerGameOver()
+    {
+        Match3AudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
     }
 }

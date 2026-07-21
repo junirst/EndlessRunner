@@ -53,9 +53,24 @@ public class MiniGolfAudioManager : MonoBehaviour
         PlaySfx(levelCompleteSfx);
     }
 
-    public void PlayGameOverSfx()
+    public void PlayGameOverSfx(AudioClip clipOverride = null)
     {
-        PlaySfx(gameOverSfx);
+        PlaySfx(GetGameOverClip(clipOverride));
+    }
+
+    private AudioClip GetGameOverClip(AudioClip clipOverride)
+    {
+        if (clipOverride != null)
+        {
+            return clipOverride;
+        }
+
+        if (gameOverSfx != null)
+        {
+            return gameOverSfx;
+        }
+
+        return Resources.Load<AudioClip>("minigolfgameover");
     }
 
     public void PlayButtonClickSfx()

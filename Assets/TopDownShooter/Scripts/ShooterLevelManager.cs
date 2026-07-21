@@ -14,6 +14,7 @@ public class ShooterLevelManager : MonoBehaviour
     public TextMeshProUGUI highscoreText;
     public TextMeshProUGUI pauseScoreText;
     public TextMeshProUGUI pauseHighscoreText;
+    [SerializeField] private AudioClip gameOverSfx;
 
     public ShooterSaveData data;
 
@@ -69,7 +70,7 @@ public class ShooterLevelManager : MonoBehaviour
 
         isGameOver = true;
         ShooterAudioManager.Instance?.StopBgm();
-        ShooterAudioManager.Instance?.PlayGameOverSfx();
+        ShooterAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
 
         deathScreen.SetActive(true);
         scoreText.text = "Score: " + score.ToString();

@@ -4580,6 +4580,7 @@ MonoBehaviour:
   currentScore: 0
   scoreMultiplier: 1
   scoreMultiplierTimeRemaining: 0
+  gameOverSfx: {fileID: 8300000, guid: 14196dce0cc1d7f4abfebf786891ceaa, type: 3}
   data:
     highscore: 0
   isPlaying: 0

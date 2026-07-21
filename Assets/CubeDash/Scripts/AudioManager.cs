@@ -56,9 +56,35 @@ public class AudioManager : MonoBehaviour
         PlaySfx(crouchSfx);
     }
 
-    public void PlayGameOverSfx()
+    public void PlayGameOverSfx(AudioClip clipOverride = null)
     {
-        PlaySfx(gameOverSfx);
+        PlaySfx(GetGameOverClip(clipOverride));
+    }
+
+    private AudioClip GetGameOverClip(AudioClip clipOverride)
+    {
+        if (clipOverride != null)
+        {
+            return clipOverride;
+        }
+
+        if (gameOverSfx != null)
+        {
+            return gameOverSfx;
+        }
+
+        AudioClip loadedClip = Resources.Load<AudioClip>("cubedashgameover");
+        if (loadedClip == null)
+        {
+            loadedClip = Resources.Load<AudioClip>("CubeDash/cubedashgameover");
+        }
+
+        if (loadedClip == null)
+        {
+            loadedClip = Resources.Load<AudioClip>("CubeDash/Resources/cubedashgameover");
+        }
+
+        return loadedClip;
     }
 
     public void PlayButtonClickSfx()

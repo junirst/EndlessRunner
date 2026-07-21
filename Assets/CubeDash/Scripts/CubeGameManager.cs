@@ -28,6 +28,7 @@ public class CubeGameManager : MonoBehaviour
 
     [SerializeField] private float scoreMultiplier = 1f;
     [SerializeField] private float scoreMultiplierTimeRemaining = 0f;
+    [SerializeField] private AudioClip gameOverSfx;
 
     public Data data;
     public bool isPlaying = false;
@@ -109,7 +110,7 @@ public class CubeGameManager : MonoBehaviour
         isPlaying = false;
         ResetScoreMultiplier();
         AudioManager.Instance?.StopBgm();
-        AudioManager.Instance?.PlayGameOverSfx();
+        AudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
         onGameOver.Invoke();
     }
 

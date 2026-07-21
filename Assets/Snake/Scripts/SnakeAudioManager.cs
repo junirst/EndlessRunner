@@ -76,10 +76,17 @@ public class SnakeAudioManager : MonoBehaviour
             sfxSource.PlayOneShot(eatSfx);
     }
 
-    public void PlayGameOverSfx()
+    public void PlayGameOverSfx(AudioClip clipOverride = null)
     {
-        if (gameOverSfx != null && sfxSource != null)
-            sfxSource.PlayOneShot(gameOverSfx);
+        AudioClip clipToPlay = clipOverride != null ? clipOverride : gameOverSfx;
+
+        if (clipToPlay == null)
+        {
+            clipToPlay = Resources.Load<AudioClip>("snakegameover");
+        }
+
+        if (clipToPlay != null && sfxSource != null)
+            sfxSource.PlayOneShot(clipToPlay);
     }
 
     public void PlayButtonClickSfx()
