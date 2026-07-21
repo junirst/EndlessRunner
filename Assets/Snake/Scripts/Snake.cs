@@ -22,13 +22,21 @@ public class Snake : MonoBehaviour
     [SerializeField] private float permanentSpeedIncrease = 0.05f;
 
     private Coroutine speedCoroutine;
+    private float baseSpeedMultiplier;
+    private float wallImmunityTimer;
 
     public IReadOnlyList<Transform> Segments => segments;
     public Vector2Int CurrentDirection => direction;
+    public bool IsWallImmune => wallImmunityTimer > 0f;
 
     public void SetAutoInput(Vector2Int dir)
     {
         autoInput = dir;
+    }
+
+    private void Awake()
+    {
+        baseSpeedMultiplier = speedMultiplier;
     }
 
     private void Start()
@@ -61,6 +69,9 @@ public class Snake : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (wallImmunityTimer > 0f)
+            wallImmunityTimer -= Time.deltaTime;
+
         if (Time.time < nextUpdate)
             return;
 
@@ -112,8 +123,9 @@ public class Snake : MonoBehaviour
     {
         StopAllCoroutines();
         speedCoroutine = null;
-        speedMultiplier = 1f;
+        speedMultiplier = baseSpeedMultiplier;
         permanentSpeedBonus = 0f;
+        wallImmunityTimer = 0.2f;
         ScoreManager.Instance.ResetMultiplier();
         PowerUpUI.Instance?.ClearAll();
 
@@ -168,6 +180,7 @@ public class Snake : MonoBehaviour
         else if (other.CompareTag("Wall"))
         {
             if (moveThroughWalls > 0f) return;
+            if (wallImmunityTimer > 0f) return;
             ResetState();
         }
         else if (other.CompareTag("Body"))
@@ -191,7 +204,7 @@ public class Snake : MonoBehaviour
             duration
         );
         yield return new WaitForSeconds(duration);
-        speedMultiplier = 1f;
+        speedMultiplier = baseSpeedMultiplier;
         speedCoroutine = null;
     }
 }

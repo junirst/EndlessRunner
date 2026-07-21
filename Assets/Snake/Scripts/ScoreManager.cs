@@ -19,7 +19,7 @@ public class ScoreManager : MonoBehaviour
         set => highScore = value;
     }
 
-    private const string HighScoreKey = "SnakeHighScore";
+    public string StageId { get; set; }
 
     private void Awake()
     {
@@ -29,7 +29,6 @@ public class ScoreManager : MonoBehaviour
             return;
         }
         Instance = this;
-        LoadHighScore();
     }
 
     public void AddScore(int points)
@@ -65,13 +64,14 @@ public class ScoreManager : MonoBehaviour
 
     public void SaveHighScore()
     {
-        PlayerPrefs.SetInt(HighScoreKey, highScore);
-        PlayerPrefs.Save();
+        if (string.IsNullOrEmpty(StageId)) return;
+        SnakeSaveSystem.SetHighScore(StageId, highScore);
     }
 
     public void LoadHighScore()
     {
-        highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
+        if (string.IsNullOrEmpty(StageId)) return;
+        highScore = SnakeSaveSystem.GetHighScore(StageId);
     }
 
     public void Reset()

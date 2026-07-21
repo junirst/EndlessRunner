@@ -379,7 +379,7 @@ MonoBehaviour:
   cubeDashSceneName: CubeDash
   miniGolfSceneName: MainMenu
   topDownShooterSceneName: Menu
-  snakeSceneName: Infinite
+  snakeSceneName: SnakeMenu
   sceneLoadDelay: 0.08
 --- !u!1 &208786534
 GameObject:

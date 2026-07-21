@@ -2708,7 +2708,7 @@ MonoBehaviour:
   cubeDashSceneName: CubeDash
   miniGolfSceneName: MainMenu
   topDownShooterSceneName: Menu
-  snakeSceneName: SnakeGame
+  snakeSceneName: SnakeMenu
 --- !u!1 &1148740645
 GameObject:
   m_ObjectHideFlags: 0

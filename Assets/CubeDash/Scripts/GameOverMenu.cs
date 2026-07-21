@@ -15,6 +15,7 @@ public class GameOverMenu : MonoBehaviour
     private RectTransform arrowRect;
     private int selectedIndex = 0;
     private bool canInteract = true;
+    private bool isBlinking;
 
     private void Awake()
     {
@@ -59,7 +60,11 @@ public class GameOverMenu : MonoBehaviour
         for (int i = 0; i < buttons.Length; i++)
         {
             int capturedIndex = i;
-            buttons[i].onClick.AddListener(() => StartCoroutine(BlinkAndExecute(capturedIndex)));
+            buttons[i].onClick.AddListener(() =>
+            {
+                if (gameObject.activeInHierarchy)
+                    StartCoroutine(BlinkAndExecute(capturedIndex));
+            });
         }
 
         UpdateArrowPosition();
@@ -122,6 +127,8 @@ public class GameOverMenu : MonoBehaviour
 
     private IEnumerator BlinkAndExecute(int index)
     {
+        if (isBlinking) yield break;
+        isBlinking = true;
         canInteract = false;
 
         Button btn = buttons[index];
@@ -138,8 +145,10 @@ public class GameOverMenu : MonoBehaviour
 
         btnText.color = originalColor;
         canInteract = true;
+        isBlinking = false;
 
-        btn.onClick.Invoke();
+        if (gameObject.activeInHierarchy)
+            btn.onClick.Invoke();
     }
 
     private void PlayNavSfx()

@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public class GameManager : MonoBehaviour
@@ -10,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Snake snake;
     [SerializeField] private Food food;
     [SerializeField] private TextMeshProUGUI finalScoreText;
+    [SerializeField] private LoadingScreen loadingScreen;
 
     public bool IsGameOver { get; private set; }
 
@@ -22,11 +25,53 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         Application.runInBackground = true;
+
+        if (loadingScreen == null)
+            BuildLoadingScreen();
+    }
+
+    private void BuildLoadingScreen()
+    {
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas == null) canvas = FindObjectOfType<Canvas>();
+        if (canvas == null) return;
+
+        GameObject lsGO = new GameObject("LoadingScreen", typeof(RectTransform));
+        lsGO.transform.SetParent(canvas.transform, false);
+        RectTransform lsRT = lsGO.GetComponent<RectTransform>();
+        lsRT.anchorMin = Vector2.zero;
+        lsRT.anchorMax = Vector2.one;
+        lsRT.offsetMin = Vector2.zero;
+        lsRT.offsetMax = Vector2.zero;
+
+        CanvasGroup cg = lsGO.AddComponent<CanvasGroup>();
+        cg.alpha = 0f;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+
+        Image bg = lsGO.AddComponent<Image>();
+        bg.color = new Color(0f, 0f, 0f, 0.85f);
+        bg.raycastTarget = true;
+
+        GameObject snakeGO = new GameObject("SnakeContainer", typeof(RectTransform));
+        snakeGO.transform.SetParent(lsRT, false);
+        RectTransform snakeRT = snakeGO.GetComponent<RectTransform>();
+        snakeRT.anchorMin = new Vector2(1f, 0f);
+        snakeRT.anchorMax = new Vector2(1f, 0f);
+        snakeRT.anchoredPosition = new Vector2(-40f, 40f);
+        snakeRT.sizeDelta = new Vector2(250f, 60f);
+        snakeRT.pivot = new Vector2(1f, 0f);
+
+        LoadingScreen ls = lsGO.AddComponent<LoadingScreen>();
+        ls.Configure(cg, snakeRT);
+        loadingScreen = ls;
     }
 
     private void Start()
     {
         gameOverScreen.SetActive(false);
+        ScoreManager.Instance.StageId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        ScoreManager.Instance.LoadHighScore();
         SnakeAudioManager.Instance?.PlayBgm();
     }
 
@@ -59,6 +104,15 @@ public class GameManager : MonoBehaviour
         IsGameOver = false;
         Time.timeScale = 1f;
         gameOverScreen.SetActive(false);
+
+        if (loadingScreen != null)
+            loadingScreen.ShowAndLoad(SceneManager.GetActiveScene().name);
+        else
+            DirectRetry();
+    }
+
+    private void DirectRetry()
+    {
         snake.enabled = true;
         snake.ResetState();
         food.Reposition();

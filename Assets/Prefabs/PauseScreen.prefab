@@ -359,7 +359,7 @@ MonoBehaviour:
   hoverColor: {r: 0.5647059, g: 0.45882356, b: 0.50980395, a: 1}
   pressedColor: {r: 0.41960788, g: 0.28627452, b: 0.41960788, a: 1}
   hoverScale: {x: 2.16, y: 2.16, z: 1}
-  pressedScale: {x: 0.94, y: 0.94, z: 1}
+  pressedScale: {x: 1.8, y: 1.8, z: 1}
   transitionDuration: 0.1
 --- !u!1 &1433473582212321164
 GameObject:
@@ -1182,7 +1182,7 @@ MonoBehaviour:
   hoverColor: {r: 0.5647059, g: 0.45882356, b: 0.50980395, a: 1}
   pressedColor: {r: 0.41960788, g: 0.28627452, b: 0.41960788, a: 1}
   hoverScale: {x: 2.16, y: 2.16, z: 1}
-  pressedScale: {x: 0.94, y: 0.94, z: 1}
+  pressedScale: {x: 1.8, y: 1.8, z: 1}
   transitionDuration: 0.1
 --- !u!1 &4684181534035511001
 GameObject:

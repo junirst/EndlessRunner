@@ -11,7 +11,7 @@ public class TitleScript : MonoBehaviour
     [SerializeField] private string cubeDashSceneName = "CubeDash";
     [SerializeField] private string miniGolfSceneName = "MainMenu";
     [SerializeField] private string topDownShooterSceneName = "Menu";
-    [SerializeField] private string snakeSceneName = "SnakeGame";
+    [SerializeField] private string snakeSceneName = "SnakeMenu";
     [SerializeField] private float sceneLoadDelay = 0.08f;
 
     private TextMeshProUGUI totalStarsText;
