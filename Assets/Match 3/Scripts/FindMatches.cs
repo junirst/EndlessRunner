@@ -13,6 +13,26 @@ public class FindMatches : MonoBehaviour
         board = Object.FindFirstObjectByType<Board>();
     }
 
+    private List<GameObject> IsAdjacentBomb(Dot dot1, Dot dot2, Dot dot3)
+    {
+        // Use a set to avoid duplicate pieces when bombs overlap
+        HashSet<GameObject> resultSet = new HashSet<GameObject>();
+        if (dot1 != null && dot1.isAdjacentBomb)
+        {
+            foreach (var g in GetAdjacentPieces(dot1.column, dot1.row)) resultSet.Add(g);
+        }
+        if (dot2 != null && dot2.isAdjacentBomb)
+        {
+            foreach (var g in GetAdjacentPieces(dot2.column, dot2.row)) resultSet.Add(g);
+        }
+        if (dot3 != null && dot3.isAdjacentBomb)
+        {
+            foreach (var g in GetAdjacentPieces(dot3.column, dot3.row)) resultSet.Add(g);
+        }
+
+        return resultSet.ToList();
+    }
+
     public void FindAllMatches()
     {
         // Clear out any old matches from the list first
@@ -92,6 +112,19 @@ public class FindMatches : MonoBehaviour
                                         }
                                     }
                                 }
+                                // ADJACENT BOMB CHECK (Inside Horizontal Match)
+                                List<GameObject> adjacentBombPiecesH = IsAdjacentBomb(currentDot.GetComponent<Dot>(), leftDot.GetComponent<Dot>(), rightDot.GetComponent<Dot>());
+                                if (adjacentBombPiecesH != null && adjacentBombPiecesH.Count > 0)
+                                {
+                                    foreach (GameObject piece in adjacentBombPiecesH)
+                                    {
+                                        if (piece != null)
+                                        {
+                                            piece.GetComponent<Dot>().isMatched = true;
+                                            if (!currentMatches.Contains(piece)) currentMatches.Add(piece);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -163,6 +196,19 @@ public class FindMatches : MonoBehaviour
                                         }
                                     }
                                 }
+                                // ADJACENT BOMB CHECK (Inside Vertical Match)
+                                List<GameObject> adjacentBombPiecesV = IsAdjacentBomb(currentDot.GetComponent<Dot>(), upDot.GetComponent<Dot>(), downdot.GetComponent<Dot>());
+                                if (adjacentBombPiecesV != null && adjacentBombPiecesV.Count > 0)
+                                {
+                                    foreach (GameObject piece in adjacentBombPiecesV)
+                                    {
+                                        if (piece != null)
+                                        {
+                                            piece.GetComponent<Dot>().isMatched = true;
+                                            if (!currentMatches.Contains(piece)) currentMatches.Add(piece);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -190,6 +236,27 @@ public class FindMatches : MonoBehaviour
                 }
             }
         }
+    }
+
+    List<GameObject> GetAdjacentPieces(int column, int row)
+    {
+        List<GameObject> dots = new List<GameObject>();
+        for (int i = column - 1; i <= column + 1; i++)
+        {
+            for (int j = row - 1; j <= row + 1; j++)
+            {
+                // Check if the indices are within the bounds of the board
+                if (i >= 0 && i < board.width && j >= 0 && j < board.height)
+                {
+                    if (board.allDots[i, j] != null)
+                    {
+                        dots.Add(board.allDots[i, j]);
+                        board.allDots[i, j].GetComponent<Dot>().isMatched = true;
+                    }
+                }
+            }
+        }
+        return dots;
     }
 
     List<GameObject> GetColumnPieces(int column)
@@ -283,11 +350,13 @@ public class FindMatches : MonoBehaviour
                     {
                         //make a row bomb
                         otherDot.MakeRowBomb();
+                        Debug.Log($"Created Row Bomb at ({otherDot.column},{otherDot.row}) (otherDot)");
                     }
                     else
                     {
                         //make a column bomb
                         otherDot.MakeColumnBomb();
+                        Debug.Log($"Created Column Bomb at ({otherDot.column},{otherDot.row}) (otherDot)");
                     }
                 }
             }
