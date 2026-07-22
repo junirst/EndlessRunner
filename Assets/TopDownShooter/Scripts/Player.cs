@@ -55,6 +55,11 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(mx, my).normalized * speed;
     }
 
+    public void ResetFireTimer()
+    {
+        fireTimer = fireRate;
+    }
+
     private void Shoot()
     {
         Instantiate(bulletPrefab, firingPoint.position, firingPoint.rotation);

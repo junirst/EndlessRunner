@@ -1525,6 +1525,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 634654156}
     m_Modifications:
+    - target: {fileID: 300639527626927834, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 300639527626927834, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
     - target: {fileID: 551026281735168242, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -1552,6 +1560,14 @@ PrefabInstance:
     - target: {fileID: 2994150241488837887, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008511893491564253, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008511893491564253, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 3277657876655776485, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_Pivot.x
@@ -1660,6 +1676,14 @@ PrefabInstance:
     - target: {fileID: 6983725278226445241, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7472394980237290543, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7472394980237290543, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 7511962066242203121, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_Material
@@ -3801,6 +3825,14 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 1895451827}
+    - target: {fileID: 1844546230255218106, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1844546230255218106, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
     - target: {fileID: 1928925709989773760, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_Material
       value: 
@@ -3833,6 +3865,22 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 1117418691}
+    - target: {fileID: 5193928826460766474, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5193928826460766474, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6109155630695327466, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6109155630695327466, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
     - target: {fileID: 6326717172639410722, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -3852,6 +3900,14 @@ PrefabInstance:
     - target: {fileID: 7007948661487727005, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PauseManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7177104785460897281, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7177104785460897281, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
+      propertyPath: pressedScale.y
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 8818411707972528692, guid: f1462334844ecbd4db89cf0ae5be3e26, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

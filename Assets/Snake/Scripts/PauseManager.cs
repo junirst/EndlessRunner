@@ -8,7 +8,8 @@ public class PauseManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject settingsUI;
 
-    [SerializeField] private string mainMenuSceneName = "TitleScreen";
+    [SerializeField] private string mainMenuSceneName = "SnakeMenu";
+    public string MainMenuSceneName => mainMenuSceneName;
 
     public bool IsPaused { get; private set; }
 
@@ -38,7 +39,7 @@ public class PauseManager : MonoBehaviour
             {
                 SnakeAudioManager.Instance?.PlayButtonClickSfx();
                 Time.timeScale = 1f;
-                SceneManager.LoadScene("TitleScreen");
+                SceneManager.LoadScene(mainMenuSceneName);
                 return;
             }
 

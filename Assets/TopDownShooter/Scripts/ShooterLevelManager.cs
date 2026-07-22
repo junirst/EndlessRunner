@@ -111,6 +111,10 @@ public class ShooterLevelManager : MonoBehaviour
         isPaused = true;
         Time.timeScale = 0f;
 
+        Player player = FindObjectOfType<Player>();
+        if (player != null)
+            player.ResetFireTimer();
+
         if (pauseScoreText != null)
         {
             pauseScoreText.text = "Score: " + score.ToString();
@@ -174,7 +178,7 @@ public class ShooterLevelManager : MonoBehaviour
 
     public bool CanAcceptInput()
     {
-        return !isPaused && !isGameOver;
+        return !isPaused && !isGameOver && (PauseManager.Instance == null || !PauseManager.Instance.IsPaused);
     }
 
     private bool CanTogglePause()

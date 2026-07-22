@@ -54,6 +54,12 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        if (CubeGameManager.Instance == null || !CubeGameManager.Instance.isPlaying)
+        {
+            UpdateAnimationState(false);
+            return;
+        }
+
         #region JUMPING
 
         int maxJumps = doubleJumpTimeRemaining > 0f ? 2 : 1;

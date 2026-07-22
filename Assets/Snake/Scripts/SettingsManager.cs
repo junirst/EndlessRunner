@@ -34,10 +34,34 @@ public class SettingsManager : MonoBehaviour
         PopulateResolutionDropdown();
         LoadFromPlayerPrefs();
 
+        ApplySavedSettings();
+
         if (bgmSlider != null)
             bgmSlider.onValueChanged.AddListener(SetBGMVolume);
         if (sfxSlider != null)
             sfxSlider.onValueChanged.AddListener(SetSFXVolume);
+    }
+
+    private void ApplySavedSettings()
+    {
+        int savedScreenMode = PlayerPrefs.GetInt(ScreenModeKey, 0);
+        FullScreenMode mode = savedScreenMode switch
+        {
+            1 => FullScreenMode.Windowed,
+            _ => FullScreenMode.FullScreenWindow,
+        };
+        int savedResWidth = PlayerPrefs.GetInt(ResolutionWidthKey, Screen.width);
+        int savedResHeight = PlayerPrefs.GetInt(ResolutionHeightKey, Screen.height);
+        int resIndex = GetResolutionIndex(savedResWidth, savedResHeight);
+        if (resIndex >= 0 && availableResolutions != null && resIndex < availableResolutions.Length)
+        {
+            Resolution res = availableResolutions[resIndex];
+            Screen.SetResolution(res.width, res.height, mode);
+        }
+        else
+        {
+            Screen.SetResolution(Screen.width, Screen.height, mode);
+        }
     }
 
     public void LoadFromPlayerPrefs()
@@ -56,10 +80,6 @@ public class SettingsManager : MonoBehaviour
             screenModeDropdown.SetValueWithoutNotify(savedScreenMode);
         if (resolutionDropdown != null)
             resolutionDropdown.SetValueWithoutNotify(resIndex >= 0 ? resIndex : 0);
-
-        ApplyScreenMode(savedScreenMode);
-        if (resIndex >= 0)
-            ApplyResolution(resIndex);
     }
 
     public void SaveToPlayerPrefs()
@@ -112,34 +132,9 @@ public class SettingsManager : MonoBehaviour
         return -1;
     }
 
-    public void ApplyScreenMode(int index)
-    {
-        FullScreenMode mode = index switch
-        {
-            0 => FullScreenMode.FullScreenWindow,
-            1 => FullScreenMode.Windowed,
-            2 => FullScreenMode.FullScreenWindow,
-            _ => FullScreenMode.FullScreenWindow,
-        };
+    public void ApplyScreenMode(int index) { }
 
-        if (resolutionDropdown != null && availableResolutions != null &&
-            resolutionDropdown.value >= 0 && resolutionDropdown.value < availableResolutions.Length)
-        {
-            Resolution res = availableResolutions[resolutionDropdown.value];
-            Screen.SetResolution(res.width, res.height, mode);
-        }
-        else
-        {
-            Screen.SetResolution(Screen.width, Screen.height, mode);
-        }
-    }
-
-    public void ApplyResolution(int index)
-    {
-        if (availableResolutions == null || index < 0 || index >= availableResolutions.Length) return;
-        Resolution res = availableResolutions[index];
-        Screen.SetResolution(res.width, res.height, Screen.fullScreenMode);
-    }
+    public void ApplyResolution(int index) { }
 
     private void SetBGMVolume(float value)
     {
@@ -174,11 +169,22 @@ public class SettingsManager : MonoBehaviour
 
     public void Save()
     {
-        if (screenModeDropdown != null)
-            ApplyScreenMode(screenModeDropdown.value);
-        if (resolutionDropdown != null && resolutionDropdown.value >= 0 && availableResolutions != null &&
-            resolutionDropdown.value < availableResolutions.Length)
-            ApplyResolution(resolutionDropdown.value);
+        FullScreenMode mode = screenModeDropdown != null ? (screenModeDropdown.value switch
+        {
+            1 => FullScreenMode.Windowed,
+            _ => FullScreenMode.FullScreenWindow,
+        }) : Screen.fullScreenMode;
+
+        if (resolutionDropdown != null && availableResolutions != null &&
+            resolutionDropdown.value >= 0 && resolutionDropdown.value < availableResolutions.Length)
+        {
+            Resolution res = availableResolutions[resolutionDropdown.value];
+            Screen.SetResolution(res.width, res.height, mode);
+        }
+        else
+        {
+            Screen.SetResolution(Screen.width, Screen.height, mode);
+        }
 
         SaveToPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();

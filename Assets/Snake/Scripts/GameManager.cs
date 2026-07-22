@@ -125,6 +125,6 @@ public class GameManager : MonoBehaviour
     {
         SettingsManager.Instance?.RevertToPlayerPrefs();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(PauseManager.Instance?.MainMenuSceneName ?? "SnakeMenu");
     }
 }
