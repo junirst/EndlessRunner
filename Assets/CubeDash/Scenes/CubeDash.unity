@@ -2299,7 +2299,7 @@ MonoBehaviour:
     m_Bits: 256
   obstacleCheckRadius: 0.45
   powerUpSpawnTime: 12
-  powerUpSpawnTimeFactor: 0.08
+  powerUpSpawnTimeFactor: 0.1
   powerUpSpeed: 5
   powerUpSpeedFactor: 0.1
 --- !u!1 &1033328825
