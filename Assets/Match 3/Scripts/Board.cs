@@ -30,18 +30,21 @@ public class Board : MonoBehaviour
     public int height;
     public int offSet;
     public GameObject tilePrefab;
+    public GameObject BreakableTilePrefab;
     public GameObject[] dots;
     public GameObject[,] allDots;
     public Dot currentDot;
     public GameObject destroyEffect;
     public tileType[] boardLayout;
     private bool[,] blankSpaces;
+    private BackgroundTile[,] breakableTiles;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
 
     // Start is called before the first frame update
     void Start()
     {
+        breakableTiles = new BackgroundTile[width, height];
         findMatches = FindObjectOfType<FindMatches>();
 
         // Basic validation to catch inspector misconfiguration early
@@ -79,6 +82,30 @@ public class Board : MonoBehaviour
             if (boardLayout[i].tileKind == TileKind.Blank)
             {
                 blankSpaces[boardLayout[i].x, boardLayout[i].y] = true;
+            }
+        }
+    }
+
+    public void GenerateBreakableTiles()
+    {
+        //look at all the tiles in the layout
+        for (int i = 0; i < boardLayout.Length; i++)
+        {
+            //if a tile is a "jelly" tile  
+            if (boardLayout[i].tileKind == TileKind.Breakable)
+            {
+                //create a "jelly" tile at that position
+                Vector2 breakableTilePosition = new Vector2(boardLayout[i].x, boardLayout[i].y);
+                GameObject tile = Instantiate(BreakableTilePrefab, breakableTilePosition, Quaternion.identity);
+                breakableTiles[boardLayout[i].x, boardLayout[i].y] = tile.GetComponent<BackgroundTile>();
+                tile.transform.parent = this.transform;
+                tile.name = "( " + boardLayout[i].x + ", " + boardLayout[i].y + " )";
+                BackgroundTile backgroundTileComponent = tile.GetComponent<BackgroundTile>();
+                if (backgroundTileComponent != null)
+                {
+                    backgroundTileComponent.hitPoints = boardLayout[i].breakableValue;
+                }
+                allTiles[boardLayout[i].x, boardLayout[i].y] = backgroundTileComponent;
             }
         }
     }
@@ -298,6 +325,16 @@ public class Board : MonoBehaviour
                 {
                     CheckToMakeBombs();
                 }
+                //does a tile need to break?
+                if (breakableTiles[column, row] != null)
+                {
+                    //if it does, give it damage
+                    breakableTiles[column, row].TakeDamage(1);
+                    if (breakableTiles[column, row].hitPoints <= 0)
+                    {
+                        breakableTiles[column, row] = null;
+                    }
+                }
                 if (findMatches != null && findMatches.currentMatches.Contains(allDots[column, row]))
                 {
                     findMatches.currentMatches.Remove(allDots[column, row]);
@@ -327,7 +364,41 @@ public class Board : MonoBehaviour
                 }
             }
         }
+        findMatches.currentMatches.Clear();
         StartCoroutine(DecreaseRowCo());
+    }
+
+    private IEnumerator DecreaseRowCo2()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                if (allDots[i, j] == null)
+                {
+                    //if the curent spot isn't blank and is empty
+                    if (!blankSpaces[i, j] && allDots[i, j] == null)
+                    {
+                        //loop from the space above to the top of the column
+                        for (int k = j + 1; k < height; k++)
+                        {
+                            //if a dot is found, move it to the empty space
+                            if (allDots[i, k] != null)
+                            {
+                                //move the dot to the empty space
+                                allDots[i, k].GetComponent<Dot>().row = j;
+                                //set that spot to be null
+                                allDots[i, k] = null;
+                                //break out of the loop
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        yield return new WaitForSeconds(.4f);
+        StartCoroutine(FillBoardCo());
     }
 
     private IEnumerator DecreaseRowCo()
@@ -371,7 +442,7 @@ public class Board : MonoBehaviour
             for (int j = 0; j < height; j++)
             {
                 // Only refill positions that are not blank spaces
-                if (!blankSpaces[i, j] && allDots[i, j] == null)
+                if (!blankSpaces[i, j] && allDots[i, j] == null && !blankSpaces[i,j])
                 {
                     Vector2 tempPosition = new Vector2(i, height + missingPiecesCount);
                     missingPiecesCount++;

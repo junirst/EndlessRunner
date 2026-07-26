@@ -184,6 +184,27 @@ public class Dot : MonoBehaviour
         }
     }
 
+    void MovePiecesActual(Vector2 direction)
+    {
+        otherDot = board.allDots[column + (int)direction.x, row + (int)direction.y];
+        previousColumn = column;
+        previousRow = row;
+        if (otherDot != null)
+        {
+            otherDot.GetComponent<Dot>().column -= (int)direction.x;
+            otherDot.GetComponent<Dot>().row -= (int)direction.y;
+            column += (int)direction.x;
+            row += (int)direction.y;
+            board.allDots[column, row] = this.gameObject;
+            board.allDots[otherDot.GetComponent<Dot>().column, otherDot.GetComponent<Dot>().row] = otherDot;
+            StartCoroutine(CheckMoveCo());
+        }
+        else
+        {
+            board.currentState = GameState.move;
+        }
+    }
+
     void MovePieces()
     {
 
