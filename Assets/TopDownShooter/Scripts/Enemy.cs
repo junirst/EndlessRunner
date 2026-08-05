@@ -62,4 +62,15 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            ShooterLevelManager.manager.InscreaseScore(1);
+            ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
+            Destroy(other.gameObject);
+            Destroy(gameObject);
+        }
+    }
 }

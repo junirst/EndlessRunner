@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float fireRate = 0.5f;
 
     private Rigidbody2D rb;
+    private MotionDrivenBodySpriteAnimator2D bodyAnimator;
     private float mx;
     private float my;
 
@@ -22,6 +23,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        bodyAnimator = GetComponentInChildren<MotionDrivenBodySpriteAnimator2D>(true);
     }
 
     private void Update()
@@ -63,10 +65,20 @@ public class Player : MonoBehaviour
     private void Shoot()
     {
         Instantiate(bulletPrefab, firingPoint.position, firingPoint.rotation);
+        bodyAnimator?.TriggerAttack();
         ShooterAudioManager.Instance?.PlayPlayerShootSfx();
     }
 
     private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("EnemyBullet"))
+        {
+            ShooterLevelManager.manager.GameOver();
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("EnemyBullet"))
         {
