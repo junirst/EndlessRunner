@@ -402,8 +402,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnRate: 3
   enemyPrefab:
-  - {fileID: 4937690408093685197, guid: 51825c2de254d254c95a5856be51eb20, type: 3}
-  - {fileID: 4937690408093685197, guid: 13971e05b2ea42b419fdae5dcc09fc1a, type: 3}
   - {fileID: 6182800830122318535, guid: 5c056c76776ee7f4ca89b8fbcd859c34, type: 3}
   canSpawn: 1
 --- !u!4 &199142535
@@ -414,12 +412,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 199142533}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -15.080261, y: 0.39781094, z: 0.036285087}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2053850224}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &480346571
 GameObject:
@@ -1562,8 +1560,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnRate: 2
   enemyPrefab:
-  - {fileID: 4937690408093685197, guid: 51825c2de254d254c95a5856be51eb20, type: 3}
-  - {fileID: 4937690408093685197, guid: 13971e05b2ea42b419fdae5dcc09fc1a, type: 3}
   - {fileID: 6182800830122318535, guid: 5c056c76776ee7f4ca89b8fbcd859c34, type: 3}
   canSpawn: 1
 --- !u!4 &1276938417
@@ -1574,12 +1570,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1276938415}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 11, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.08026155, y: 11.397811, z: 0.036285087}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2053850224}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1311613389 stripped
 MonoBehaviour:
@@ -1632,10 +1628,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6772e31a0b39b5f4a8f9b87d4af95a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnRate: 5
+  spawnRate: 2
   enemyPrefab:
-  - {fileID: 4937690408093685197, guid: 51825c2de254d254c95a5856be51eb20, type: 3}
-  - {fileID: 4937690408093685197, guid: 13971e05b2ea42b419fdae5dcc09fc1a, type: 3}
   - {fileID: 6182800830122318535, guid: 5c056c76776ee7f4ca89b8fbcd859c34, type: 3}
   canSpawn: 1
 --- !u!4 &1346650559
@@ -1646,12 +1640,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1346650557}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.25, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 14.169739, y: 0.39781094, z: 0.036285087}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2053850224}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1379999407
 GameObject:
@@ -2494,6 +2488,7 @@ GameObject:
   - component: {fileID: 2053850223}
   - component: {fileID: 2053850222}
   - component: {fileID: 2053850221}
+  - component: {fileID: 2053850225}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2596,8 +2591,33 @@ Transform:
   - {fileID: 900690001}
   - {fileID: 1415916423}
   - {fileID: 2085671892}
+  - {fileID: 1276938417}
+  - {fileID: 1346650559}
+  - {fileID: 199142535}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2053850225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053850220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae75b8265080202459cbb55f56901f34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashCount: 4
+  flashInterval: 0.08
+  destroyDelayAfterFlash: 0.08
+  deathFrames:
+  - {fileID: 21300000, guid: 3bb68334c67e14e4f9c526ebdd6fd757, type: 3}
+  - {fileID: 21300000, guid: b1fe1350ae9e82d4d91818dc569da88e, type: 3}
+  - {fileID: 21300000, guid: 67a0ec233dc3bd24da8b3f3d0658ff4c, type: 3}
+  - {fileID: 21300000, guid: 8c935e0536e1bf140a05bfc74f76bb50, type: 3}
+  deathFrameRate: 12
+  targetRenderer: {fileID: 0}
 --- !u!1 &2085671891
 GameObject:
   m_ObjectHideFlags: 0
@@ -2689,9 +2709,6 @@ SceneRoots:
   - {fileID: 173452633}
   - {fileID: 1167876697}
   - {fileID: 2053850224}
-  - {fileID: 1276938417}
-  - {fileID: 1346650559}
-  - {fileID: 199142535}
   - {fileID: 621848289}
   - {fileID: 972946824}
   - {fileID: 1576604004}
