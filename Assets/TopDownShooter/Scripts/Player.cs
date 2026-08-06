@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float fireRate = 0.5f;
 
     private Rigidbody2D rb;
+    private ArcadeDeathEffect2D deathEffect;
     private MotionDrivenBodySpriteAnimator2D bodyAnimator;
     private float mx;
     private float my;
@@ -74,7 +75,7 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("EnemyBullet"))
         {
             ShooterLevelManager.manager.GameOver();
-            Destroy(gameObject);
+            GetDeathEffect().PlayAndDestroy();
         }
     }
 
@@ -83,7 +84,18 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("EnemyBullet"))
         {
             ShooterLevelManager.manager.GameOver();
-            Destroy(gameObject);
+            GetDeathEffect().PlayAndDestroy();
         }
+    }
+
+    private ArcadeDeathEffect2D GetDeathEffect()
+    {
+        ArcadeDeathEffect2D effect = GetComponent<ArcadeDeathEffect2D>();
+        if (!effect)
+        {
+            effect = gameObject.AddComponent<ArcadeDeathEffect2D>();
+        }
+
+        return effect;
     }
 }

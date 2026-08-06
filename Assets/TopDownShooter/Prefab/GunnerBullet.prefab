@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1808086387303672307}
   - component: {fileID: 5948230194231042201}
   m_Layer: 0
-  m_Name: EnemyBullet
+  m_Name: GunnerBullet
   m_TagString: EnemyBullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.52, y: 0.62, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -77,8 +77,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.14010859, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 9f443de87a1c0a544881535e43d61f66, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -147,8 +147,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 2}
+  m_Offset: {x: 0.00036625864, y: 0.028988076}
+  m_Size: {x: 0.13388892, y: 0.22851224}
   m_Direction: 0
 --- !u!114 &1808086387303672307
 MonoBehaviour:
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bcd5918b901c124e9851673aff73d89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  speed: 2.5
   lifetime: 3
 --- !u!114 &5948230194231042201
 MonoBehaviour:
@@ -177,5 +177,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 3821667503653866288}
-  frames: []
+  frames:
+  - {fileID: 21300000, guid: bfa86db587193d14cb5994a28970af9e, type: 3}
+  - {fileID: 21300000, guid: 44765a8cc6ea5704fb601cc7d13d96f8, type: 3}
+  - {fileID: 21300000, guid: a160787adc486cd47be62aa9d3b68358, type: 3}
+  - {fileID: 21300000, guid: 9f443de87a1c0a544881535e43d61f66, type: 3}
   frameRate: 12
