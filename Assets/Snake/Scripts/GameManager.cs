@@ -70,6 +70,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         gameOverScreen.SetActive(false);
         ScoreManager.Instance.StageId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         ScoreManager.Instance.LoadHighScore();
@@ -92,12 +94,28 @@ public class GameManager : MonoBehaviour
         gameOverScreen.SetActive(true);
         snake.enabled = false;
 
+        ShowLeaderboard(score);
+
         if (PauseManager.Instance != null && PauseManager.Instance.IsPaused)
             PauseManager.Instance.Resume();
 
         PowerUpUI.Instance?.ClearAll();
         SnakeAudioManager.Instance?.StopBgm();
         SnakeAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
+    }
+
+    private void ShowLeaderboard(int score)
+    {
+        if (LeaderboardManager.Instance == null) return;
+
+        Canvas canvas = gameOverScreen != null ? gameOverScreen.GetComponentInParent<Canvas>() : null;
+        if (canvas == null) canvas = FindObjectOfType<Canvas>();
+        if (canvas == null) return;
+
+        string boardKey = LeaderboardManager.GetBoardKey(ScoreManager.GameKey, ScoreManager.Instance.StageId);
+        if (!LeaderboardManager.Instance.IsValidBoard(boardKey)) return;
+
+        LeaderboardUI.Show(canvas, boardKey, score);
     }
 
     public void Retry()

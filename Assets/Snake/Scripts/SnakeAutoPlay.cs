@@ -43,18 +43,18 @@ public class SnakeAutoPlay : MonoBehaviour
     private int WrapX(int x)
     {
         if (!UsesWrapping) return x;
-        int half = Mathf.RoundToInt(snake.moveThroughWalls);
-        int width = half * 2;
-        x = ((x + half) % width + width) % width - half;
+        int bound = Mathf.RoundToInt(snake.moveThroughWalls);
+        if (x > bound) return -bound;
+        if (x < -bound) return bound;
         return x;
     }
 
     private int WrapY(int y)
     {
         if (!UsesWrapping) return y;
-        int half = Mathf.RoundToInt(snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f);
-        int height = half * 2;
-        y = ((y + half) % height + height) % height - half;
+        int bound = Mathf.RoundToInt(snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f);
+        if (y > bound) return -bound;
+        if (y < -bound) return bound;
         return y;
     }
 
@@ -71,8 +71,11 @@ public class SnakeAutoPlay : MonoBehaviour
         if (path != null && path.Count > 0)
         {
             Vector2Int next = path[0];
-            Vector2Int dir = next - head;
-            if (dir != -currentDir)
+            Vector2Int dir = new Vector2Int(
+                Mathf.Clamp(WrappedAxisDelta(head.x, next.x, true), -1, 1),
+                Mathf.Clamp(WrappedAxisDelta(head.y, next.y, false), -1, 1)
+            );
+            if (dir != Vector2Int.zero && dir != -currentDir)
                 return dir;
         }
 
@@ -84,15 +87,14 @@ public class SnakeAutoPlay : MonoBehaviour
         if (!UsesWrapping)
             return to - from;
 
-        int half = isX
+        int bound = isX
             ? Mathf.RoundToInt(snake.moveThroughWalls)
             : Mathf.RoundToInt(snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f);
-        int size = half * 2;
+        int n = bound * 2 + 1;
         int raw = to - from;
-        int wrapped = raw;
-        if (raw > half) wrapped = raw - size;
-        else if (raw < -half) wrapped = raw + size;
-        return wrapped;
+        int mod = ((raw % n) + n) % n;
+        if (mod > bound) mod -= n;
+        return mod;
     }
 
     private int Manhattan(Vector2Int a, Vector2Int b)
@@ -117,8 +119,11 @@ public class SnakeAutoPlay : MonoBehaviour
     private bool IsOnBody(Vector2Int pos)
     {
         IReadOnlyList<Transform> segs = snake.Segments;
+        int tailIndex = segs.Count - 1;
         for (int i = 0; i < segs.Count; i++)
         {
+            if (i == tailIndex) continue;
+
             Vector2Int segPos = new Vector2Int(
                 Mathf.RoundToInt(segs[i].position.x),
                 Mathf.RoundToInt(segs[i].position.y)

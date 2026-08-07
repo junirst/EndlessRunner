@@ -5,6 +5,8 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
+    public const string GameKey = "snake";
+
     [SerializeField] private int basePoints = 10;
 
     private int score;
@@ -66,6 +68,9 @@ public class ScoreManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(StageId)) return;
         SnakeSaveSystem.SetHighScore(StageId, highScore);
+
+        string boardKey = LeaderboardManager.GetBoardKey(GameKey, StageId);
+        LeaderboardManager.Instance?.SubmitScore(boardKey, highScore);
     }
 
     public void LoadHighScore()

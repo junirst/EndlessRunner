@@ -14,6 +14,7 @@ public class Snake : MonoBehaviour
     public float verticalBound = 0f;
 
     private readonly List<Transform> segments = new List<Transform>();
+    private readonly List<Vector2Int> cells = new List<Vector2Int>();
     private Vector2Int input;
     private Vector2Int? autoInput;
     private float nextUpdate;
@@ -78,34 +79,67 @@ public class Snake : MonoBehaviour
         if (input != Vector2Int.zero)
             direction = input;
 
-        for (int i = segments.Count - 1; i > 0; i--)
-            segments[i].position = segments[i - 1].position;
+        Vector2Int headCell = new Vector2Int(
+            Mathf.RoundToInt(transform.position.x),
+            Mathf.RoundToInt(transform.position.y)
+        );
+        Vector2Int newHead = Wrap(headCell + direction);
 
-        int x = Mathf.RoundToInt(transform.position.x) + direction.x;
-        int y = Mathf.RoundToInt(transform.position.y) + direction.y;
-
-        if (moveThroughWalls > 0f)
+        if (newHead != headCell && WouldCollide(newHead))
         {
-            float boundX = moveThroughWalls;
-            float boundY = verticalBound > 0f ? verticalBound : moveThroughWalls * 0.5f;
-
-            if (x > boundX) x = Mathf.RoundToInt(-boundX);
-            else if (x < -boundX) x = Mathf.RoundToInt(boundX);
-            if (y > boundY) y = Mathf.RoundToInt(-boundY);
-            else if (y < -boundY) y = Mathf.RoundToInt(boundY);
+            GameManager.Instance.GameOver();
+            return;
         }
 
-        transform.position = new Vector2(x, y);
+        cells.Insert(0, newHead);
+        cells.RemoveAt(cells.Count - 1);
+
+        transform.position = new Vector2(newHead.x, newHead.y);
+        for (int i = 1; i < segments.Count; i++)
+        {
+            Vector2Int cell = cells[i];
+            segments[i].position = new Vector2(cell.x, cell.y);
+        }
 
         nextUpdate = Time.time + (1f / (speed * (1f + permanentSpeedBonus) * speedMultiplier));
     }
 
+    private Vector2Int Wrap(Vector2Int cell)
+    {
+        if (moveThroughWalls <= 0f) return cell;
+
+        int x = cell.x;
+        int y = cell.y;
+        float boundX = moveThroughWalls;
+        float boundY = verticalBound > 0f ? verticalBound : moveThroughWalls * 0.5f;
+
+        if (x > boundX) x = Mathf.RoundToInt(-boundX);
+        else if (x < -boundX) x = Mathf.RoundToInt(boundX);
+        if (y > boundY) y = Mathf.RoundToInt(-boundY);
+        else if (y < -boundY) y = Mathf.RoundToInt(boundY);
+
+        return new Vector2Int(x, y);
+    }
+
+    private bool WouldCollide(Vector2Int pos)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            // The tail cell vacates on this move, so it is not a collision.
+            if (i == cells.Count - 1) continue;
+            if (cells[i] == pos) return true;
+        }
+        return false;
+    }
+
     public void Grow()
     {
+        Vector2Int tailCell = cells[cells.Count - 1];
         Transform segment = Instantiate(segmentPrefab);
-        segment.position = segments[segments.Count - 1].position;
+        segment.position = new Vector2(tailCell.x, tailCell.y);
         segment.tag = "Body";
         segments.Add(segment);
+        cells.Add(tailCell);
     }
 
     public void Shrink(int count)
@@ -115,6 +149,7 @@ public class Snake : MonoBehaviour
         {
             Transform tail = segments[segments.Count - 1];
             segments.RemoveAt(segments.Count - 1);
+            cells.RemoveAt(cells.Count - 1);
             Destroy(tail.gameObject);
         }
     }
@@ -138,8 +173,18 @@ public class Snake : MonoBehaviour
         segments.Clear();
         segments.Add(transform);
 
-        for (int i = 0; i < initialSize - 1; i++)
-            Grow();
+        cells.Clear();
+        for (int i = 0; i < initialSize; i++)
+            cells.Add(new Vector2Int(-i, 0));
+
+        for (int i = 1; i < initialSize; i++)
+        {
+            Vector2Int cell = cells[i];
+            Transform segment = Instantiate(segmentPrefab);
+            segment.position = new Vector2(cell.x, cell.y);
+            segment.tag = "Body";
+            segments.Add(segment);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
