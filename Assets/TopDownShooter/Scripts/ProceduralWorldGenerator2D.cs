@@ -52,6 +52,9 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
     [SerializeField] private bool alignCameraToPlayer = true;
     [SerializeField] private Vector2Int spawnOffset;
 
+    [Header("Enemy Spawn")]
+    [SerializeField, Min(0)] private int enemySpawnPaddingCells = 2;
+
     #endregion
 
     #region State
@@ -59,6 +62,7 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
     private readonly Dictionary<Sprite, Tile> tileCache = new Dictionary<Sprite, Tile>();
     private System.Random random;
     private int currentSeed;
+    private Vector3Int mapOriginCell;
 
     #endregion
 
@@ -91,17 +95,18 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
             targetTilemap.ClearAllTiles();
         }
 
-        Vector3Int origin = new Vector3Int(-(width / 2), -(height / 2), 0);
+        mapOriginCell = new Vector3Int(-(width / 2), -(height / 2), 0);
         Vector2Int spawnCell = GetSpawnCell();
 
-        FillBaseTerrain(origin);
-        GenerateRoadNetwork(origin, spawnCell);
+        FillBaseTerrain(mapOriginCell);
+        GenerateRoadNetwork(mapOriginCell, spawnCell);
+        EnsureInvisibleBorderWalls();
 
         targetTilemap.RefreshAllTiles();
 
         if (placePlayerAtSpawn)
         {
-            PlacePlayerAtSpawn(origin, spawnCell);
+            PlacePlayerAtSpawn(mapOriginCell, spawnCell);
         }
 
         if (alignCameraToPlayer)
@@ -383,5 +388,98 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
     private int ClampCell(int value, int maxExclusive)
     {
         return Mathf.Clamp(value, 0, maxExclusive - 1);
+    }
+
+    public bool TryGetRandomEnemySpawnPosition(out Vector3 position)
+    {
+        position = default;
+
+        if (!targetTilemap)
+        {
+            return false;
+        }
+
+        int minX = borderThickness + enemySpawnPaddingCells;
+        int minY = borderThickness + enemySpawnPaddingCells;
+        int maxX = width - borderThickness - enemySpawnPaddingCells - 1;
+        int maxY = height - borderThickness - enemySpawnPaddingCells - 1;
+
+        if (minX > maxX || minY > maxY)
+        {
+            return false;
+        }
+
+        int cellX = random.Next(minX, maxX + 1);
+        int cellY = random.Next(minY, maxY + 1);
+        position = targetTilemap.GetCellCenterWorld(mapOriginCell + new Vector3Int(cellX, cellY, 0));
+        return true;
+    }
+
+    private void EnsureInvisibleBorderWalls()
+    {
+        Transform wallRoot = GetOrCreateWallRoot();
+        if (!wallRoot)
+        {
+            return;
+        }
+
+        RemoveExistingWalls(wallRoot);
+
+        Vector3 leftEdge = targetTilemap.GetCellCenterWorld(mapOriginCell + new Vector3Int(0, height / 2, 0));
+        Vector3 rightEdge = targetTilemap.GetCellCenterWorld(mapOriginCell + new Vector3Int(width - 1, height / 2, 0));
+        Vector3 bottomEdge = targetTilemap.GetCellCenterWorld(mapOriginCell + new Vector3Int(width / 2, 0, 0));
+        Vector3 topEdge = targetTilemap.GetCellCenterWorld(mapOriginCell + new Vector3Int(width / 2, height - 1, 0));
+
+        float cellWidth = targetTilemap.layoutGrid ? targetTilemap.layoutGrid.cellSize.x : 1f;
+        float cellHeight = targetTilemap.layoutGrid ? targetTilemap.layoutGrid.cellSize.y : 1f;
+        float wallThickness = Mathf.Max(cellWidth, cellHeight);
+
+        CreateWallPiece(wallRoot, "LeftWall", leftEdge + Vector3.left * wallThickness, new Vector2(wallThickness, height * cellHeight + wallThickness * 2f));
+        CreateWallPiece(wallRoot, "RightWall", rightEdge + Vector3.right * wallThickness, new Vector2(wallThickness, height * cellHeight + wallThickness * 2f));
+        CreateWallPiece(wallRoot, "BottomWall", bottomEdge + Vector3.down * wallThickness, new Vector2(width * cellWidth + wallThickness * 2f, wallThickness));
+        CreateWallPiece(wallRoot, "TopWall", topEdge + Vector3.up * wallThickness, new Vector2(width * cellWidth + wallThickness * 2f, wallThickness));
+    }
+
+    private Transform GetOrCreateWallRoot()
+    {
+        Transform existing = transform.Find("InvisibleWalls");
+        if (existing)
+        {
+            return existing;
+        }
+
+        GameObject wallRootObject = new GameObject("InvisibleWalls");
+        wallRootObject.transform.SetParent(transform, false);
+        wallRootObject.transform.position = Vector3.zero;
+        return wallRootObject.transform;
+    }
+
+    private void RemoveExistingWalls(Transform wallRoot)
+    {
+        for (int i = wallRoot.childCount - 1; i >= 0; i--)
+        {
+            Transform child = wallRoot.GetChild(i);
+            if (Application.isPlaying)
+            {
+                Destroy(child.gameObject);
+            }
+            else
+            {
+                DestroyImmediate(child.gameObject);
+            }
+        }
+    }
+
+    private void CreateWallPiece(Transform wallRoot, string name, Vector3 worldPosition, Vector2 size)
+    {
+        GameObject wallPiece = new GameObject(name);
+        wallPiece.transform.SetParent(wallRoot, true);
+        wallPiece.transform.position = worldPosition;
+        wallPiece.transform.localRotation = Quaternion.identity;
+        wallPiece.transform.localScale = Vector3.one;
+
+        BoxCollider2D collider = wallPiece.AddComponent<BoxCollider2D>();
+        collider.size = size;
+        collider.isTrigger = false;
     }
 }

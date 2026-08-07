@@ -7,9 +7,16 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float spawnRate = 1f;
     [SerializeField] private GameObject[] enemyPrefab;
     [SerializeField] private bool canSpawn = true;
+    [SerializeField] private ProceduralWorldGenerator2D worldGenerator;
+    [SerializeField] private bool spawnInsideGeneratedMap = true;
 
     private void Start()
     {
+        if (!worldGenerator)
+        {
+            worldGenerator = FindObjectOfType<ProceduralWorldGenerator2D>();
+        }
+
         StartCoroutine(Spawner());
     }
 
@@ -23,7 +30,13 @@ public class EnemySpawner : MonoBehaviour
             int rand = Random.Range(0, enemyPrefab.Length);
             GameObject enemyToSpawn = enemyPrefab[rand];
 
-            Instantiate(enemyToSpawn, transform.position, Quaternion.identity);
+            Vector3 spawnPosition = transform.position;
+            if (spawnInsideGeneratedMap && worldGenerator && worldGenerator.TryGetRandomEnemySpawnPosition(out Vector3 generatedPosition))
+            {
+                spawnPosition = generatedPosition;
+            }
+
+            Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
         }   
     }
 }

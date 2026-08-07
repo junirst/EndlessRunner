@@ -404,6 +404,8 @@ MonoBehaviour:
   enemyPrefab:
   - {fileID: 6182800830122318535, guid: 5c056c76776ee7f4ca89b8fbcd859c34, type: 3}
   canSpawn: 1
+  worldGenerator: {fileID: 0}
+  spawnInsideGeneratedMap: 1
 --- !u!4 &199142535
 Transform:
   m_ObjectHideFlags: 0
@@ -1750,7 +1752,10 @@ MonoBehaviour:
   spawnRate: 2
   enemyPrefab:
   - {fileID: 6182800830122318535, guid: 5c056c76776ee7f4ca89b8fbcd859c34, type: 3}
+  - {fileID: 6182800830122318535, guid: f8b3912c26c8dc24fa850e7adca2465f, type: 3}
   canSpawn: 1
+  worldGenerator: {fileID: 0}
+  spawnInsideGeneratedMap: 1
 --- !u!4 &1276938417
 Transform:
   m_ObjectHideFlags: 0
@@ -1821,6 +1826,8 @@ MonoBehaviour:
   enemyPrefab:
   - {fileID: 6182800830122318535, guid: 5c056c76776ee7f4ca89b8fbcd859c34, type: 3}
   canSpawn: 1
+  worldGenerator: {fileID: 0}
+  spawnInsideGeneratedMap: 1
 --- !u!4 &1346650559
 Transform:
   m_ObjectHideFlags: 0
@@ -2193,6 +2200,7 @@ MonoBehaviour:
   placePlayerAtSpawn: 1
   alignCameraToPlayer: 1
   spawnOffset: {x: 0, y: 0}
+  enemySpawnPaddingCells: 2
 --- !u!4 &1613444959
 Transform:
   m_ObjectHideFlags: 0
