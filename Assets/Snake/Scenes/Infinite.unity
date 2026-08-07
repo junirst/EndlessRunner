@@ -1414,11 +1414,11 @@ MonoBehaviour:
   maxSlots: 5
   typeIcons:
   - {fileID: 21300000, guid: 3fe670ebc56a67a47b8eccd328c17b4e, type: 3}
-  - {fileID: 21300000, guid: 327d641001cddf949bb7bfbfcedf0915, type: 3}
-  - {fileID: 21300000, guid: 9b2a2bb8c1d18924281426b20eae695e, type: 3}
-  - {fileID: 21300000, guid: 167842b0f704a704bb804e8fefaaf7ea, type: 3}
-  - {fileID: 21300000, guid: 4d0ed1afb9b65784f95729169ec10a9c, type: 3}
   - {fileID: 21300000, guid: 53f560dba7c50574a884e18dcc93509b, type: 3}
+  - {fileID: 21300000, guid: 53f560dba7c50574a884e18dcc93509b, type: 3}
+  - {fileID: 21300000, guid: 53f560dba7c50574a884e18dcc93509b, type: 3}
+  - {fileID: 21300000, guid: 53f560dba7c50574a884e18dcc93509b, type: 3}
+  - {fileID: 21300000, guid: f78bca2b557b05241a06805771e4b1fb, type: 3}
 --- !u!114 &1153943715
 MonoBehaviour:
   m_ObjectHideFlags: 0
