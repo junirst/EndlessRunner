@@ -8,6 +8,7 @@ public class RangedEnemy : MonoBehaviour
     public float speed = 3f;
     public float rotationSpeed = 0.0025f;
     private Rigidbody2D rb;
+    private MotionDrivenBodySpriteAnimator2D bodyAnimator;
     public GameObject bulletPrefab;
 
     public float distanceToShoot = 5f;
@@ -21,6 +22,7 @@ public class RangedEnemy : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        bodyAnimator = GetComponentInChildren<MotionDrivenBodySpriteAnimator2D>(true);
     }
 
     private void Update()
@@ -43,6 +45,7 @@ public class RangedEnemy : MonoBehaviour
         if (timeToFire <= 0f)
         {
             Instantiate(bulletPrefab, firingPoint.position, firingPoint.rotation);
+            bodyAnimator?.TriggerAttack();
             ShooterAudioManager.Instance?.PlayEnemyShootSfx();
             timeToFire = fireRate;
         } else {
@@ -83,14 +86,47 @@ public class RangedEnemy : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             ShooterLevelManager.manager.GameOver();
-            Destroy(other.gameObject);
+            PlayDeathEffect(other.gameObject);
             target = null;
         } else if (other.gameObject.CompareTag("Bullet"))
         {
             ShooterLevelManager.manager.InscreaseScore(3);
             ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
             Destroy(other.gameObject);
-            Destroy(gameObject);
+            GetDeathEffect().PlayAndDestroy();
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            ShooterLevelManager.manager.InscreaseScore(3);
+            ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
+            Destroy(other.gameObject);
+            GetDeathEffect().PlayAndDestroy();
+        }
+    }
+
+    private ArcadeDeathEffect2D GetDeathEffect()
+    {
+        ArcadeDeathEffect2D effect = GetComponent<ArcadeDeathEffect2D>();
+        if (!effect)
+        {
+            effect = gameObject.AddComponent<ArcadeDeathEffect2D>();
+        }
+
+        return effect;
+    }
+
+    private void PlayDeathEffect(GameObject targetObject)
+    {
+        ArcadeDeathEffect2D playerDeathEffect = targetObject.GetComponent<ArcadeDeathEffect2D>();
+        if (!playerDeathEffect)
+        {
+            playerDeathEffect = targetObject.AddComponent<ArcadeDeathEffect2D>();
+        }
+
+        playerDeathEffect.PlayAndDestroy();
     }
 }

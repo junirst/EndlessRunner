@@ -52,14 +52,47 @@ public class Enemy : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             ShooterLevelManager.manager.GameOver();
-            Destroy(other.gameObject);
+            PlayDeathEffect(other.gameObject);
             target = null;
         } else if (other.gameObject.CompareTag("Bullet"))
         {
             ShooterLevelManager.manager.InscreaseScore(1);
             ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
             Destroy(other.gameObject);
-            Destroy(gameObject);
+            GetDeathEffect().PlayAndDestroy();
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            ShooterLevelManager.manager.InscreaseScore(1);
+            ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
+            Destroy(other.gameObject);
+            GetDeathEffect().PlayAndDestroy();
+        }
+    }
+
+    private ArcadeDeathEffect2D GetDeathEffect()
+    {
+        ArcadeDeathEffect2D effect = GetComponent<ArcadeDeathEffect2D>();
+        if (!effect)
+        {
+            effect = gameObject.AddComponent<ArcadeDeathEffect2D>();
+        }
+
+        return effect;
+    }
+
+    private void PlayDeathEffect(GameObject targetObject)
+    {
+        ArcadeDeathEffect2D playerDeathEffect = targetObject.GetComponent<ArcadeDeathEffect2D>();
+        if (!playerDeathEffect)
+        {
+            playerDeathEffect = targetObject.AddComponent<ArcadeDeathEffect2D>();
+        }
+
+        playerDeathEffect.PlayAndDestroy();
     }
 }

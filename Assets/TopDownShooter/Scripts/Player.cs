@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float fireRate = 0.5f;
 
     private Rigidbody2D rb;
+    private ArcadeDeathEffect2D deathEffect;
+    private MotionDrivenBodySpriteAnimator2D bodyAnimator;
     private float mx;
     private float my;
 
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        bodyAnimator = GetComponentInChildren<MotionDrivenBodySpriteAnimator2D>(true);
     }
 
     private void Update()
@@ -63,6 +66,7 @@ public class Player : MonoBehaviour
     private void Shoot()
     {
         Instantiate(bulletPrefab, firingPoint.position, firingPoint.rotation);
+        bodyAnimator?.TriggerAttack();
         ShooterAudioManager.Instance?.PlayPlayerShootSfx();
     }
 
@@ -71,7 +75,27 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("EnemyBullet"))
         {
             ShooterLevelManager.manager.GameOver();
-            Destroy(gameObject);
+            GetDeathEffect().PlayAndDestroy();
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("EnemyBullet"))
+        {
+            ShooterLevelManager.manager.GameOver();
+            GetDeathEffect().PlayAndDestroy();
+        }
+    }
+
+    private ArcadeDeathEffect2D GetDeathEffect()
+    {
+        ArcadeDeathEffect2D effect = GetComponent<ArcadeDeathEffect2D>();
+        if (!effect)
+        {
+            effect = gameObject.AddComponent<ArcadeDeathEffect2D>();
+        }
+
+        return effect;
     }
 }
