@@ -8,6 +8,7 @@ public class LeaderboardUI : MonoBehaviour
     #region Fields
 
     private const int TopLimit = 10;
+    private const int MaxNameLength = 16;
 
     [SerializeField] private string boardKey;
     [SerializeField] private int playerScore;
@@ -227,7 +228,7 @@ public class LeaderboardUI : MonoBehaviour
         nameInput.placeholder = placeholder;
         nameInput.textViewport = textAreaRT;
         nameInput.text = "";
-        nameInput.characterLimit = 16;
+        nameInput.characterLimit = MaxNameLength;
         nameInput.characterValidation = TMP_InputField.CharacterValidation.Name;
 
         RectTransform saveRT = CreateRect("SaveButton", parent, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
@@ -247,6 +248,8 @@ public class LeaderboardUI : MonoBehaviour
 
         string name = nameInput.text.Trim();
         if (string.IsNullOrEmpty(name)) return;
+        if (name.Length > MaxNameLength)
+            name = name.Substring(0, MaxNameLength);
 
         submitted = true;
         nameInputRoot.SetActive(false);
@@ -308,7 +311,13 @@ public class LeaderboardUI : MonoBehaviour
         {
             LeaderboardEntry e = entries[i];
             string rank = (i + 1).ToString();
-            output += $"#{rank.PadLeft(2)}  {e.Name.PadRight(16)}  {e.Score}\n";
+            string name = e.Name;
+            if (name.Length > MaxNameLength)
+                name = name.Substring(0, MaxNameLength);
+            string rankCell = $"<mspace=0.7em>#{rank.PadLeft(2)}</mspace>";
+            string nameCell = $"<mspace=0.52em>{name.PadRight(MaxNameLength)}</mspace>";
+            string scoreCell = $"<mspace=0.52em>{e.Score,8}</mspace>";
+            output += rankCell + " " + nameCell + scoreCell + "\n";
         }
         listText.text = output.TrimEnd('\n');
     }

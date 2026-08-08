@@ -3809,6 +3809,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 7092125129812994325, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
+      propertyPath: m_fontSize
+      value: 49
+      objectReference: {fileID: 0}
+    - target: {fileID: 7092125129812994325, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 49
+      objectReference: {fileID: 0}
     - target: {fileID: 7537927718533453380, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
