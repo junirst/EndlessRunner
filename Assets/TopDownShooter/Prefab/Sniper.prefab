@@ -374,11 +374,11 @@ MonoBehaviour:
   flashInterval: 0.08
   destroyDelayAfterFlash: 0.08
   deathFrames:
-  - {fileID: 21300000, guid: 015bf4b56176f50498069c3a720a8adc, type: 3}
-  - {fileID: 21300000, guid: 48852320016ca2f4fa4d57fb66022b3b, type: 3}
-  - {fileID: 21300000, guid: e1bff6c6c9d43d64fb5daa716fee9a49, type: 3}
-  - {fileID: 21300000, guid: 34edd77fa94f4c84db857bccf7990ef4, type: 3}
-  - {fileID: 21300000, guid: ab8a10e12ae5ddc49b5dcc686a000914, type: 3}
+  - {fileID: 21300000, guid: 451ce25d272e0e8439f35a1a2a8dfa18, type: 3}
+  - {fileID: 21300000, guid: c893f542c5344824e895e4f216a8cdea, type: 3}
+  - {fileID: 21300000, guid: ce4ab635e90e2014bb1552d787b25213, type: 3}
+  - {fileID: 21300000, guid: 5fb319b42bbbc584e82031c090465cc1, type: 3}
+  - {fileID: 21300000, guid: 7a1cb10982c80104e9925cdfcaed3dbc, type: 3}
   deathFrameRate: 12
   targetRenderer: {fileID: 0}
 --- !u!1 &6538862145429098034
