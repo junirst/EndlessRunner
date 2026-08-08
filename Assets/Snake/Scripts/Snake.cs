@@ -13,6 +13,8 @@ public class Snake : MonoBehaviour
     public float moveThroughWalls = 0f;
     public float verticalBound = 0f;
 
+    [SerializeField] private float cellSize = 0f;
+
     private readonly List<Transform> segments = new List<Transform>();
     private readonly List<Vector2Int> cells = new List<Vector2Int>();
     private Vector2Int input;
@@ -22,13 +24,22 @@ public class Snake : MonoBehaviour
 
     [SerializeField] private float permanentSpeedIncrease = 0.05f;
 
-    private Coroutine speedCoroutine;
+    private readonly List<SpeedEffect> speedEffects = new List<SpeedEffect>();
+    private Coroutine speedEffectsRoutine;
     private float baseSpeedMultiplier;
     private float wallImmunityTimer;
+    private const float MinSpeedMultiplier = 0.1f;
 
     public IReadOnlyList<Transform> Segments => segments;
     public Vector2Int CurrentDirection => direction;
     public bool IsWallImmune => wallImmunityTimer > 0f;
+
+    /// <summary>
+    /// Grid step in world units (distance between segment centers). Uses the
+    /// serialized <see cref="cellSize"/> when set, otherwise the head's width so
+    /// scaled-up sprites do not overlap each other.
+    /// </summary>
+    public float CellSize { get; private set; } = 1f;
 
     public void SetAutoInput(Vector2Int dir)
     {
@@ -38,6 +49,8 @@ public class Snake : MonoBehaviour
     private void Awake()
     {
         baseSpeedMultiplier = speedMultiplier;
+        CellSize = cellSize > 0f ? cellSize : Mathf.Abs(transform.localScale.x);
+        if (CellSize <= 0f) CellSize = 1f;
     }
 
     private void Start()
@@ -80,8 +93,8 @@ public class Snake : MonoBehaviour
             direction = input;
 
         Vector2Int headCell = new Vector2Int(
-            Mathf.RoundToInt(transform.position.x),
-            Mathf.RoundToInt(transform.position.y)
+            Mathf.RoundToInt(transform.position.x / CellSize),
+            Mathf.RoundToInt(transform.position.y / CellSize)
         );
         Vector2Int newHead = Wrap(headCell + direction);
 
@@ -94,11 +107,11 @@ public class Snake : MonoBehaviour
         cells.Insert(0, newHead);
         cells.RemoveAt(cells.Count - 1);
 
-        transform.position = new Vector2(newHead.x, newHead.y);
+        transform.position = new Vector2(newHead.x * CellSize, newHead.y * CellSize);
         for (int i = 1; i < segments.Count; i++)
         {
             Vector2Int cell = cells[i];
-            segments[i].position = new Vector2(cell.x, cell.y);
+            segments[i].position = new Vector2(cell.x * CellSize, cell.y * CellSize);
         }
 
         nextUpdate = Time.time + (1f / (speed * (1f + permanentSpeedBonus) * speedMultiplier));
@@ -110,13 +123,15 @@ public class Snake : MonoBehaviour
 
         int x = cell.x;
         int y = cell.y;
-        float boundX = moveThroughWalls;
-        float boundY = verticalBound > 0f ? verticalBound : moveThroughWalls * 0.5f;
+        int boundX = Mathf.RoundToInt(moveThroughWalls / CellSize);
+        int boundY = verticalBound > 0f
+            ? Mathf.RoundToInt(verticalBound / CellSize)
+            : Mathf.RoundToInt((moveThroughWalls * 0.5f) / CellSize);
 
-        if (x > boundX) x = Mathf.RoundToInt(-boundX);
-        else if (x < -boundX) x = Mathf.RoundToInt(boundX);
-        if (y > boundY) y = Mathf.RoundToInt(-boundY);
-        else if (y < -boundY) y = Mathf.RoundToInt(boundY);
+        if (x > boundX) x = -boundX;
+        else if (x < -boundX) x = boundX;
+        if (y > boundY) y = -boundY;
+        else if (y < -boundY) y = boundY;
 
         return new Vector2Int(x, y);
     }
@@ -136,7 +151,7 @@ public class Snake : MonoBehaviour
     {
         Vector2Int tailCell = cells[cells.Count - 1];
         Transform segment = Instantiate(segmentPrefab);
-        segment.position = new Vector2(tailCell.x, tailCell.y);
+        segment.position = new Vector2(tailCell.x * CellSize, tailCell.y * CellSize);
         segment.tag = "Body";
         segments.Add(segment);
         cells.Add(tailCell);
@@ -157,7 +172,8 @@ public class Snake : MonoBehaviour
     public void ResetState()
     {
         StopAllCoroutines();
-        speedCoroutine = null;
+        speedEffectsRoutine = null;
+        speedEffects.Clear();
         speedMultiplier = baseSpeedMultiplier;
         permanentSpeedBonus = 0f;
         wallImmunityTimer = 0.2f;
@@ -181,7 +197,7 @@ public class Snake : MonoBehaviour
         {
             Vector2Int cell = cells[i];
             Transform segment = Instantiate(segmentPrefab);
-            segment.position = new Vector2(cell.x, cell.y);
+            segment.position = new Vector2(cell.x * CellSize, cell.y * CellSize);
             segment.tag = "Body";
             segments.Add(segment);
         }
@@ -205,10 +221,10 @@ public class Snake : MonoBehaviour
                     if (segments.Count > 4) Shrink(1);
                     break;
                 case Food.FoodType.Speed:
-                    SetSpeedMultiplier(1.5f, food.Duration);
+                    ApplySpeedEffect(1.5f, food.Duration);
                     break;
                 case Food.FoodType.Slow:
-                    SetSpeedMultiplier(0.5f, food.Duration);
+                    ApplySpeedEffect(0.5f, food.Duration);
                     break;
                 case Food.FoodType.ScoreMultiplier:
                     ScoreManager.Instance.SetMultiplier(2f, food.Duration);
@@ -234,22 +250,62 @@ public class Snake : MonoBehaviour
         }
     }
 
-    private void SetSpeedMultiplier(float value, float duration)
+    private void ApplySpeedEffect(float factor, float duration)
     {
-        if (speedCoroutine != null)
-            StopCoroutine(speedCoroutine);
-        speedCoroutine = StartCoroutine(SpeedRoutine(value, duration));
-    }
+        if (duration <= 0f) return;
 
-    private IEnumerator SpeedRoutine(float value, float duration)
-    {
-        speedMultiplier = value;
+        speedEffects.Add(new SpeedEffect(factor, duration));
         PowerUpUI.Instance?.ShowPowerUp(
-            value > 1f ? Food.FoodType.Speed : Food.FoodType.Slow,
+            factor > 1f ? Food.FoodType.Speed : Food.FoodType.Slow,
             duration
         );
-        yield return new WaitForSeconds(duration);
-        speedMultiplier = baseSpeedMultiplier;
-        speedCoroutine = null;
+        RecalculateSpeedMultiplier();
+
+        if (speedEffectsRoutine == null)
+            speedEffectsRoutine = StartCoroutine(TickSpeedEffects());
+    }
+
+    private IEnumerator TickSpeedEffects()
+    {
+        while (speedEffects.Count > 0)
+        {
+            bool changed = false;
+            for (int i = speedEffects.Count - 1; i >= 0; i--)
+            {
+                speedEffects[i].remaining -= Time.deltaTime;
+                if (speedEffects[i].remaining <= 0f)
+                {
+                    speedEffects.RemoveAt(i);
+                    changed = true;
+                }
+            }
+            if (changed)
+                RecalculateSpeedMultiplier();
+            yield return null;
+        }
+        speedEffectsRoutine = null;
+    }
+
+    // Multiplicative stacking: normal x 1.5 (Speed) then x 0.5 (Slow) results in
+    // the base multiplier times the product of all active effects, and each effect
+    // reverts individually when its timer expires.
+    private void RecalculateSpeedMultiplier()
+    {
+        float multiplier = baseSpeedMultiplier;
+        foreach (SpeedEffect effect in speedEffects)
+            multiplier *= effect.factor;
+        speedMultiplier = Mathf.Max(multiplier, MinSpeedMultiplier);
+    }
+
+    private class SpeedEffect
+    {
+        public readonly float factor;
+        public float remaining;
+
+        public SpeedEffect(float factor, float duration)
+        {
+            this.factor = factor;
+            remaining = duration;
+        }
     }
 }

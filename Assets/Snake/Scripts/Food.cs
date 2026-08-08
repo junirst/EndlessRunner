@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Food : MonoBehaviour
@@ -44,6 +45,14 @@ public class Food : MonoBehaviour
 
     private void Start()
     {
+        // Wait one frame so Snake.Start() has built the initial body before
+        // deciding where food is allowed to spawn.
+        StartCoroutine(RandomizeNextFrame());
+    }
+
+    private IEnumerator RandomizeNextFrame()
+    {
+        yield return null;
         RandomizedPosition();
     }
 
@@ -53,15 +62,45 @@ public class Food : MonoBehaviour
         spriteRenderer.color = foodColors[(int)Type];
 
         Bounds bounds = gridArea.bounds;
+        float cs = snake != null ? snake.CellSize : 1f;
+
+        // Stay at least one cell away from each wall. Board corners / food rubbing
+        // the wall make the auto-play bot path around it in a circle, so keep a
+        // gutter of one cell on every side.
+        float minX = bounds.min.x + cs;
+        float maxX = bounds.max.x - cs;
+        float minY = bounds.min.y + cs;
+        float maxY = bounds.max.y - cs;
+        if (maxX <= minX) { minX = bounds.min.x; maxX = bounds.max.x; }
+        if (maxY <= minY) { minY = bounds.min.y; maxY = bounds.max.y; }
+
+        Vector3 best = transform.position;
+        float bestSpace = -1f;
         for (int i = 0; i < 30; i++)
         {
-            float x = Mathf.Round(Random.Range(bounds.min.x, bounds.max.x));
-            float y = Mathf.Round(Random.Range(bounds.min.y, bounds.max.y));
-            transform.position = new Vector3(x, y, 0f);
+            float x = Mathf.Clamp(Mathf.Round(Random.Range(minX, maxX) / cs) * cs, minX, maxX);
+            float y = Mathf.Clamp(Mathf.Round(Random.Range(minY, maxY) / cs) * cs, minY, maxY);
+            Vector3 candidate = new Vector3(x, y, 0f);
 
-            if (!IsOnSnake() && !IsOnObstacle())
+            // Keep the food out of the snake AND away from obstacle-tagged walls.
+            // A cell touching an obstacle makes the auto-play bot path around it
+            // in circles, so require a one-cell gutter of clear space.
+            if (!IsOnSnake(candidate) && !IsNearObstacle(candidate))
+            {
+                transform.position = candidate;
                 return;
+            }
+
+            float space = SnakeDistance(candidate);
+            if (space > bestSpace)
+            {
+                bestSpace = space;
+                best = candidate;
+            }
         }
+
+        // No fully open cell after all tries - use the cell furthest from the snake.
+        transform.position = best;
     }
 
     private FoodType PickRandomType()
@@ -79,20 +118,41 @@ public class Food : MonoBehaviour
 
     private bool IsOnSnake()
     {
+        return IsOnSnake(transform.position);
+    }
+
+    private bool IsOnSnake(Vector3 position)
+    {
         if (snake == null) return false;
 
+        float threshold = Mathf.Max(snake.CellSize * 0.5f, 0.1f);
         foreach (Transform seg in snake.Segments)
         {
-            if (Vector3.Distance(transform.position, seg.position) < 0.1f)
+            if (Vector3.Distance(position, seg.position) < threshold)
                 return true;
         }
         return false;
     }
-    private bool IsOnObstacle()
+
+    private float SnakeDistance(Vector3 position)
     {
+        if (snake == null) return float.MaxValue;
+
+        float min = float.MaxValue;
+        foreach (Transform seg in snake.Segments)
+            min = Mathf.Min(min, Vector3.Distance(position, seg.position));
+        return min;
+    }
+    private bool IsNearObstacle(Vector3 position)
+    {
+        // Overlap a box big enough to reach all four neighbouring cells, so a
+        // spawn only passes when the surrounding ring is also clear of Obstacle.
+        BoxCollider2D collider = snake.GetComponent<BoxCollider2D>();
+        Vector2 size = collider != null ? collider.size * snake.CellSize : Vector2.one * snake.CellSize;
+        size += Vector2.one * snake.CellSize * 2f;
         Collider2D[] hits = Physics2D.OverlapBoxAll(
-            transform.position,
-            snake.GetComponent<BoxCollider2D>().size,
+            position,
+            size,
             0f
         );
         foreach (Collider2D hit in hits)

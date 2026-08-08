@@ -68,9 +68,6 @@ public class ScoreManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(StageId)) return;
         SnakeSaveSystem.SetHighScore(StageId, highScore);
-
-        string boardKey = LeaderboardManager.GetBoardKey(GameKey, StageId);
-        LeaderboardManager.Instance?.SubmitScore(boardKey, highScore);
     }
 
     public void LoadHighScore()

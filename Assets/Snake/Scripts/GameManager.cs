@@ -91,7 +91,9 @@ public class GameManager : MonoBehaviour
         }
 
         finalScoreText.text = $"Score: {score}\nHigh Score: {ScoreManager.Instance.HighScore}";
-        gameOverScreen.SetActive(true);
+        // The leaderboard shows first; the game over screen activates only once
+        // the leaderboard is closed.
+        gameOverScreen.SetActive(false);
         snake.enabled = false;
 
         ShowLeaderboard(score);
@@ -115,7 +117,13 @@ public class GameManager : MonoBehaviour
         string boardKey = LeaderboardManager.GetBoardKey(ScoreManager.GameKey, ScoreManager.Instance.StageId);
         if (!LeaderboardManager.Instance.IsValidBoard(boardKey)) return;
 
-        LeaderboardUI.Show(canvas, boardKey, score);
+        LeaderboardUI ui = LeaderboardUI.Show(canvas, boardKey, score);
+        if (ui != null)
+            ui.onClose = () =>
+            {
+                gameOverScreen.SetActive(true);
+                ui.onClose = null;
+            };
     }
 
     public void Retry()

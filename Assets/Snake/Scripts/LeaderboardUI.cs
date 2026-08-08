@@ -20,6 +20,14 @@ public class LeaderboardUI : MonoBehaviour
     [SerializeField] private TMP_InputField nameInput;
 
     private bool fetching;
+    private bool submitted;
+    private bool framed;
+
+    /// <summary>
+    /// Invoked when the panel is closed, so callers can reveal the screen that
+    /// was waiting behind the leaderboard (e.g. the game over screen).
+    /// </summary>
+    public System.Action onClose;
 
     #endregion
 
@@ -97,10 +105,16 @@ public class LeaderboardUI : MonoBehaviour
         if (ui.canvasGroup == null || ui.statusText == null)
             ui.EnsureRefs();
 
+        ui.ApplyPrefabStyle();
+
+        if (ui.nameInput != null)
+            ui.nameInput.text = "";
+
         ui.gameObject.SetActive(true);
         ui.canvasGroup.alpha = 1f;
         ui.canvasGroup.blocksRaycasts = true;
         ui.canvasGroup.interactable = true;
+        ui.submitted = false;
         ui.boardKey = boardKey;
         ui.playerScore = playerScore;
         ui.fetching = false;
@@ -127,10 +141,10 @@ public class LeaderboardUI : MonoBehaviour
         canvasGroup = cg;
 
         Image bg = gameObject.AddComponent<Image>();
-        bg.color = new Color(0f, 0f, 0f, 0.9f);
+        bg.color = new Color(0f, 0f, 0f, 1f);
         bg.raycastTarget = true;
 
-        RectTransform card = CreateRect("Card", rootRT, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+        RectTransform card = CreateFrame(rootRT, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
             new Vector2(0f, 20f), new Vector2(560f, 640f));
 
         TextMeshProUGUI title = CreateText("Title", card,
@@ -141,18 +155,20 @@ public class LeaderboardUI : MonoBehaviour
             "Loading...", 20f, TextAlignmentOptions.Center, new Color(1f, 1f, 1f, 0.9f));
         StretchTop(statusText.rectTransform, -56f, 30f);
 
-        listText = CreateText("List", card,
+        RectTransform listFrame = CreateFrame(card, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+            new Vector2(0f, -96f), new Vector2(520f, 380f));
+        listText = CreateText("List", listFrame,
             "", 20f, TextAlignmentOptions.TopLeft, Color.white);
         RectTransform listRT = listText.rectTransform;
-        listRT.anchorMin = new Vector2(0f, 1f);
-        listRT.anchorMax = new Vector2(1f, 1f);
+        listRT.anchorMin = new Vector2(0.5f, 1f);
+        listRT.anchorMax = new Vector2(0.5f, 1f);
         listRT.pivot = new Vector2(0.5f, 1f);
-        listRT.anchoredPosition = new Vector2(0f, -96f);
-        listRT.sizeDelta = new Vector2(520f, 380f);
+        listRT.anchoredPosition = new Vector2(0f, -12f);
+        listRT.sizeDelta = new Vector2(490f, 356f);
 
         rankText = CreateText("Rank", card,
             "", 20f, TextAlignmentOptions.Center, new Color(1f, 0.84f, 0.2f));
-        StretchTop(rankText.rectTransform, -470f, 30f);
+        StretchTop(rankText.rectTransform, -494f, 30f);
 
         nameInputRoot = new GameObject("NameInputRoot", typeof(RectTransform));
         nameInputRoot.transform.SetParent(card, false);
@@ -210,7 +226,7 @@ public class LeaderboardUI : MonoBehaviour
         nameInput.textComponent = text;
         nameInput.placeholder = placeholder;
         nameInput.textViewport = textAreaRT;
-        nameInput.text = LeaderboardManager.Instance?.PlayerName ?? "";
+        nameInput.text = "";
         nameInput.characterLimit = 16;
         nameInput.characterValidation = TMP_InputField.CharacterValidation.Name;
 
@@ -225,13 +241,22 @@ public class LeaderboardUI : MonoBehaviour
         saveBtn.onClick.AddListener(SaveName);
     }
 
-    private void SaveName()
+    public void SaveName()
     {
+        if (submitted) return;
+
         string name = nameInput.text.Trim();
         if (string.IsNullOrEmpty(name)) return;
 
-        LeaderboardManager.Instance.PlayerName = name;
+        submitted = true;
         nameInputRoot.SetActive(false);
+        _ = SaveAndRenderAsync(name);
+    }
+
+    private async System.Threading.Tasks.Task SaveAndRenderAsync(string name)
+    {
+        if (LeaderboardManager.Instance != null)
+            await LeaderboardManager.Instance.SubmitScoreAndWaitAsync(boardKey, name, playerScore);
         FetchAndRender();
     }
 
@@ -243,33 +268,21 @@ public class LeaderboardUI : MonoBehaviour
     {
         if (fetching) return;
         fetching = true;
-        statusText.text = "Loading...";
 
-        bool hasName = LeaderboardManager.Instance != null && LeaderboardManager.Instance.HasPlayerName;
-
-        _ = RefreshAsync(hasName);
+        _ = RefreshAsync();
     }
 
-    private async System.Threading.Tasks.Task RefreshAsync(bool hasName)
+    private async System.Threading.Tasks.Task RefreshAsync()
     {
-        // Make sure the current score is on the server before reading it back,
-        // otherwise the list/rank can show the previous best.
-        if (LeaderboardManager.Instance != null)
-            await LeaderboardManager.Instance.SubmitAndWaitAsync(boardKey, playerScore);
-
         LeaderboardManager.Instance?.FetchTop(boardKey, TopLimit, entries =>
         {
             fetching = false;
             RenderList(entries);
-            if (!hasName)
-            {
+            if (!submitted)
                 nameInputRoot.SetActive(true);
-                statusText.text = "Enter your name to join the ranking!";
-            }
         }, () =>
         {
             fetching = false;
-            statusText.text = "Offline - leaderboard unavailable.";
         });
 
         LeaderboardManager.Instance?.GetPlayerRank(boardKey, playerScore, rank =>
@@ -290,19 +303,22 @@ public class LeaderboardUI : MonoBehaviour
         }
 
         string output = "";
-        for (int i = 0; i < entries.Count; i++)
+        int count = Mathf.Min(entries.Count, TopLimit);
+        for (int i = 0; i < count; i++)
         {
             LeaderboardEntry e = entries[i];
             string rank = (i + 1).ToString();
             output += $"#{rank.PadLeft(2)}  {e.Name.PadRight(16)}  {e.Score}\n";
         }
         listText.text = output.TrimEnd('\n');
-        statusText.text = $"Top {entries.Count} of {boardKey}";
     }
 
     public void Close()
     {
+        System.Action callback = onClose;
+        onClose = null;
         gameObject.SetActive(false);
+        callback?.Invoke();
     }
 
     #endregion
@@ -335,6 +351,79 @@ public class LeaderboardUI : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Applies the black backdrop / white-frame styling to an existing prefab
+    /// instance. The prefab was authored before the framed look, so instead of
+    /// regenerating it (which would wipe manual layout), we dress it in place.
+    /// </summary>
+    public void ApplyPrefabStyle()
+    {
+        if (framed) return;
+        framed = true;
+
+        Image bg = GetComponent<Image>();
+        if (bg != null)
+            bg.color = new Color(0f, 0f, 0f, 1f);
+
+        RectTransform card = FindChildRect("Card");
+        if (card != null && card.GetComponent<Image>() == null)
+        {
+            Image cardImg = card.gameObject.AddComponent<Image>();
+            cardImg.color = Color.white;
+            cardImg.raycastTarget = false;
+
+            GameObject innerGO = new GameObject("Inner", typeof(RectTransform));
+            innerGO.transform.SetParent(card, false);
+            RectTransform inner = (RectTransform)innerGO.transform;
+            inner.anchorMin = Vector2.zero;
+            inner.anchorMax = Vector2.one;
+            inner.offsetMin = new Vector2(4f, 4f);
+            inner.offsetMax = new Vector2(-4f, -4f);
+            Image innerImg = innerGO.AddComponent<Image>();
+            innerImg.color = new Color(0.05f, 0.05f, 0.05f, 1f);
+            innerImg.raycastTarget = false;
+            inner.SetAsFirstSibling();
+        }
+
+        RectTransform list = FindChildRect("List");
+        if (list != null && list.parent != null && list.GetComponent<Image>() == null)
+        {
+            GameObject frameGO = new GameObject("ListFrame", typeof(RectTransform));
+            RectTransform frame = (RectTransform)frameGO.transform;
+            frame.SetParent(card, false);
+            frame.anchorMin = list.anchorMin;
+            frame.anchorMax = list.anchorMax;
+            frame.pivot = list.pivot;
+            frame.anchoredPosition = list.anchoredPosition;
+            frame.sizeDelta = new Vector2(list.sizeDelta.x + 8f, list.sizeDelta.y + 8f);
+            Image frameImg = frameGO.AddComponent<Image>();
+            frameImg.color = Color.white;
+            frameImg.raycastTarget = false;
+
+            GameObject listBgGO = new GameObject("Inner", typeof(RectTransform));
+            listBgGO.transform.SetParent(frame, false);
+            RectTransform listBg = (RectTransform)listBgGO.transform;
+            listBg.anchorMin = Vector2.zero;
+            listBg.anchorMax = Vector2.one;
+            listBg.offsetMin = new Vector2(4f, 4f);
+            listBg.offsetMax = new Vector2(-4f, -4f);
+            Image listBgImg = listBgGO.AddComponent<Image>();
+            listBgImg.color = new Color(0.05f, 0.05f, 0.05f, 1f);
+            listBgImg.raycastTarget = false;
+
+            frame.SetSiblingIndex(list.GetSiblingIndex());
+        }
+    }
+
+    private RectTransform FindChildRect(string name)
+    {
+        foreach (RectTransform child in GetComponentsInChildren<RectTransform>(true))
+        {
+            if (child.gameObject.name == name) return child;
+        }
+        return null;
+    }
+
     private static RectTransform CreateRect(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
         Vector2 position, Vector2 size)
     {
@@ -347,6 +436,29 @@ public class LeaderboardUI : MonoBehaviour
         rt.anchoredPosition = position;
         rt.sizeDelta = size;
         return rt;
+    }
+
+    /// <summary>
+    /// Builds a rect with a white border: a white backdrop plus a slightly smaller
+    /// dark fill, so the framed area reads as a clean white outline around the
+    /// content (used for the leaderboard card and the score list).
+    /// </summary>
+    private static RectTransform CreateFrame(Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+        Vector2 position, Vector2 size)
+    {
+        RectTransform frame = CreateRect("Frame", parent, anchorMin, anchorMax, position, size);
+
+        Image border = frame.gameObject.AddComponent<Image>();
+        border.color = Color.white;
+        border.raycastTarget = false;
+
+        RectTransform inner = CreateRect("Inner", frame, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            Vector2.zero, new Vector2(size.x - 8f, size.y - 8f));
+        Image fill = inner.gameObject.AddComponent<Image>();
+        fill.color = new Color(0.05f, 0.05f, 0.05f, 1f);
+        fill.raycastTarget = false;
+
+        return frame;
     }
 
     private static TextMeshProUGUI CreateText(string name, Transform parent, string content, float fontSize,

@@ -34,20 +34,12 @@ public class LeaderboardManager : MonoBehaviour
     private const string ApiKey = "AIzaSyCrlf9nxmD9yqWeo4IcwGYkL0UPPjBpCzU";
 
     private const string DatabaseId = "(default)";
-    private const string NameKey = "PlayerName";
-    private const string DeviceKey = "LeaderboardDeviceId";
 
     private static readonly string[] ValidBoards =
     {
         "snake_infinite", "snake_level1", "snake_level2",
         "cubedash", "shooter", "minigolf"
     };
-
-    #endregion
-
-    #region Private Fields
-
-    private string deviceId;
 
     #endregion
 
@@ -62,14 +54,6 @@ public class LeaderboardManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        deviceId = PlayerPrefs.GetString(DeviceKey, "");
-        if (string.IsNullOrEmpty(deviceId))
-        {
-            deviceId = Guid.NewGuid().ToString("N");
-            PlayerPrefs.SetString(DeviceKey, deviceId);
-            PlayerPrefs.Save();
-        }
     }
 
     public static void EnsureInstance()
@@ -85,18 +69,6 @@ public class LeaderboardManager : MonoBehaviour
     #region Read-Only Helpers
 
     public bool IsInitialized => !string.IsNullOrEmpty(ProjectId) && !string.IsNullOrEmpty(ApiKey);
-
-    public string PlayerName
-    {
-        get => PlayerPrefs.GetString(NameKey, "");
-        set
-        {
-            PlayerPrefs.SetString(NameKey, value);
-            PlayerPrefs.Save();
-        }
-    }
-
-    public bool HasPlayerName => !string.IsNullOrEmpty(PlayerName);
 
     public static string GetBoardKey(string gameKey, string stageId)
     {
@@ -116,9 +88,10 @@ public class LeaderboardManager : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// Submit the player's best score for a board. Keeps the highest score per device.
+    /// Submit a score as a brand-new leaderboard entry. Every call creates a new
+    /// document, so the same machine/name can hold many rows (arcade style).
     /// </summary>
-    public void SubmitScore(string boardKey, int score)
+    public async System.Threading.Tasks.Task SubmitScoreAndWaitAsync(string boardKey, string name, int score)
     {
         if (!IsValidBoard(boardKey))
         {
@@ -130,22 +103,10 @@ public class LeaderboardManager : MonoBehaviour
             Debug.LogWarning("LeaderboardManager: not configured (set ProjectId/ApiKey), score not submitted.");
             return;
         }
-        if (score <= 0) return;
-
-        string name = string.IsNullOrEmpty(PlayerName) ? "Anonymous" : PlayerName;
-        _ = SubmitScoreAsync(boardKey, name, score);
-    }
-
-    /// <summary>
-    /// Submit the score for a board and await completion, so callers can read
-    /// back fresh data (list / rank) that reflects the submitted score.
-    /// </summary>
-    public async System.Threading.Tasks.Task SubmitAndWaitAsync(string boardKey, int score)
-    {
-        if (!IsValidBoard(boardKey) || !IsInitialized || score <= 0)
+        if (score <= 0 || string.IsNullOrWhiteSpace(name))
             return;
-        string name = string.IsNullOrEmpty(PlayerName) ? "Anonymous" : PlayerName;
-        await SubmitScoreAsync(boardKey, name, score);
+
+        await SubmitNewEntryAsync(boardKey, name.Trim(), score);
     }
 
     /// <summary>
@@ -183,29 +144,19 @@ public class LeaderboardManager : MonoBehaviour
 
     #region Firestore REST Requests
 
-    private async Task SubmitScoreAsync(string boardKey, string name, int score)
+    private async Task SubmitNewEntryAsync(string boardKey, string name, int score)
     {
         try
         {
-            (bool exists, int existing) = await GetExistingScoreAsync(boardKey);
-
-            if (exists && existing >= score)
+            string docId = Guid.NewGuid().ToString("N");
+            bool ok = await WriteScoreAsync(boardKey, name, score, docId);
+            if (ok)
             {
-                Debug.Log($"Leaderboard: existing {existing} >= {score}, not overwriting.");
-                return;
+                Debug.Log($"Leaderboard: submitted {score} for '{boardKey}' as '{name}'.");
             }
-
-            for (int attempt = 0; attempt < 2; attempt++)
+            else
             {
-                bool ok = await WriteScoreAsync(boardKey, name, score, exists);
-                if (ok)
-                {
-                    Debug.Log($"Leaderboard: submitted {score} for '{boardKey}'.");
-                    return;
-                }
-                // Precondition failed (document state changed) - re-read and try again.
-                (exists, existing) = await GetExistingScoreAsync(boardKey);
-                if (exists && existing >= score) return;
+                Debug.LogWarning($"Leaderboard: submit for '{boardKey}' failed (server rejected the write).");
             }
         }
         catch (Exception e)
@@ -214,40 +165,23 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    private async Task<(bool exists, int score)> GetExistingScoreAsync(string boardId)
+    private async Task<bool> WriteScoreAsync(string boardId, string name, int score, string docId)
     {
-        string url = $"{BaseUrl}/documents/{boardId}/{deviceId}?key={ApiKey}";
-        using (UnityWebRequest req = UnityWebRequest.Get(url))
-        {
-            await AwaitRequest(req);
-            if (req.result == UnityWebRequest.Result.Success)
-            {
-                int score = ParseScore(req.downloadHandler.text);
-                return (true, score);
-            }
-            // 404 = document not found yet.
-            return (false, 0);
-        }
-    }
+        string[] parts = boardId.Split('_');
+        string game = parts[0];
+        string scene = parts.Length > 1 ? boardId.Substring(boardId.IndexOf('_') + 1) : "";
 
-    private static Task<bool> AwaitRequest(UnityWebRequest req)
-    {
-        var tcs = new TaskCompletionSource<bool>();
-        req.SendWebRequest().completed += _ => tcs.TrySetResult(req.result == UnityWebRequest.Result.Success);
-        return tcs.Task;
-    }
-
-    private async Task<bool> WriteScoreAsync(string boardId, string name, int score, bool exists)
-    {
         var fields = new Dictionary<string, object>
         {
             { "Score", new Dictionary<string, object> { { "integerValue", score.ToString() } } },
             { "Name", new Dictionary<string, object> { { "stringValue", name } } },
+            { "Game", new Dictionary<string, object> { { "stringValue", game } } },
+            { "Scene", new Dictionary<string, object> { { "stringValue", scene } } },
             { "Timestamp", new Dictionary<string, object> { { "timestampValue", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") } } }
         };
         var document = new Dictionary<string, object> { { "fields", fields } };
 
-        string url = $"{BaseUrl}/documents/{boardId}/{deviceId}?key={ApiKey}&currentDocument.exists={(exists ? "true" : "false")}";
+        string url = $"{BaseUrl}/documents/{boardId}/{docId}?key={ApiKey}&currentDocument.exists=false";
         string body = Json.Serialize(document);
 
         using (UnityWebRequest req = new UnityWebRequest(url, "PATCH"))
@@ -259,6 +193,13 @@ public class LeaderboardManager : MonoBehaviour
             await AwaitRequest(req);
             return req.result == UnityWebRequest.Result.Success;
         }
+    }
+
+    private static Task<bool> AwaitRequest(UnityWebRequest req)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        req.SendWebRequest().completed += _ => tcs.TrySetResult(req.result == UnityWebRequest.Result.Success);
+        return tcs.Task;
     }
 
     private async Task FetchTopAsync(string boardId, int limit, Action<List<LeaderboardEntry>> onResult, Action onError)
@@ -351,14 +292,6 @@ public class LeaderboardManager : MonoBehaviour
 
     #region JSON Parsing
 
-    private static int ParseScore(string json)
-    {
-        if (!TryParseObject(json, out Dictionary<string, object> root)) return 0;
-        if (!root.TryGetValue("fields", out object f) || !(f is Dictionary<string, object> fields)) return 0;
-        if (!fields.TryGetValue("Score", out object s) || !(s is Dictionary<string, object> sv)) return 0;
-        return (sv.TryGetValue("integerValue", out object iv) && int.TryParse((string)iv, out int val)) ? val : 0;
-    }
-
     private static List<LeaderboardEntry> ParseRunQuery(string json)
     {
         List<LeaderboardEntry> entries = new List<LeaderboardEntry>();
@@ -399,18 +332,6 @@ public class LeaderboardManager : MonoBehaviour
                 count++;
         }
         return count;
-    }
-
-    private static bool TryParseObject(string json, out Dictionary<string, object> result)
-    {
-        result = null;
-        if (string.IsNullOrEmpty(json)) return false;
-        if (Json.Deserialize(json) is Dictionary<string, object> obj)
-        {
-            result = obj;
-            return true;
-        }
-        return false;
     }
 
     #endregion
