@@ -103,8 +103,20 @@ public class Enemy : MonoBehaviour
     private void HandleDied(Health deadHealth)
     {
         ShooterLevelManager.manager?.InscreaseScore(scoreValue);
+        GetDropper().DropLoot();
         ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
         GetDeathEffect().PlayAndDestroy();
+    }
+
+    private EnemyPowerUpDropper GetDropper()
+    {
+        EnemyPowerUpDropper dropper = GetComponent<EnemyPowerUpDropper>();
+        if (!dropper)
+        {
+            dropper = gameObject.AddComponent<EnemyPowerUpDropper>();
+        }
+
+        return dropper;
     }
 
     private ArcadeDeathEffect2D GetDeathEffect()

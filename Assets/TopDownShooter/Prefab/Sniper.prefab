@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 4517526787835802141}
   - component: {fileID: 7589098705864525518}
   - component: {fileID: 5448570344115815346}
+  - component: {fileID: 7339927711828645318}
   m_Layer: 0
   m_Name: Sniper
   m_TagString: Enemy
@@ -383,6 +384,23 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7a1cb10982c80104e9925cdfcaed3dbc, type: 3}
   deathFrameRate: 12
   targetRenderer: {fileID: 0}
+--- !u!114 &7339927711828645318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6182800830122318535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dae4c5a1b2f86434997b11e19c3bc7d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthDropChance: 0.25
+  healthPickupPrefab: {fileID: 6498352366914950695, guid: 08e2649106d396741b159de6c4d1a9ca, type: 3}
+  armorDropChance: 0.2
+  armorPickupPrefab: {fileID: 6498352366914950695, guid: 285c25ca204fd074fbebb66d186c8858, type: 3}
+  spawnOffset: {x: 0, y: 0.4}
 --- !u!1 &6538862145429098034
 GameObject:
   m_ObjectHideFlags: 0
