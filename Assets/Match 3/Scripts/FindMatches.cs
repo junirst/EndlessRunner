@@ -295,9 +295,10 @@ public class FindMatches : MonoBehaviour
             //is the piece moved matched?
             if (board.currentDot.isMatched)
             {
-                /*
+                
                 //make it unmatched
                 board.currentDot.isMatched = false;
+                /*
                 //decide what kind of bomb to make
                 int typeOfBomb = Random.Range(0, 100);
                 if (typeOfBomb < 50)
@@ -323,7 +324,7 @@ public class FindMatches : MonoBehaviour
                     board.currentDot.MakeColumnBomb();
                 }
             }
-            else if (board.currentDot.otherDot != null);
+            else if (board.currentDot.otherDot != null)
             {
                 Dot otherDot = board.currentDot.otherDot.GetComponent<Dot>();
                 //other dots matched?
