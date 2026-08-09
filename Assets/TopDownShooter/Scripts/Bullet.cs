@@ -50,12 +50,14 @@ public class Bullet : MonoBehaviour
 
     private void TryDealDamage(GameObject targetObject)
     {
-        if (!targetObject.CompareTag(targetTag))
+        bool isExpectedTagTarget = targetObject.CompareTag(targetTag);
+        bool canHitWeaponDropDestructible = targetTag == "Enemy" && targetObject.GetComponentInParent<ShooterWeaponDropper>() != null;
+        if (!isExpectedTagTarget && !canHitWeaponDropDestructible)
         {
             return;
         }
 
-        Player player = targetObject.GetComponent<Player>();
+        Player player = targetObject.GetComponentInParent<Player>();
         if (player != null)
         {
             player.ApplyDamage(damage);
@@ -63,7 +65,7 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        Health targetHealth = targetObject.GetComponent<Health>();
+        Health targetHealth = targetObject.GetComponentInParent<Health>();
         if (targetHealth == null)
         {
             return;

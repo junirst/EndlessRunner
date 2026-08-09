@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1808086387303672307}
   - component: {fileID: 5948230194231042201}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: SMG_Bullet
   m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.52, y: 0.62, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -77,8 +77,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 1061085958406d24aa3ff94f062b8c49, type: 3}
-  m_Color: {r: 1, g: 0.84413767, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: d827e353f39aa4e4a9a1cf15cf232489, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -147,8 +147,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0058313846, y: 0.0070630196}
-  m_Size: {x: 0.092429064, y: 0.119616106}
+  m_Offset: {x: 0.00036625564, y: 0.07602404}
+  m_Size: {x: 0.13388892, y: 0.2458413}
   m_Direction: 0
 --- !u!114 &1808086387303672307
 MonoBehaviour:
@@ -162,9 +162,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bcd5918b901c124e9851673aff73d89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
-  lifetime: 3
-  damage: 25
+  speed: 5
+  lifetime: 5
+  damage: 20
   targetTag: Enemy
 --- !u!114 &5948230194231042201
 MonoBehaviour:
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 3821667503653866288}
   frames:
-  - {fileID: 21300000, guid: 82b6aa713dc6e334eb9f2179625aa2cd, type: 3}
-  - {fileID: 21300000, guid: 8ece6b35c5a64cd42a005cc4caf7a42e, type: 3}
-  - {fileID: 21300000, guid: 1061085958406d24aa3ff94f062b8c49, type: 3}
+  - {fileID: 21300000, guid: 810b6881ad0079e4bb8da8f10d616283, type: 3}
+  - {fileID: 21300000, guid: a7c64f80246fdd7418f13e3065147a55, type: 3}
+  - {fileID: 21300000, guid: 46f6ae36c8e3b6942a889f6c817c4f42, type: 3}
   frameRate: 12

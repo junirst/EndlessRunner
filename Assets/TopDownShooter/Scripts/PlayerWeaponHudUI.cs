@@ -7,7 +7,7 @@ public class PlayerWeaponHudUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI ammoText;
     [SerializeField] private Image weaponIconImage;
-    [SerializeField] private Sprite weaponIcon;
+    [SerializeField] private Sprite defaultWeaponIcon;
     [SerializeField] private Player player;
 
     private void Awake()
@@ -21,7 +21,23 @@ public class PlayerWeaponHudUI : MonoBehaviour
     private void Start()
     {
         BindPlayer();
-        RefreshIcon();
+        RefreshAll();
+    }
+
+    private void OnEnable()
+    {
+        if (player != null)
+        {
+            player.PlayerWeaponChanged += HandleWeaponChanged;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (player != null)
+        {
+            player.PlayerWeaponChanged -= HandleWeaponChanged;
+        }
     }
 
     private void Update()
@@ -36,8 +52,29 @@ public class PlayerWeaponHudUI : MonoBehaviour
 
     public void BindPlayer(Player targetPlayer)
     {
+        if (player != null)
+        {
+            player.PlayerWeaponChanged -= HandleWeaponChanged;
+        }
+
         player = targetPlayer;
+        if (player != null)
+        {
+            player.PlayerWeaponChanged += HandleWeaponChanged;
+        }
+
+        RefreshAll();
+    }
+
+    private void HandleWeaponChanged()
+    {
+        RefreshAll();
+    }
+
+    private void RefreshAll()
+    {
         RefreshAmmoText();
+        RefreshIcon();
     }
 
     private void BindPlayer()
@@ -47,7 +84,7 @@ public class PlayerWeaponHudUI : MonoBehaviour
             player = FindObjectOfType<Player>();
         }
 
-        RefreshAmmoText();
+        RefreshAll();
     }
 
     private void RefreshAmmoText()
@@ -73,7 +110,13 @@ public class PlayerWeaponHudUI : MonoBehaviour
             return;
         }
 
-        weaponIconImage.sprite = weaponIcon;
-        weaponIconImage.enabled = weaponIcon != null;
+        Sprite currentIcon = player != null ? player.GetWeaponIcon() : null;
+        if (currentIcon == null)
+        {
+            currentIcon = defaultWeaponIcon;
+        }
+
+        weaponIconImage.sprite = currentIcon;
+        weaponIconImage.enabled = currentIcon != null;
     }
 }

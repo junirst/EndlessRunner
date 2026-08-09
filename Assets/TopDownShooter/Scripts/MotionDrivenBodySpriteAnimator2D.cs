@@ -90,4 +90,41 @@ public class MotionDrivenBodySpriteAnimator2D : MonoBehaviour
             targetRenderer.sprite = frame;
         }
     }
+
+    public void SetFrames(Sprite[] newFrames, bool refreshSprite = true)
+    {
+        frames = newFrames != null ? newFrames : new Sprite[0];
+        frameTimer = 0f;
+        currentFrame = 0;
+        isPlaying = false;
+
+        if (refreshSprite && targetRenderer && frames.Length > 0 && frames[0])
+        {
+            targetRenderer.sprite = frames[0];
+        }
+    }
+
+    public void SetIdleSprite(Sprite idleSprite)
+    {
+        if (targetRenderer && idleSprite)
+        {
+            targetRenderer.sprite = idleSprite;
+        }
+    }
+
+    public Sprite[] GetFramesCopy()
+    {
+        if (frames == null || frames.Length == 0)
+        {
+            return new Sprite[0];
+        }
+
+        Sprite[] copy = new Sprite[frames.Length];
+        for (int i = 0; i < frames.Length; i++)
+        {
+            copy[i] = frames[i];
+        }
+
+        return copy;
+    }
 }
