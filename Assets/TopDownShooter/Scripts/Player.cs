@@ -10,6 +10,9 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform firingPoint;
     [Range(0.1f, 2f)]
     [SerializeField] private float fireRate = 0.5f;
+    [SerializeField] private bool infiniteAmmo = true;
+    [SerializeField, Min(0)] private int maxAmmo = 12;
+    [SerializeField, Min(0)] private int startingAmmo = 12;
 
     private Rigidbody2D rb;
     private ArcadeDeathEffect2D deathEffect;
@@ -20,6 +23,7 @@ public class Player : MonoBehaviour
     private float my;
 
     private float fireTimer;
+    private int currentAmmo;
 
     private Vector2 mousePos;
 
@@ -35,6 +39,15 @@ public class Player : MonoBehaviour
         if (!armor)
         {
             armor = gameObject.AddComponent<Armor>();
+        }
+
+        if (infiniteAmmo)
+        {
+            currentAmmo = int.MaxValue;
+        }
+        else
+        {
+            currentAmmo = Mathf.Clamp(startingAmmo, 0, maxAmmo);
         }
     }
 
@@ -99,6 +112,31 @@ public class Player : MonoBehaviour
         return armor;
     }
 
+    public bool HasInfiniteAmmo()
+    {
+        return infiniteAmmo;
+    }
+
+    public int GetCurrentAmmo()
+    {
+        return currentAmmo;
+    }
+
+    public int GetMaxAmmo()
+    {
+        return maxAmmo;
+    }
+
+    public string GetAmmoDisplayText()
+    {
+        if (infiniteAmmo)
+        {
+            return "∞";
+        }
+
+        return currentAmmo + "/" + maxAmmo;
+    }
+
     public void ApplyDamage(float damageAmount)
     {
         if (damageAmount <= 0f)
@@ -120,9 +158,30 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
+        if (!TryConsumeAmmo())
+        {
+            return;
+        }
+
         Instantiate(bulletPrefab, firingPoint.position, firingPoint.rotation);
         bodyAnimator?.TriggerAttack();
         ShooterAudioManager.Instance?.PlayPlayerShootSfx();
+    }
+
+    private bool TryConsumeAmmo()
+    {
+        if (infiniteAmmo)
+        {
+            return true;
+        }
+
+        if (currentAmmo <= 0)
+        {
+            return false;
+        }
+
+        currentAmmo--;
+        return true;
     }
 
     private void HandleDied(Health deadHealth)
