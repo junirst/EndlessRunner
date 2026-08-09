@@ -164,6 +164,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   lifetime: 3
+  damage: 50
+  targetTag: Enemy
 --- !u!114 &5948230194231042201
 MonoBehaviour:
   m_ObjectHideFlags: 0

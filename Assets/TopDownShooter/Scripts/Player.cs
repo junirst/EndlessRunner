@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private ArcadeDeathEffect2D deathEffect;
     private MotionDrivenBodySpriteAnimator2D bodyAnimator;
+    private Health health;
+    private Armor armor;
     private float mx;
     private float my;
 
@@ -21,10 +23,34 @@ public class Player : MonoBehaviour
 
     private Vector2 mousePos;
 
+    private void Awake()
+    {
+        health = GetComponent<Health>();
+        if (!health)
+        {
+            health = gameObject.AddComponent<Health>();
+        }
+
+        armor = GetComponent<Armor>();
+        if (!armor)
+        {
+            armor = gameObject.AddComponent<Armor>();
+        }
+    }
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         bodyAnimator = GetComponentInChildren<MotionDrivenBodySpriteAnimator2D>(true);
+        health.Died += HandleDied;
+    }
+
+    private void OnDestroy()
+    {
+        if (health != null)
+        {
+            health.Died -= HandleDied;
+        }
     }
 
     private void Update()
@@ -63,6 +89,35 @@ public class Player : MonoBehaviour
         fireTimer = fireRate;
     }
 
+    public Health GetHealth()
+    {
+        return health;
+    }
+
+    public Armor GetArmor()
+    {
+        return armor;
+    }
+
+    public void ApplyDamage(float damageAmount)
+    {
+        if (damageAmount <= 0f)
+        {
+            return;
+        }
+
+        float remainingDamage = damageAmount;
+        if (armor != null)
+        {
+            remainingDamage = armor.AbsorbDamage(remainingDamage);
+        }
+
+        if (remainingDamage > 0f)
+        {
+            health?.TakeDamage(remainingDamage);
+        }
+    }
+
     private void Shoot()
     {
         Instantiate(bulletPrefab, firingPoint.position, firingPoint.rotation);
@@ -70,22 +125,10 @@ public class Player : MonoBehaviour
         ShooterAudioManager.Instance?.PlayPlayerShootSfx();
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void HandleDied(Health deadHealth)
     {
-        if (other.gameObject.CompareTag("EnemyBullet"))
-        {
-            ShooterLevelManager.manager.GameOver();
-            GetDeathEffect().PlayAndDestroy();
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.gameObject.CompareTag("EnemyBullet"))
-        {
-            ShooterLevelManager.manager.GameOver();
-            GetDeathEffect().PlayAndDestroy();
-        }
+        ShooterLevelManager.manager?.GameOver();
+        GetDeathEffect().PlayAndDestroy();
     }
 
     private ArcadeDeathEffect2D GetDeathEffect()

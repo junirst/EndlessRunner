@@ -239,7 +239,7 @@ GameObject:
   - component: {fileID: 5448570344115815346}
   m_Layer: 0
   m_Name: Sniper
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -353,6 +353,8 @@ MonoBehaviour:
   target: {fileID: 0}
   speed: 3
   rotationSpeed: 0.01
+  contactDamage: 25
+  scoreValue: 3
   bulletPrefab: {fileID: 6498352366914950695, guid: 65c14a45342e3314396d4e11bc0927da, type: 3}
   distanceToShoot: 16
   distanceToStop: 5
