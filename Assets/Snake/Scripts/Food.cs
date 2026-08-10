@@ -16,22 +16,36 @@ public class Food : MonoBehaviour
     [SerializeField] private BoxCollider2D gridArea;
     [SerializeField] private Snake snake;
     [SerializeField] private Color[] foodColors;
+    [SerializeField] private Sprite[] foodSprites;
     [SerializeField] private int[] scoreValues;
     [SerializeField] private float[] durations;
     [SerializeField] private float[] weights;
+    [SerializeField, Range(0.6f, 1f)] private float fillScale = 1f;
 
     public FoodType Type { get; private set; }
     public int ScoreValue => scoreValues != null && (int)Type < scoreValues.Length ? scoreValues[(int)Type] : 10;
     public float Duration => durations != null && (int)Type < durations.Length ? durations[(int)Type] : 0f;
 
     private SpriteRenderer spriteRenderer;
+    private Sprite defaultSprite;
     private float totalWeight;
+    private CircleCollider2D circleCollider;
+    private float baseLocalScale = 1f;
+    private float baseColliderRadius;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null)
             spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+
+        circleCollider = GetComponent<CircleCollider2D>();
+        baseLocalScale = Mathf.Abs(transform.localScale.x);
+        if (baseLocalScale <= 0f) baseLocalScale = 1f;
+        if (circleCollider != null)
+            baseColliderRadius = circleCollider.radius * baseLocalScale;
+
+        defaultSprite = spriteRenderer.sprite;
 
         if (weights == null || weights.Length == 0)
             weights = new float[] { 1f };
@@ -59,7 +73,7 @@ public class Food : MonoBehaviour
     public void RandomizedPosition()
     {
         Type = PickRandomType();
-        spriteRenderer.color = foodColors[(int)Type];
+        ApplyVisuals();
 
         Bounds bounds = gridArea.bounds;
         float cs = snake != null ? snake.CellSize : 1f;
@@ -101,6 +115,40 @@ public class Food : MonoBehaviour
 
         // No fully open cell after all tries - use the cell furthest from the snake.
         transform.position = best;
+    }
+
+    private void ApplyVisuals()
+    {
+        int index = (int)Type;
+        Sprite sprite = foodSprites != null && index >= 0 && index < foodSprites.Length
+            ? foodSprites[index]
+            : defaultSprite;
+
+        if (sprite != null)
+        {
+            spriteRenderer.sprite = sprite;
+            spriteRenderer.color = Color.white;
+            FitToCell(sprite);
+        }
+        else
+        {
+            spriteRenderer.color = foodColors != null && index < foodColors.Length
+                ? foodColors[index]
+                : Color.white;
+        }
+    }
+
+    private void FitToCell(Sprite sprite)
+    {
+        float cs = snake != null ? snake.CellSize : 1f;
+        Vector2 size = sprite.bounds.size;
+        float scale = cs / Mathf.Max(size.x, size.y) * fillScale;
+        transform.localScale = new Vector3(scale, scale, transform.localScale.z);
+
+        // Keep the trigger's world-space radius constant so scaling the sprite
+        // never inflates the pickup area.
+        if (circleCollider != null && baseColliderRadius > 0f)
+            circleCollider.radius = baseColliderRadius / Mathf.Abs(scale);
     }
 
     private FoodType PickRandomType()

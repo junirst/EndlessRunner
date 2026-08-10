@@ -15,6 +15,8 @@ public class Snake : MonoBehaviour
 
     [SerializeField] private float cellSize = 0f;
 
+    [SerializeField] private float cornerScale = 2.6f;
+
     private readonly List<Transform> segments = new List<Transform>();
     private readonly List<Vector2Int> cells = new List<Vector2Int>();
     private Vector2Int input;
@@ -29,6 +31,13 @@ public class Snake : MonoBehaviour
     private float baseSpeedMultiplier;
     private float wallImmunityTimer;
     private const float MinSpeedMultiplier = 0.1f;
+    private const string InputXParam = "InputX";
+    private const string InputYParam = "InputY";
+
+    private Animator animator;
+    private Vector2Int lastDirection;
+    private float bodyScale = 1f;
+    private Vector2 bodyColliderSize = Vector2.one;
 
     public IReadOnlyList<Transform> Segments => segments;
     public Vector2Int CurrentDirection => direction;
@@ -51,11 +60,45 @@ public class Snake : MonoBehaviour
         baseSpeedMultiplier = speedMultiplier;
         CellSize = cellSize > 0f ? cellSize : Mathf.Abs(transform.localScale.x);
         if (CellSize <= 0f) CellSize = 1f;
+
+        animator = GetComponent<Animator>();
+
+        if (segmentPrefab != null)
+        {
+            SpriteRenderer prefabRenderer = segmentPrefab.GetComponent<SpriteRenderer>();
+            if (prefabRenderer != null && prefabRenderer.sprite != null)
+            {
+                Vector2 size = prefabRenderer.sprite.bounds.size;
+                float maxSize = Mathf.Max(size.x, size.y);
+                if (maxSize > 0f)
+                    bodyScale = CellSize / maxSize;
+            }
+
+            BoxCollider2D prefabCollider = segmentPrefab.GetComponent<BoxCollider2D>();
+            if (prefabCollider != null)
+                bodyColliderSize = prefabCollider.size;
+        }
+
+        // Capture the grid size above before rescaling the visuals so the
+        // head sprite can fill its cell exactly without shifting the grid.
+        FitToCell(transform);
     }
 
     private void Start()
     {
         ResetState();
+    }
+
+    private void UpdateAnimatorDirection()
+    {
+        if (animator == null) return;
+
+        if (direction != lastDirection)
+        {
+            lastDirection = direction;
+            animator.SetFloat(InputXParam, direction.x);
+            animator.SetFloat(InputYParam, direction.y);
+        }
     }
 
     private void Update()
@@ -92,6 +135,8 @@ public class Snake : MonoBehaviour
         if (input != Vector2Int.zero)
             direction = input;
 
+        UpdateAnimatorDirection();
+
         Vector2Int headCell = new Vector2Int(
             Mathf.RoundToInt(transform.position.x / CellSize),
             Mathf.RoundToInt(transform.position.y / CellSize)
@@ -112,6 +157,7 @@ public class Snake : MonoBehaviour
         {
             Vector2Int cell = cells[i];
             segments[i].position = new Vector2(cell.x * CellSize, cell.y * CellSize);
+            UpdateSegmentAnimation(segments[i], GetSegmentAnimationDirection(i));
         }
 
         nextUpdate = Time.time + (1f / (speed * (1f + permanentSpeedBonus) * speedMultiplier));
@@ -147,14 +193,114 @@ public class Snake : MonoBehaviour
         return false;
     }
 
+    private void FitToCell(Transform segment)
+    {
+        SpriteRenderer spriteRenderer = segment.GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null || spriteRenderer.sprite == null) return;
+
+        Vector2 size = spriteRenderer.sprite.bounds.size;
+        if (size.x <= 0f || size.y <= 0f) return;
+
+        float scale = CellSize / Mathf.Max(size.x, size.y);
+        segment.localScale = new Vector3(
+            scale,
+            scale,
+            segment.localScale.z
+        );
+    }
+
+    // Facing of a body segment: it points one cell toward the head. Falls back
+    // to the nearest segment with a non-zero delta so a freshly grown tail
+    // (which shares its cell with the old tail for one tick) still faces along
+    // the body.
+    private Vector2Int GetSegmentFacing(int index)
+    {
+        if (index <= 0 || index >= cells.Count)
+            return Vector2Int.right;
+
+        Vector2Int facing = cells[index - 1] - cells[index];
+        if (facing != Vector2Int.zero)
+            return facing;
+
+        for (int k = index - 1; k > 0; k--)
+        {
+            facing = cells[k - 1] - cells[k];
+            if (facing != Vector2Int.zero)
+                return facing;
+        }
+        return Vector2Int.right;
+    }
+
+    // Direction from a segment toward the tail. Returns null when there is no
+    // segment behind this one (tail) or when the neighbor shares this cell for
+    // a tick after growing, so those segments keep rendering straight.
+    private Vector2Int? GetBackDirection(int index)
+    {
+        if (index <= 0 || index >= cells.Count - 1)
+            return null;
+
+        for (int k = index; k < cells.Count - 1; k++)
+        {
+            Vector2Int delta = cells[k + 1] - cells[k];
+            if (delta != Vector2Int.zero)
+                return delta;
+        }
+        return null;
+    }
+
+    // Blend-tree direction for a body segment: the cardinal facing for a
+    // straight run, or the diagonal (front + back) that selects the matching
+    // corner sprite where the body bends.
+    private Vector2Int GetSegmentAnimationDirection(int index)
+    {
+        Vector2Int front = GetSegmentFacing(index);
+        Vector2Int? back = GetBackDirection(index);
+        if (back == null) return front;
+
+        Vector2Int backValue = back.Value;
+        if (front.x * backValue.y - front.y * backValue.x == 0)
+            return front;
+
+        return front + backValue;
+    }
+
+    private void UpdateSegmentAnimation(Transform segment, Vector2Int dir)
+    {
+        // Corners keep their own absolute scale (2.6) so the drawn arm reaches
+        // the neighboring cell center exactly; straights stay fit-to-cell. The
+        // collider shrinks on corners to keep the hit area unchanged.
+        bool isCorner = Mathf.Abs(dir.x) == 1 && Mathf.Abs(dir.y) == 1;
+        float scale = isCorner ? cornerScale : bodyScale;
+        segment.localScale = new Vector3(scale, scale, segment.localScale.z);
+
+        BoxCollider2D collider = segment.GetComponent<BoxCollider2D>();
+        if (collider != null)
+        {
+            float colliderFactor = isCorner && cornerScale > 0f ? bodyScale / cornerScale : 1f;
+            collider.size = bodyColliderSize * colliderFactor;
+        }
+
+        Animator segmentAnimator = segment.GetComponent<Animator>();
+        if (segmentAnimator == null) return;
+
+        segmentAnimator.SetFloat(InputXParam, dir.x);
+        segmentAnimator.SetFloat(InputYParam, dir.y);
+    }
+
     public void Grow()
     {
         Vector2Int tailCell = cells[cells.Count - 1];
         Transform segment = Instantiate(segmentPrefab);
         segment.position = new Vector2(tailCell.x * CellSize, tailCell.y * CellSize);
         segment.tag = "Body";
+        FitToCell(segment);
         segments.Add(segment);
         cells.Add(tailCell);
+
+        UpdateSegmentAnimation(
+            segment,
+            GetSegmentAnimationDirection(segments.Count - 1)
+        );
     }
 
     public void Shrink(int count)
@@ -199,7 +345,9 @@ public class Snake : MonoBehaviour
             Transform segment = Instantiate(segmentPrefab);
             segment.position = new Vector2(cell.x * CellSize, cell.y * CellSize);
             segment.tag = "Body";
+            FitToCell(segment);
             segments.Add(segment);
+            UpdateSegmentAnimation(segment, GetSegmentAnimationDirection(i));
         }
     }
 
