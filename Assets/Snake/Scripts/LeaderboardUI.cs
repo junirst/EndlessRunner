@@ -103,8 +103,7 @@ public class LeaderboardUI : MonoBehaviour
             ui = root.GetComponent<LeaderboardUI>();
         }
 
-        if (ui.canvasGroup == null || ui.statusText == null)
-            ui.EnsureRefs();
+        ui.EnsureRefs();
 
         ui.ApplyPrefabStyle();
 
@@ -120,6 +119,50 @@ public class LeaderboardUI : MonoBehaviour
         ui.playerScore = playerScore;
         ui.fetching = false;
         ui.FetchAndRender();
+        return ui;
+    }
+
+    /// <summary>
+    /// Shows the leaderboard in front of a game's end screen. The screen stays
+    /// hidden until the leaderboard is closed (mirrors snake's game over flow).
+    /// Falls back to revealing the screen immediately if the leaderboard cannot
+    /// run (no manager, unknown board, or no canvas).
+    /// </summary>
+    public static LeaderboardUI ShowForGame(GameObject screenToReveal, string gameKey, string stageId, int score)
+    {
+        if (LeaderboardManager.Instance == null)
+        {
+            if (screenToReveal != null) screenToReveal.SetActive(true);
+            return null;
+        }
+
+        string boardKey = LeaderboardManager.GetBoardKey(gameKey, stageId);
+        if (!LeaderboardManager.Instance.IsValidBoard(boardKey))
+        {
+            if (screenToReveal != null) screenToReveal.SetActive(true);
+            return null;
+        }
+
+        Canvas canvas = screenToReveal != null ? screenToReveal.GetComponentInParent<Canvas>() : null;
+        if (canvas == null) canvas = UnityEngine.Object.FindObjectOfType<Canvas>();
+        if (canvas == null)
+        {
+            if (screenToReveal != null) screenToReveal.SetActive(true);
+            return null;
+        }
+
+        LeaderboardUI ui = Show(canvas, boardKey, score);
+        if (ui == null)
+        {
+            if (screenToReveal != null) screenToReveal.SetActive(true);
+            return null;
+        }
+
+        ui.onClose = () =>
+        {
+            ui.onClose = null;
+            if (screenToReveal != null) screenToReveal.SetActive(true);
+        };
         return ui;
     }
 
@@ -245,6 +288,8 @@ public class LeaderboardUI : MonoBehaviour
     public void SaveName()
     {
         if (submitted) return;
+        if (nameInput == null) EnsureRefs();
+        if (nameInput == null) return;
 
         string name = nameInput.text.Trim();
         if (string.IsNullOrEmpty(name)) return;
@@ -281,8 +326,6 @@ public class LeaderboardUI : MonoBehaviour
         {
             fetching = false;
             RenderList(entries);
-            if (!submitted)
-                nameInputRoot.SetActive(true);
         }, () =>
         {
             fetching = false;
@@ -291,9 +334,13 @@ public class LeaderboardUI : MonoBehaviour
         LeaderboardManager.Instance?.GetPlayerRank(boardKey, playerScore, rank =>
         {
             rankText.text = $"Your rank: #{rank}";
+            if (!submitted)
+                nameInputRoot.SetActive(playerScore > 0 && rank > 0 && rank <= TopLimit);
         }, () =>
         {
             rankText.text = "";
+            if (!submitted)
+                nameInputRoot.SetActive(false);
         });
     }
 

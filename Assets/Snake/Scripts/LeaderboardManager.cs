@@ -38,7 +38,14 @@ public class LeaderboardManager : MonoBehaviour
     private static readonly string[] ValidBoards =
     {
         "snake_infinite", "snake_level1", "snake_level2",
-        "cubedash", "shooter", "minigolf"
+        "cubedash", "shooter",
+        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3"
+    };
+
+    // Boards where a LOWER score is better (e.g. minigolf strokes).
+    private static readonly string[] AscendingBoards =
+    {
+        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3"
     };
 
     #endregion
@@ -72,13 +79,19 @@ public class LeaderboardManager : MonoBehaviour
 
     public static string GetBoardKey(string gameKey, string stageId)
     {
+        string game = gameKey.ToLowerInvariant();
         string stage = string.IsNullOrEmpty(stageId) ? "" : stageId.ToLowerInvariant();
-        return $"{gameKey.ToLowerInvariant()}_{stage}";
+        return stage.Length == 0 ? game : $"{game}_{stage}";
     }
 
     public bool IsValidBoard(string boardKey)
     {
         return Array.IndexOf(ValidBoards, boardKey) >= 0;
+    }
+
+    public bool IsAscendingBoard(string boardKey)
+    {
+        return Array.IndexOf(AscendingBoards, boardKey) >= 0;
     }
 
     private string BaseUrl => $"https://firestore.googleapis.com/v1/projects/{ProjectId}/databases/{DatabaseId}";
@@ -216,7 +229,7 @@ public class LeaderboardManager : MonoBehaviour
                                 new Dictionary<string, object>
                                 {
                                     { "field", new Dictionary<string, object> { { "fieldPath", "Score" } } },
-                                    { "direction", "DESCENDING" }
+                                    { "direction", IsAscendingBoard(boardId) ? "ASCENDING" : "DESCENDING" }
                                 }
                             }
                         },
@@ -252,7 +265,7 @@ public class LeaderboardManager : MonoBehaviour
                                 { "fieldFilter", new Dictionary<string, object>
                                     {
                                         { "field", new Dictionary<string, object> { { "fieldPath", "Score" } } },
-                                        { "op", "GREATER_THAN" },
+                                        { "op", IsAscendingBoard(boardId) ? "LESS_THAN" : "GREATER_THAN" },
                                         { "value", new Dictionary<string, object> { { "integerValue", score.ToString() } } }
                                     }
                                 }
