@@ -15,8 +15,6 @@ public class Snake : MonoBehaviour
 
     [SerializeField] private float cellSize = 0f;
 
-    [SerializeField] private float cornerScale = 2.6f;
-
     private readonly List<Transform> segments = new List<Transform>();
     private readonly List<Vector2Int> cells = new List<Vector2Int>();
     private Vector2Int input;
@@ -266,19 +264,14 @@ public class Snake : MonoBehaviour
 
     private void UpdateSegmentAnimation(Transform segment, Vector2Int dir)
     {
-        // Corners keep their own absolute scale (2.6) so the drawn arm reaches
-        // the neighboring cell center exactly; straights stay fit-to-cell. The
-        // collider shrinks on corners to keep the hit area unchanged.
-        bool isCorner = Mathf.Abs(dir.x) == 1 && Mathf.Abs(dir.y) == 1;
-        float scale = isCorner ? cornerScale : bodyScale;
-        segment.localScale = new Vector3(scale, scale, segment.localScale.z);
+        // All segments (straights and corners) use the same fit-to-cell scale so
+        // the corner L-arms reach the neighboring cell edges exactly, keeping the
+        // body width consistent through turns. The collider stays at body size.
+        segment.localScale = new Vector3(bodyScale, bodyScale, segment.localScale.z);
 
         BoxCollider2D collider = segment.GetComponent<BoxCollider2D>();
         if (collider != null)
-        {
-            float colliderFactor = isCorner && cornerScale > 0f ? bodyScale / cornerScale : 1f;
-            collider.size = bodyColliderSize * colliderFactor;
-        }
+            collider.size = bodyColliderSize;
 
         Animator segmentAnimator = segment.GetComponent<Animator>();
         if (segmentAnimator == null) return;
