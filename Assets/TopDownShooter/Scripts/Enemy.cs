@@ -8,11 +8,32 @@ public class Enemy : MonoBehaviour
     public Transform target;
     public float speed = 3f;
     public float rotationSpeed = 0.0025f;
+    [SerializeField, Min(0f)] private float contactDamage = 25f;
+    [SerializeField, Min(0)] private int scoreValue = 1;
     private Rigidbody2D rb;
+    private Health health;
+
+    private void Awake()
+    {
+        health = GetComponent<Health>();
+        if (!health)
+        {
+            health = gameObject.AddComponent<Health>();
+        }
+    }
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        health.Died += HandleDied;
+    }
+
+    private void OnDestroy()
+    {
+        if (health != null)
+        {
+            health.Died -= HandleDied;
+        }
     }
 
     private void Update()
@@ -51,27 +72,51 @@ public class Enemy : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            ShooterLevelManager.manager.GameOver();
-            PlayDeathEffect(other.gameObject);
-            target = null;
-        } else if (other.gameObject.CompareTag("Bullet"))
-        {
-            ShooterLevelManager.manager.InscreaseScore(1);
-            ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
-            Destroy(other.gameObject);
-            GetDeathEffect().PlayAndDestroy();
+            DealContactDamage(other.gameObject);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Bullet"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            ShooterLevelManager.manager.InscreaseScore(1);
-            ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
-            Destroy(other.gameObject);
-            GetDeathEffect().PlayAndDestroy();
+            DealContactDamage(other.gameObject);
         }
+    }
+
+    private void DealContactDamage(GameObject targetObject)
+    {
+        Player player = targetObject.GetComponent<Player>();
+        if (player != null)
+        {
+            player.ApplyDamage(contactDamage);
+            return;
+        }
+
+        Health targetHealth = targetObject.GetComponent<Health>();
+        if (targetHealth != null)
+        {
+            targetHealth.TakeDamage(contactDamage);
+        }
+    }
+
+    private void HandleDied(Health deadHealth)
+    {
+        ShooterLevelManager.manager?.InscreaseScore(scoreValue);
+        GetDropper().DropLoot();
+        ShooterAudioManager.Instance?.PlayEnemyDeathSfx();
+        GetDeathEffect().PlayAndDestroy();
+    }
+
+    private EnemyPowerUpDropper GetDropper()
+    {
+        EnemyPowerUpDropper dropper = GetComponent<EnemyPowerUpDropper>();
+        if (!dropper)
+        {
+            dropper = gameObject.AddComponent<EnemyPowerUpDropper>();
+        }
+
+        return dropper;
     }
 
     private ArcadeDeathEffect2D GetDeathEffect()

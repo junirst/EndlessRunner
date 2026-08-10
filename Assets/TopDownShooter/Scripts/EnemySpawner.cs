@@ -5,6 +5,8 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private float spawnRate = 1f;
+    [SerializeField, Min(0.01f)] private float minimumSpawnRate = 0.25f;
+    [SerializeField, Min(1f)] private float spawnRateRampDuration = 90f;
     [SerializeField] private GameObject[] enemyPrefab;
     [SerializeField] private bool canSpawn = true;
     [SerializeField] private ProceduralWorldGenerator2D worldGenerator;
@@ -22,11 +24,15 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator Spawner()
     {
-        WaitForSeconds wait = new WaitForSeconds(spawnRate);
-
         while (canSpawn)
         {
-            yield return wait;
+            yield return new WaitForSeconds(GetCurrentSpawnDelay());
+
+            if (!canSpawn)
+            {
+                yield break;
+            }
+
             int rand = Random.Range(0, enemyPrefab.Length);
             GameObject enemyToSpawn = enemyPrefab[rand];
 
@@ -38,5 +44,12 @@ public class EnemySpawner : MonoBehaviour
 
             Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
         }   
+    }
+
+    private float GetCurrentSpawnDelay()
+    {
+        float elapsedTime = Time.timeSinceLevelLoad;
+        float rampT = Mathf.Clamp01(elapsedTime / spawnRateRampDuration);
+        return Mathf.Max(minimumSpawnRate, Mathf.Lerp(spawnRate, minimumSpawnRate, rampT));
     }
 }

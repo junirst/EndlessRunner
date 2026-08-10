@@ -237,9 +237,10 @@ GameObject:
   - component: {fileID: 4517526787835802141}
   - component: {fileID: 7589098705864525518}
   - component: {fileID: 5448570344115815346}
+  - component: {fileID: -2279687115913366962}
   m_Layer: 0
   m_Name: Gunner
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -353,6 +354,8 @@ MonoBehaviour:
   target: {fileID: 0}
   speed: 3
   rotationSpeed: 0.01
+  contactDamage: 25
+  scoreValue: 3
   bulletPrefab: {fileID: 6498352366914950695, guid: 2ba8036f532d29548a5c7d4674a66d73, type: 3}
   distanceToShoot: 8
   distanceToStop: 3
@@ -381,6 +384,23 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ab8a10e12ae5ddc49b5dcc686a000914, type: 3}
   deathFrameRate: 12
   targetRenderer: {fileID: 0}
+--- !u!114 &-2279687115913366962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6182800830122318535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dae4c5a1b2f86434997b11e19c3bc7d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthDropChance: 0.25
+  healthPickupPrefab: {fileID: 6498352366914950695, guid: 08e2649106d396741b159de6c4d1a9ca, type: 3}
+  armorDropChance: 0.2
+  armorPickupPrefab: {fileID: 6498352366914950695, guid: 285c25ca204fd074fbebb66d186c8858, type: 3}
+  spawnOffset: {x: 0, y: 0.4}
 --- !u!1 &6538862145429098034
 GameObject:
   m_ObjectHideFlags: 0

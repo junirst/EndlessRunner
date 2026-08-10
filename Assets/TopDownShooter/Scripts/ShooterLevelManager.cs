@@ -21,6 +21,8 @@ public class ShooterLevelManager : MonoBehaviour
     public int score;
     public bool isPaused;
     public bool isGameOver;
+
+    private Health playerHealth;
     
 
     private void Awake()
