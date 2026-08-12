@@ -8,10 +8,12 @@ public class MotionDrivenSpriteAnimator2D : MonoBehaviour
     [SerializeField] private Sprite[] frames = new Sprite[7];
     [SerializeField, Min(0.1f)] private float frameRate = 12f;
     [SerializeField, Min(0f)] private float idleThreshold = 0.01f;
+    [SerializeField, Min(0f)] private float stopGraceDuration = 0.15f;
 
     private bool wasMoving;
     private float frameTimer;
     private int currentFrame;
+    private float lastMovingTime = float.NegativeInfinity;
 
     private void Awake()
     {
@@ -45,7 +47,15 @@ public class MotionDrivenSpriteAnimator2D : MonoBehaviour
 
     private void Update()
     {
-        bool isMoving = movementBody && movementBody.velocity.sqrMagnitude > idleThreshold * idleThreshold;
+        // Physics can momentarily zero the velocity on contact with the player/props;
+        // hold the moving state briefly so the legs don't vanish on every collision.
+        bool physicallyMoving = movementBody && movementBody.velocity.sqrMagnitude > idleThreshold * idleThreshold;
+        if (physicallyMoving)
+        {
+            lastMovingTime = Time.time;
+        }
+
+        bool isMoving = Time.time - lastMovingTime <= stopGraceDuration;
 
         if (!isMoving)
         {

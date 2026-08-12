@@ -11,12 +11,11 @@ GameObject:
   - component: {fileID: 1483436021042616021}
   - component: {fileID: 3821667503653866288}
   - component: {fileID: 1228254803973073654}
-  - component: {fileID: 7773118035200165675}
-  - component: {fileID: 1808086387303672307}
-  - component: {fileID: 5948230194231042201}
+  - component: {fileID: 7557482130345258418}
+  - component: {fileID: 4642961389318052153}
   m_Layer: 0
-  m_Name: GunnerBullet
-  m_TagString: EnemyBullet
+  m_Name: MG
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -77,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 9f443de87a1c0a544881535e43d61f66, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4eba5a4ab394b3c469e66075a3dde779, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,7 +102,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -115,8 +114,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &7773118035200165675
-CapsuleCollider2D:
+--- !u!61 &7557482130345258418
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -147,10 +146,20 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.00036625864, y: 0.028988076}
-  m_Size: {x: 0.13388892, y: 0.22851224}
-  m_Direction: 0
---- !u!114 &1808086387303672307
+  m_Offset: {x: 0.0021091104, y: 0.0014226586}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.234375, y: 0.71875}
+    newSize: {x: 1, y: 2}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.1848634, y: 0.41147003}
+  m_EdgeRadius: 0
+--- !u!114 &4642961389318052153
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,29 +168,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6498352366914950695}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bcd5918b901c124e9851673aff73d89, type: 3}
+  m_Script: {fileID: 11500000, guid: 10a6f71a1f983d041a1df510fa47c6a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2.5
-  lifetime: 3
-  damage: 5
-  targetTag: Player
---- !u!114 &5948230194231042201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6498352366914950695}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f6f1c7f9c7f4c2aa5b6dd2f3a8c2d11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 3821667503653866288}
-  frames:
-  - {fileID: 21300000, guid: bfa86db587193d14cb5994a28970af9e, type: 3}
-  - {fileID: 21300000, guid: 44765a8cc6ea5704fb601cc7d13d96f8, type: 3}
-  - {fileID: 21300000, guid: a160787adc486cd47be62aa9d3b68358, type: 3}
-  - {fileID: 21300000, guid: 9f443de87a1c0a544881535e43d61f66, type: 3}
-  frameRate: 12
+  weaponIcon: {fileID: 21300000, guid: 4eba5a4ab394b3c469e66075a3dde779, type: 3}
+  bulletPrefab: {fileID: 6498352366914950695, guid: a9fa4d964d6f1654885b26e4ab65033b, type: 3}
+  fireRate: 0.1
+  infiniteAmmo: 0
+  maxAmmo: 100
+  startingAmmo: 100
+  bodyFrames:
+  - {fileID: 21300000, guid: 5e170e2ced3fbc94ba68f973ac9a38c6, type: 3}
+  - {fileID: 21300000, guid: 091263b0da428cc41b9f273e68869e02, type: 3}
+  gunFrames:
+  - {fileID: 21300000, guid: d5678f302f20b5b4091c2f8b84852944, type: 3}

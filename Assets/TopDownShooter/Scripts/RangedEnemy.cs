@@ -19,6 +19,7 @@ public class RangedEnemy : MonoBehaviour
 
     public float fireRate;
     private float timeToFire;
+    private bool wasMoving;
 
     public Transform firingPoint;
 
@@ -80,6 +81,19 @@ public class RangedEnemy : MonoBehaviour
             rb.velocity = Vector2.zero;
             }
         }
+
+        bool isMoving = rb.velocity.sqrMagnitude > 0.01f;
+        if (isMoving != wasMoving)
+        {
+            ShooterAudioManager.Instance?.SetEnemyMovementSfx(gameObject, isMoving);
+            wasMoving = isMoving;
+        }
+    }
+
+    private void OnDisable()
+    {
+        ShooterAudioManager.Instance?.SetEnemyMovementSfx(gameObject, false);
+        wasMoving = false;
     }
 
     private void RotateTowardsTarget()

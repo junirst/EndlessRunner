@@ -12,6 +12,7 @@ public class Enemy : MonoBehaviour
     [SerializeField, Min(0)] private int scoreValue = 1;
     private Rigidbody2D rb;
     private Health health;
+    private bool wasMoving;
 
     private void Awake()
     {
@@ -50,6 +51,18 @@ public class Enemy : MonoBehaviour
     private void FixedUpdate()
     {
         rb.velocity = transform.up * speed;
+        bool isMoving = rb.velocity.sqrMagnitude > 0.01f;
+        if (isMoving != wasMoving)
+        {
+            ShooterAudioManager.Instance?.SetEnemyMovementSfx(gameObject, isMoving);
+            wasMoving = isMoving;
+        }
+    }
+
+    private void OnDisable()
+    {
+        ShooterAudioManager.Instance?.SetEnemyMovementSfx(gameObject, false);
+        wasMoving = false;
     }
 
     private void RotateTowardsTarget()

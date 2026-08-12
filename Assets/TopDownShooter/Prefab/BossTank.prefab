@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 2521710446298835286}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.14, y: 1.09, z: 0}
+  m_LocalPosition: {x: 0.08, y: 6.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -105,7 +105,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: 2c54846e516af2c4d9c289d6e732ee40, type: 3}
+  m_Sprite: {fileID: 21300000, guid: eb751810cbd696a4db54d88a7f59d7e0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -128,16 +128,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9643a2f994ffe2441bc7b1bcda47c192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementBody: {fileID: 4517526787835802141}
+  movementBody: {fileID: 0}
   targetRenderer: {fileID: 1119354956203089506}
   frames:
-  - {fileID: 21300000, guid: 2df0be86d50bb90429eead351b08249c, type: 3}
-  - {fileID: 21300000, guid: 70b6d3f0302ca684296d0ae2c3ad9762, type: 3}
-  - {fileID: 21300000, guid: 7a4f32efa6baa9844a528a94e9d19a20, type: 3}
-  - {fileID: 21300000, guid: ea8a51de16e847e45af2ecf4819a8952, type: 3}
-  - {fileID: 21300000, guid: d059094228cc1ba4ca2b1377d22b146f, type: 3}
-  - {fileID: 21300000, guid: 89270cec610151349bc2ae71652dc23a, type: 3}
-  - {fileID: 21300000, guid: 3093871609c032e418c05d9f7ca193e6, type: 3}
+  - {fileID: 21300000, guid: 5023c0e58168d734abdb1e8fa4bdbced, type: 3}
+  - {fileID: 21300000, guid: f0b9d293d4ce0824eb6cd68870ac1566, type: 3}
+  - {fileID: 21300000, guid: 7748e29126cb57547aabea89e5bd4ece, type: 3}
+  - {fileID: 21300000, guid: 17df7246c926c2f429b03884b2b5e09e, type: 3}
   frameRate: 12
   idleThreshold: 0.01
 --- !u!1 &4989986724509482908
@@ -213,7 +210,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 2a0bb1292cdf77848b29b25f63e2e2af, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b825d2971412f604cbde829bcc2d538f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -235,11 +232,11 @@ GameObject:
   - component: {fileID: 7572450265181051674}
   - component: {fileID: 1007424791518885932}
   - component: {fileID: 4517526787835802141}
-  - component: {fileID: 7589098705864525518}
   - component: {fileID: 5448570344115815346}
-  - component: {fileID: 7339927711828645318}
+  - component: {fileID: 2878343785134871299}
+  - component: {fileID: 2817278568186203082}
   m_Layer: 0
-  m_Name: Sniper
+  m_Name: BossTank
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -308,9 +305,10 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0, y: 0.5773587}
-      - {x: -0.5, y: -0.28866667}
-      - {x: 0.5, y: -0.28866667}
+    - - {x: 2.761995, y: 3.719608}
+      - {x: -2.6764536, y: 3.7404397}
+      - {x: -2.6168313, y: -3.7680562}
+      - {x: 2.6898258, y: -3.719393}
   m_UseDelaunayMesh: 0
 --- !u!50 &4517526787835802141
 Rigidbody2D:
@@ -339,28 +337,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &7589098705864525518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6182800830122318535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23c0c4239a451ce4fb4af3915e52ac1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  speed: 3
-  rotationSpeed: 0.01
-  contactDamage: 25
-  scoreValue: 3
-  bulletPrefab: {fileID: 6498352366914950695, guid: 65c14a45342e3314396d4e11bc0927da, type: 3}
-  distanceToShoot: 16
-  distanceToStop: 5
-  fireRate: 3
-  firingPoint: {fileID: 3355548053775092992}
 --- !u!114 &5448570344115815346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,15 +352,10 @@ MonoBehaviour:
   flashCount: 4
   flashInterval: 0.08
   destroyDelayAfterFlash: 0.08
-  deathFrames:
-  - {fileID: 21300000, guid: 451ce25d272e0e8439f35a1a2a8dfa18, type: 3}
-  - {fileID: 21300000, guid: c893f542c5344824e895e4f216a8cdea, type: 3}
-  - {fileID: 21300000, guid: ce4ab635e90e2014bb1552d787b25213, type: 3}
-  - {fileID: 21300000, guid: 5fb319b42bbbc584e82031c090465cc1, type: 3}
-  - {fileID: 21300000, guid: 7a1cb10982c80104e9925cdfcaed3dbc, type: 3}
+  deathFrames: []
   deathFrameRate: 12
   targetRenderer: {fileID: 0}
---- !u!114 &7339927711828645318
+--- !u!114 &2878343785134871299
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -393,14 +364,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 6182800830122318535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dae4c5a1b2f86434997b11e19c3bc7d2, type: 3}
+  m_Script: {fileID: 11500000, guid: 9130d8cb1d6287b45b663793c2055a80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthDropChance: 0.25
-  healthPickupPrefab: {fileID: 6498352366914950695, guid: 08e2649106d396741b159de6c4d1a9ca, type: 3}
-  armorDropChance: 0.2
-  armorPickupPrefab: {fileID: 6498352366914950695, guid: 285c25ca204fd074fbebb66d186c8858, type: 3}
-  spawnOffset: {x: 0, y: 0.4}
+  bossDisplayName: PANZER
+  maxHealth: 1000
+  speed: 2
+  rotationSpeed: 0.0025
+  contactDamage: 40
+  scoreValue: 50
+  bulletPrefab: {fileID: 6498352366914950695, guid: a1c46e037e7bf2940875bfa228dc191e, type: 3}
+  firingPoint: {fileID: 3355548053775092992}
+  distanceToShoot: 20
+  distanceToStop: 10
+  fireRate: 5
+  deathOverlayEffectPrefab: {fileID: 0}
+  deathOverlayOffset: {x: 0, y: 0}
+  deathOverlayLifetime: 2
+--- !u!114 &2817278568186203082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6182800830122318535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe1d6d45de6768e4a948431125c32df8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bodyRenderer: {fileID: 8546489380831070064}
+  legRenderer: {fileID: 1119354956203089506}
+  deathBodyFrames:
+  - {fileID: 21300000, guid: c39dcb451baa9a84ba77ea1b1dc5b60b, type: 3}
+  - {fileID: 21300000, guid: e6ab3f4018d1c524e9cf427067b339ca, type: 3}
+  - {fileID: 21300000, guid: 2a0bdbcb3b2e4c141a501b114e84b185, type: 3}
+  - {fileID: 21300000, guid: 999eac446648c8a4784ec8d8ad3c745e, type: 3}
+  - {fileID: 21300000, guid: 527aa596d5c0ba34ea3d253dfc85ac46, type: 3}
+  deathFrameRate: 10
+  finalDeathSprite: {fileID: 21300000, guid: 30b1c83703249f44ca8029a7166275cf, type: 3}
+  corpseLifetime: 3
 --- !u!1 &6538862145429098034
 GameObject:
   m_ObjectHideFlags: 0
@@ -428,7 +431,7 @@ Transform:
   m_GameObject: {fileID: 6538862145429098034}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 1, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -475,7 +478,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 10daff6f87160ae4d97c163b994e8e6a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0e390f53f557d3c43bd07bf126a05142, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -500,6 +503,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 8546489380831070064}
   frames:
-  - {fileID: 21300000, guid: 10daff6f87160ae4d97c163b994e8e6a, type: 3}
-  - {fileID: 21300000, guid: 4ae62baf2951eef4c9019058610e25fa, type: 3}
+  - {fileID: 21300000, guid: 1a1ed90f8aec817469d1b7e92cf9ffb0, type: 3}
+  - {fileID: 21300000, guid: 7f39f1bc54ae00848ac3c5b7fed5f9b1, type: 3}
+  - {fileID: 21300000, guid: 534e182a6cde46343b7164f9857911e9, type: 3}
   frameRate: 12

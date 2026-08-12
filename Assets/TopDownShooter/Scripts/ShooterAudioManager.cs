@@ -10,7 +10,11 @@ public class ShooterAudioManager : MonoBehaviour
 
     [Header("SFX Clips")]
     [SerializeField] private AudioClip playerShootSfx;
+    [SerializeField] private AudioClip playerMovementSfx;
     [SerializeField] private AudioClip enemyShootSfx;
+    [SerializeField] private AudioClip enemyMovementSfx;
+    [SerializeField] private AudioClip bossAttackSfx;
+    [SerializeField] private AudioClip bossMovementSfx;
     [SerializeField] private AudioClip enemyDeathSfx;
     [SerializeField] private AudioClip gameOverSfx;
     [SerializeField] private AudioClip buttonClickSfx;
@@ -44,9 +48,29 @@ public class ShooterAudioManager : MonoBehaviour
         PlaySfx(playerShootSfx);
     }
 
+    public void SetPlayerMovementSfx(GameObject actor, bool isMoving)
+    {
+        SetMovementSfx(actor, playerMovementSfx, isMoving);
+    }
+
     public void PlayEnemyShootSfx()
     {
         PlaySfx(enemyShootSfx);
+    }
+
+    public void SetEnemyMovementSfx(GameObject actor, bool isMoving)
+    {
+        SetMovementSfx(actor, enemyMovementSfx, isMoving);
+    }
+
+    public void PlayBossAttackSfx()
+    {
+        PlaySfx(bossAttackSfx);
+    }
+
+    public void SetBossMovementSfx(GameObject actor, bool isMoving)
+    {
+        SetMovementSfx(actor, bossMovementSfx, isMoving);
     }
 
     public void PlayEnemyDeathSfx()
@@ -106,5 +130,35 @@ public class ShooterAudioManager : MonoBehaviour
         }
 
         sfxSource.PlayOneShot(clip);
+    }
+
+    private void SetMovementSfx(GameObject actor, AudioClip clip, bool isMoving)
+    {
+        if (!actor || clip == null)
+        {
+            return;
+        }
+
+        AudioSource movementSource = actor.GetComponent<AudioSource>();
+        if (movementSource == null)
+        {
+            movementSource = actor.AddComponent<AudioSource>();
+            movementSource.playOnAwake = false;
+            movementSource.loop = true;
+            movementSource.spatialBlend = 0f;
+        }
+
+        movementSource.clip = clip;
+        if (isMoving)
+        {
+            if (!movementSource.isPlaying)
+            {
+                movementSource.Play();
+            }
+        }
+        else if (movementSource.isPlaying)
+        {
+            movementSource.Stop();
+        }
     }
 }

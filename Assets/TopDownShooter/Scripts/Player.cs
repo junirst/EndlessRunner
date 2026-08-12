@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     private float currentFireRate;
     private bool currentInfiniteAmmo;
     private int currentMaxAmmo;
+    private bool wasMoving;
     private bool isUsingDefaultWeapon;
     private Sprite[] currentBodyFrames;
     private Sprite[] currentGunFrames;
@@ -129,6 +130,18 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         rb.velocity = new Vector2(mx, my).normalized * speed;
+        bool isMoving = rb.velocity.sqrMagnitude > 0.01f;
+        if (isMoving != wasMoving)
+        {
+            ShooterAudioManager.Instance?.SetPlayerMovementSfx(gameObject, isMoving);
+            wasMoving = isMoving;
+        }
+    }
+
+    private void OnDisable()
+    {
+        ShooterAudioManager.Instance?.SetPlayerMovementSfx(gameObject, false);
+        wasMoving = false;
     }
 
     public void ResetFireTimer()

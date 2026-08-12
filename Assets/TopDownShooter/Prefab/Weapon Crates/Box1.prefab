@@ -144,6 +144,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropChance: 1
-  weaponPickupPrefab: {fileID: 6498352366914950695, guid: 5677ca3e910afaa4b8515609a955c0ad, type: 3}
+  weaponPickupPrefab: {fileID: 6498352366914950695, guid: a46724f32b06f834dad03042e61ef6bc, type: 3}
   spawnOffset: {x: 0, y: 0.4}
   dropOnDeath: 1
+  destroyObjectOnDeath: 1
+  maxHealthIfMissing: 50
