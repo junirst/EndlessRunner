@@ -418,7 +418,7 @@ public class LeaderboardUI : MonoBehaviour
         framed = true;
 
         Image bg = GetComponent<Image>();
-        if (bg != null)
+        if (bg != null && bg.sprite == null)
             bg.color = new Color(0f, 0f, 0f, 1f);
 
         RectTransform card = FindChildRect("Card");

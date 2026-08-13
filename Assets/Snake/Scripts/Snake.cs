@@ -143,6 +143,7 @@ public class Snake : MonoBehaviour
 
         if (newHead != headCell && WouldCollide(newHead))
         {
+            Debug.Log($"[Snake] DIED: {gameObject.scene.name} - self collision (head at {newHead} would move into own body)");
             GameManager.Instance.GameOver();
             return;
         }
@@ -377,6 +378,7 @@ public class Snake : MonoBehaviour
         }
         else if (other.CompareTag("Obstacle"))
         {
+            Debug.Log($"[Snake] DIED: {gameObject.scene.name} - hit obstacle '{other.name}' at {other.transform.position}");
             GameManager.Instance.GameOver();
         }
         else if (other.CompareTag("Wall"))
@@ -387,6 +389,7 @@ public class Snake : MonoBehaviour
         }
         else if (other.CompareTag("Body"))
         {
+            Debug.Log($"[Snake] DIED: {gameObject.scene.name} - hit own body segment '{other.name}' at {other.transform.position}");
             GameManager.Instance.GameOver();
         }
     }

@@ -13,6 +13,8 @@ public class SnakeMenuManager : MonoBehaviour
     [SerializeField] private Color infiniteColor = new Color(0.6f, 0.8f, 1f);
     [SerializeField] private Color level1Color = new Color(0.8f, 1f, 0.6f);
     [SerializeField] private Color level2Color = new Color(1f, 0.8f, 0.6f);
+    [SerializeField] private Color level3Color = new Color(0.7f, 0.6f, 1f);
+    [SerializeField] private Color level4Color = new Color(1f, 0.6f, 0.8f);
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI titleText;
@@ -34,6 +36,8 @@ public class SnakeMenuManager : MonoBehaviour
         ("Infinite", "Infinite"),
         ("Level1", "Level1"),
         ("Level2", "Level2"),
+        ("Level3", "Level3"),
+        ("Level4", "Level4"),
     };
 
     private Canvas canvas;
@@ -271,6 +275,8 @@ public class SnakeMenuManager : MonoBehaviour
             0 => infiniteColor,
             1 => level1Color,
             2 => level2Color,
+            3 => level3Color,
+            4 => level4Color,
             _ => Color.white
         };
     }
