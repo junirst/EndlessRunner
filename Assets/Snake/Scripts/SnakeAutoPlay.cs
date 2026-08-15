@@ -24,13 +24,14 @@ public class SnakeAutoPlay : MonoBehaviour
     {
         if (!autoPlayEnabled || snake == null || food == null) return;
 
+        float cs = snake.CellSize;
         Vector2Int headPos = new Vector2Int(
-            Mathf.RoundToInt(transform.position.x),
-            Mathf.RoundToInt(transform.position.y)
+            Mathf.RoundToInt(transform.position.x / cs),
+            Mathf.RoundToInt(transform.position.y / cs)
         );
         Vector2Int foodPos = new Vector2Int(
-            Mathf.RoundToInt(food.transform.position.x),
-            Mathf.RoundToInt(food.transform.position.y)
+            Mathf.RoundToInt(food.transform.position.x / cs),
+            Mathf.RoundToInt(food.transform.position.y / cs)
         );
 
         Vector2Int bestDir = GetBestDirection(headPos, foodPos);
@@ -43,18 +44,20 @@ public class SnakeAutoPlay : MonoBehaviour
     private int WrapX(int x)
     {
         if (!UsesWrapping) return x;
-        int half = Mathf.RoundToInt(snake.moveThroughWalls);
-        int width = half * 2;
-        x = ((x + half) % width + width) % width - half;
+        int bound = Mathf.RoundToInt(snake.moveThroughWalls / snake.CellSize);
+        if (x > bound) return -bound;
+        if (x < -bound) return bound;
         return x;
     }
 
-    private int WrapY(int y)
+private int WrapY(int y)
     {
         if (!UsesWrapping) return y;
-        int half = Mathf.RoundToInt(snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f);
-        int height = half * 2;
-        y = ((y + half) % height + height) % height - half;
+        float cs = snake.CellSize;
+        float rawBound = snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f;
+        int bound = Mathf.RoundToInt(rawBound / cs);
+        if (y > bound) return -bound;
+        if (y < -bound) return bound;
         return y;
     }
 
@@ -67,16 +70,196 @@ public class SnakeAutoPlay : MonoBehaviour
     {
         Vector2Int currentDir = snake.CurrentDirection;
 
-        List<Vector2Int> path = AStar(head, target);
-        if (path != null && path.Count > 0)
+        // Strategy 1 (eat when it does not box itself in): take the shortest path
+        // to the food, but only if after walking it there is still a corridor
+        // from the head back to the tail. This is what keeps a small sliver of
+        // open space inside/near the body instead of trapping the snake.
+        List<Vector2Int> foodPath = AStar(head, target);
+        if (foodPath != null && foodPath.Count > 0 && IsSimSafe(head, foodPath))
         {
-            Vector2Int next = path[0];
-            Vector2Int dir = next - head;
-            if (dir != -currentDir)
+            Vector2Int dir = DirectionTo(head, foodPath[0], currentDir);
+            if (dir != Vector2Int.zero)
                 return dir;
         }
 
-        return SmartFallback(head, currentDir, target);
+        // Strategy 2 (chase the tail): eating right now would close the escape
+        // route, so instead steer toward the tail. The tail frees one cell every
+        // tick, so following it opens up the board again (opening style).
+        Vector2Int tailPos = GetTail();
+        List<Vector2Int> tailPath = AStar(head, tailPos);
+        if (tailPath != null && tailPath.Count > 0 && IsSimSafe(head, tailPath))
+        {
+            Vector2Int dir = DirectionTo(head, tailPath[0], currentDir);
+            if (dir != Vector2Int.zero)
+                return dir;
+        }
+
+        // Strategy 3 (maximize open air): pick the move that keeps the most
+        // reachable cells around the head, still weighting toward the food.
+        Vector2Int maxSpaceDir = MaxSpaceDirection(head, currentDir, target);
+        if (maxSpaceDir != Vector2Int.zero)
+            return maxSpaceDir;
+
+        // Strategy 4 (last resort): any non-reverse safe move, chosen at random,
+        // keeps the bot alive while the corridor around its body reopens.
+        return RandomOpenDirection(head, currentDir);
+    }
+
+    private Vector2Int DirectionTo(Vector2Int head, Vector2Int next, Vector2Int currentDir)
+    {
+        Vector2Int dir = new Vector2Int(
+            Mathf.Clamp(WrappedAxisDelta(head.x, next.x, true), -1, 1),
+            Mathf.Clamp(WrappedAxisDelta(head.y, next.y, false), -1, 1)
+        );
+        if (dir == Vector2Int.zero || dir == -currentDir)
+            return Vector2Int.zero;
+        return dir;
+    }
+
+    private Vector2Int GetTail()
+    {
+        IReadOnlyList<Transform> segs = snake.Segments;
+        float cs = snake.CellSize;
+        Vector2Int tail = new Vector2Int(
+            Mathf.RoundToInt(segs[segs.Count - 1].position.x / cs),
+            Mathf.RoundToInt(segs[segs.Count - 1].position.y / cs)
+        );
+        return UsesWrapping ? WrapPos(tail) : tail;
+    }
+
+    private List<Vector2Int> CollectBodyCells()
+    {
+        IReadOnlyList<Transform> segs = snake.Segments;
+        float cs = snake.CellSize;
+        List<Vector2Int> body = new List<Vector2Int>();
+        // The tail cell vacates on the next move, so it is not a wall and is
+        // excluded (it is also the escape route target).
+        for (int i = 0; i < segs.Count - 1; i++)
+        {
+            Vector2Int p = new Vector2Int(
+                Mathf.RoundToInt(segs[i].position.x / cs),
+                Mathf.RoundToInt(segs[i].position.y / cs)
+            );
+            if (UsesWrapping) p = WrapPos(p);
+            body.Add(p);
+        }
+        return body;
+    }
+
+    /// <summary>
+    /// Simulates walking the whole path (the tail vacates one cell per step) and
+    /// returns true only if afterwards the head can still reach the tail cell.
+    /// That "head-to-tail reachability" is the affordable test of whether the
+    /// move leaves an open corridor behind instead of sealing the snake inside
+    /// the volume of its own body.
+    /// </summary>
+    private bool IsSimSafe(Vector2Int head, List<Vector2Int> path)
+    {
+        List<Vector2Int> sim = CollectBodyCells();
+        Vector2Int cursor = head;
+
+        foreach (Vector2Int step in path)
+        {
+            if (sim.Count > 0)
+                sim.RemoveAt(sim.Count - 1); // tail vacates first
+            if (sim.Contains(step))
+                return false;
+            sim.Insert(0, step);
+            cursor = step;
+        }
+
+        if (sim.Count == 0)
+            return true;
+        return CanReachTail(cursor, sim);
+    }
+
+    private bool CanReachTail(Vector2Int start, List<Vector2Int> simBody)
+    {
+        Vector2Int tail = simBody[simBody.Count - 1];
+
+        HashSet<Vector2Int> walls = new HashSet<Vector2Int>();
+        for (int i = 0; i < simBody.Count - 1; i++)
+            walls.Add(simBody[i]);
+
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        queue.Enqueue(start);
+        visited.Add(start);
+
+        int steps = 0;
+        while (queue.Count > 0 && steps < 3000)
+        {
+            steps++;
+            Vector2Int current = queue.Dequeue();
+            if (current == tail)
+                return true;
+
+            Vector2Int[] dirs = {
+                Vector2Int.up, Vector2Int.down,
+                Vector2Int.left, Vector2Int.right
+            };
+            foreach (Vector2Int dir in dirs)
+            {
+                Vector2Int next = UsesWrapping ? WrapPos(current + dir) : current + dir;
+                if (visited.Contains(next)) continue;
+                if (walls.Contains(next)) continue;
+                if (!IsInBounds(next)) continue;
+                if (IsOnObstacle(next)) continue;
+                visited.Add(next);
+                queue.Enqueue(next);
+            }
+        }
+        return visited.Contains(tail);
+    }
+
+    private Vector2Int MaxSpaceDirection(Vector2Int head, Vector2Int currentDir, Vector2Int target)
+    {
+        Vector2Int bestDir = Vector2Int.zero;
+        int bestSpace = -1;
+        int bestDist = int.MaxValue;
+
+        Vector2Int[] dirs = {
+            Vector2Int.up, Vector2Int.down,
+            Vector2Int.left, Vector2Int.right
+        };
+        foreach (Vector2Int dir in dirs)
+        {
+            if (dir == -currentDir) continue;
+
+            Vector2Int next = UsesWrapping ? WrapPos(head + dir) : head + dir;
+            if (!IsSafe(next)) continue;
+
+            int space = CountReachableSpace(next, 200);
+            int dist = Manhattan(next, target);
+            if (space > bestSpace || (space == bestSpace && dist < bestDist))
+            {
+                bestSpace = space;
+                bestDist = dist;
+                bestDir = dir;
+            }
+        }
+        return bestDir;
+    }
+
+    private Vector2Int RandomOpenDirection(Vector2Int head, Vector2Int currentDir)
+    {
+        List<Vector2Int> options = new List<Vector2Int>();
+        Vector2Int[] dirs = {
+            Vector2Int.up, Vector2Int.down,
+            Vector2Int.left, Vector2Int.right
+        };
+        foreach (Vector2Int dir in dirs)
+        {
+            if (dir == -currentDir) continue;
+
+            Vector2Int next = UsesWrapping ? WrapPos(head + dir) : head + dir;
+            if (IsSafe(next))
+                options.Add(dir);
+        }
+
+        if (options.Count == 0)
+            return Vector2Int.zero;
+        return options[Random.Range(0, options.Count)];
     }
 
     private int WrappedAxisDelta(int from, int to, bool isX)
@@ -84,15 +267,15 @@ public class SnakeAutoPlay : MonoBehaviour
         if (!UsesWrapping)
             return to - from;
 
-        int half = isX
-            ? Mathf.RoundToInt(snake.moveThroughWalls)
-            : Mathf.RoundToInt(snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f);
-        int size = half * 2;
+        float cs = snake.CellSize;
+        int bound = isX
+            ? Mathf.RoundToInt(snake.moveThroughWalls / cs)
+            : Mathf.RoundToInt((snake.verticalBound > 0f ? snake.verticalBound : snake.moveThroughWalls * 0.5f) / cs);
+        int n = bound * 2 + 1;
         int raw = to - from;
-        int wrapped = raw;
-        if (raw > half) wrapped = raw - size;
-        else if (raw < -half) wrapped = raw + size;
-        return wrapped;
+        int mod = ((raw % n) + n) % n;
+        if (mod > bound) mod -= n;
+        return mod;
     }
 
     private int Manhattan(Vector2Int a, Vector2Int b)
@@ -117,11 +300,15 @@ public class SnakeAutoPlay : MonoBehaviour
     private bool IsOnBody(Vector2Int pos)
     {
         IReadOnlyList<Transform> segs = snake.Segments;
+        float cs = snake.CellSize;
+        int tailIndex = segs.Count - 1;
         for (int i = 0; i < segs.Count; i++)
         {
+            if (i == tailIndex) continue;
+
             Vector2Int segPos = new Vector2Int(
-                Mathf.RoundToInt(segs[i].position.x),
-                Mathf.RoundToInt(segs[i].position.y)
+                Mathf.RoundToInt(segs[i].position.x / cs),
+                Mathf.RoundToInt(segs[i].position.y / cs)
             );
             if (UsesWrapping)
                 segPos = WrapPos(segPos);
@@ -134,14 +321,15 @@ public class SnakeAutoPlay : MonoBehaviour
     private bool IsOnBodyForBFS(Vector2Int pos)
     {
         IReadOnlyList<Transform> segs = snake.Segments;
+        float cs = snake.CellSize;
         int tailIndex = segs.Count - 1;
         for (int i = 0; i < segs.Count; i++)
         {
             if (i == tailIndex) continue;
 
             Vector2Int segPos = new Vector2Int(
-                Mathf.RoundToInt(segs[i].position.x),
-                Mathf.RoundToInt(segs[i].position.y)
+                Mathf.RoundToInt(segs[i].position.x / cs),
+                Mathf.RoundToInt(segs[i].position.y / cs)
             );
             if (UsesWrapping)
                 segPos = WrapPos(segPos);
@@ -153,9 +341,10 @@ public class SnakeAutoPlay : MonoBehaviour
 
     private bool IsOnObstacle(Vector2Int pos)
     {
+        float cs = snake.CellSize;
         Collider2D[] hits = Physics2D.OverlapBoxAll(
-            new Vector2(pos.x, pos.y),
-            snakeCollider.size,
+            new Vector2(pos.x * cs, pos.y * cs),
+            snakeCollider.size * cs,
             0f
         );
         foreach (Collider2D hit in hits)
@@ -173,11 +362,12 @@ public class SnakeAutoPlay : MonoBehaviour
 
         if (gridArea == null) return true;
 
+        float cs = snake.CellSize;
         Bounds bounds = gridArea.bounds;
-        return pos.x >= Mathf.RoundToInt(bounds.min.x) &&
-               pos.x <= Mathf.RoundToInt(bounds.max.x) &&
-               pos.y >= Mathf.RoundToInt(bounds.min.y) &&
-               pos.y <= Mathf.RoundToInt(bounds.max.y);
+        return pos.x >= Mathf.RoundToInt(bounds.min.x / cs) &&
+               pos.x <= Mathf.RoundToInt(bounds.max.x / cs) &&
+               pos.y >= Mathf.RoundToInt(bounds.min.y / cs) &&
+               pos.y <= Mathf.RoundToInt(bounds.max.y / cs);
     }
 
     private List<Vector2Int> AStar(Vector2Int start, Vector2Int goal)
@@ -252,49 +442,6 @@ public class SnakeAutoPlay : MonoBehaviour
         }
 
         return null;
-    }
-
-    private Vector2Int SmartFallback(Vector2Int head, Vector2Int currentDir, Vector2Int target)
-    {
-        Vector2Int bestDir = Vector2Int.zero;
-        int bestDist = int.MaxValue;
-        int bestSpace = -1;
-
-        Vector2Int[] dirs = {
-            Vector2Int.up, Vector2Int.down,
-            Vector2Int.left, Vector2Int.right
-        };
-
-        foreach (Vector2Int dir in dirs)
-        {
-            if (dir == -currentDir) continue;
-
-            Vector2Int next = UsesWrapping ? WrapPos(head + dir) : head + dir;
-            if (!IsSafe(next)) continue;
-
-            int dist = Manhattan(next, target);
-            int space = CountReachableSpace(next, 100);
-
-            if (dist < bestDist || (dist == bestDist && space > bestSpace))
-            {
-                bestDist = dist;
-                bestSpace = space;
-                bestDir = dir;
-            }
-        }
-
-        if (bestDir != Vector2Int.zero)
-            return bestDir;
-
-        foreach (Vector2Int dir in dirs)
-        {
-            if (dir == -currentDir) continue;
-            Vector2Int next = UsesWrapping ? WrapPos(head + dir) : head + dir;
-            if (IsSafe(next))
-                return dir;
-        }
-
-        return Vector2Int.zero;
     }
 
     private int CountReachableSpace(Vector2Int start, int maxCount)

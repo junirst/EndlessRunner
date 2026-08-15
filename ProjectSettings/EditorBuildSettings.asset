@@ -42,6 +42,12 @@ EditorBuildSettings:
     path: Assets/Snake/Scenes/Level2.unity
     guid: 7f2a5353f62901e409607a47777a1a78
   - enabled: 1
+    path: Assets/Snake/Scenes/Level3.unity
+    guid: 3608fb5efbb56354aa3ef8438614e1a8
+  - enabled: 1
+    path: Assets/Snake/Scenes/Level4.unity
+    guid: 74901d4e6b4f2814c81be03e25afef5a
+  - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level5.unity
     guid: 00c44b8ce06b9354fbe0998b5c1d44cf
   m_configObjects: {}

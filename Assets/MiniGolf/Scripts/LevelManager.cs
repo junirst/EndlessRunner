@@ -40,6 +40,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         Time.timeScale = 1f;
         if (pauseMenuUI != null)
         {
@@ -88,7 +90,23 @@ public class LevelManager : MonoBehaviour
             levelCompleteStrokeUI.text = string.IsNullOrEmpty(completionHint) ? strokeMessage : strokeMessage + "\n" + completionHint;
         }
 
-        levelCompleteUI.SetActive(true);
+        if (levelCompleteUI != null)
+        {
+            levelCompleteUI.SetActive(false);
+        }
+        ShowLevelLeaderboard(levelCompleteUI, strokes);
+    }
+
+    public static string LeaderboardStageId()
+    {
+        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        var match = System.Text.RegularExpressions.Regex.Match(scene, @"\d+$");
+        return match.Success ? "level" + match.Value : scene.ToLowerInvariant().Replace("-", "_");
+    }
+
+    private static void ShowLevelLeaderboard(GameObject screenToReveal, int strokes)
+    {
+        LeaderboardUI.ShowForGame(screenToReveal, "minigolf", LeaderboardStageId(), strokes);
     }
 
     public void GameOver()

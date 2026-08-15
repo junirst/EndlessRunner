@@ -10,6 +10,8 @@ public class ShooterLevelManager : MonoBehaviour
 
     public GameObject deathScreen;
     public GameObject pauseMenu;
+    public GameObject minimap;
+    public GameObject statsUi;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highscoreText;
     public TextMeshProUGUI pauseScoreText;
@@ -31,10 +33,15 @@ public class ShooterLevelManager : MonoBehaviour
         ShooterSaveSystem.Initialize();
 
         data = new ShooterSaveData(0);
+
+        if (minimap == null) minimap = GameObject.Find("Minimap");
+        if (statsUi == null) statsUi = GameObject.Find("Stats");
     }
 
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         Time.timeScale = 1f;
         if (pauseMenu != null)
         {
@@ -74,21 +81,33 @@ public class ShooterLevelManager : MonoBehaviour
         ShooterAudioManager.Instance?.StopBgm();
         ShooterAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
 
-        deathScreen.SetActive(true);
-        scoreText.text = "Score: " + score.ToString();
+        deathScreen.SetActive(false);
+        if (minimap != null) minimap.SetActive(false);
+        if (statsUi != null) statsUi.SetActive(false);
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score.ToString();
+        }
 
         string loadedData = ShooterSaveSystem.Load("save");
-        if (loadedData != null) {
+        if (loadedData != null)
+        {
             data = JsonUtility.FromJson<ShooterSaveData>(loadedData);
         }
-        if (data.highscore < score) {
+        if (data.highscore < score)
+        {
             data.highscore = score;
         }
 
-        highscoreText.text = "Highscore: " + data.highscore.ToString();
+        if (highscoreText != null)
+        {
+            highscoreText.text = "Highscore: " + data.highscore.ToString();
+        }
 
         string saveData = JsonUtility.ToJson(data);
         ShooterSaveSystem.Save("save", saveData);
+
+        LeaderboardUI.ShowForGame(deathScreen, "shooter", null, score);
     }
 
     public void TogglePause()
