@@ -13,6 +13,7 @@ public class Dot : MonoBehaviour
     public bool isMatched = false;
     public GameObject otherDot;
 
+    private HintManager hintManager;
     private FindMatches findMatches;
     private Board board;
     
@@ -34,6 +35,23 @@ public class Dot : MonoBehaviour
     public GameObject columnArrow;
     public GameObject colorBomb;
 
+    AudioManagerM3 audioManager;
+
+    [Header("SFX Clips")]
+    [SerializeField] private AudioClip match3Sfx;
+    [SerializeField] private AudioClip match4Sfx;
+    [SerializeField] private AudioClip match5Sfx;
+    [SerializeField] private AudioClip gameOverSfx;
+
+    private void Awake()
+    {
+        // Prefer FindObjectOfType to avoid relying on a specific tag existing in the scene
+        audioManager = FindObjectOfType<AudioManagerM3>();
+        if (audioManager == null)
+        {
+            Debug.LogWarning("Dot.Awake: AudioManagerM3 not found in scene. SFX will not play for this Dot.");
+        }
+    }
     void Start()
     {
         isColumnBomb = false;
@@ -41,6 +59,7 @@ public class Dot : MonoBehaviour
         isAdjacentBomb = false;
         isColorBomb = false; 
         // Updated to the modern Unity method to find the Board script
+        hintManager = FindObjectOfType<HintManager>();
         board = Object.FindFirstObjectByType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
         //targetX = (int)transform.position.x;
@@ -59,6 +78,28 @@ public class Dot : MonoBehaviour
             isAdjacentBomb = true;
             GameObject marker = Instantiate(adjacentMarker, transform.position, Quaternion.identity);
             marker.transform.parent = this.transform;
+        }
+    }
+
+    // Play appropriate SFX for this dot when it's destroyed as part of a match
+    public void PlayDestroySfx(int matchCount)
+    {
+        if (audioManager == null)
+            return;
+
+        AudioClip clipToPlay = match3Sfx;
+        if (matchCount >= 5)
+        {
+            clipToPlay = match5Sfx;
+        }
+        else if (matchCount == 4)
+        {
+            clipToPlay = match4Sfx;
+        }
+
+        if (clipToPlay != null)
+        {
+            audioManager.PlaySFX(clipToPlay);
         }
     }
 
@@ -160,12 +201,23 @@ public class Dot : MonoBehaviour
 
     private void OnMouseDown()
     {
-        firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //detroy hint
+        if (hintManager != null)
+        {
+            hintManager.DestroyHint();
+        }
+        if (board.currentState == GameState.move)
+        {
+            firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
     }
 
     private void OnMouseUp()
     {
-        finalTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (board.currentState == GameState.move)
+        {
+            finalTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
         CalculateAngle();
     }
 
@@ -177,6 +229,27 @@ public class Dot : MonoBehaviour
             MovePieces();
             board.currentState = GameState.wait;
             board.currentDot = this;
+        }
+        else
+        {
+            board.currentState = GameState.move;
+        }
+    }
+
+    void MovePiecesActual(Vector2 direction)
+    {
+        otherDot = board.allDots[column + (int)direction.x, row + (int)direction.y];
+        previousColumn = column;
+        previousRow = row;
+        if (otherDot != null)
+        {
+            otherDot.GetComponent<Dot>().column -= (int)direction.x;
+            otherDot.GetComponent<Dot>().row -= (int)direction.y;
+            column += (int)direction.x;
+            row += (int)direction.y;
+            board.allDots[column, row] = this.gameObject;
+            board.allDots[otherDot.GetComponent<Dot>().column, otherDot.GetComponent<Dot>().row] = otherDot;
+            StartCoroutine(CheckMoveCo());
         }
         else
         {
