@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -80,10 +79,9 @@ public class SnakeMenuManager : MonoBehaviour
     {
         LoadHighScores();
         SetupStageCards();
+        FetchLeaderboardHighScores();
         GenerateSnakeDivider();
         SnakeAudioManager.Instance?.PlayBgm();
-        if (stageCards.Length > 0 && EventSystem.current != null)
-            EventSystem.current.SetSelectedGameObject(stageCards[0].gameObject);
     }
 
     private void BuildStageCardsUI()
@@ -265,6 +263,25 @@ public class SnakeMenuManager : MonoBehaviour
         {
             int score = SnakeSaveSystem.GetHighScore(StageDefs[i].id);
             stageCards[i].Setup(StageDefs[i].id, StageDefs[i].scene, score, GetStageColor(i));
+        }
+    }
+
+    private void FetchLeaderboardHighScores()
+    {
+        LeaderboardManager.EnsureInstance();
+        if (LeaderboardManager.Instance == null) return;
+
+        for (int i = 0; i < stageCards.Length && i < StageDefs.Length; i++)
+        {
+            string boardKey = LeaderboardManager.GetBoardKey(ScoreManager.GameKey, StageDefs[i].id);
+            if (!LeaderboardManager.Instance.IsValidBoard(boardKey)) continue;
+
+            int capturedIndex = i;
+            LeaderboardManager.Instance.FetchTop(boardKey, 1, entries =>
+            {
+                if (entries != null && entries.Count > 0)
+                    stageCards[capturedIndex].SetLeaderboardTop(entries[0].Name, entries[0].Score);
+            });
         }
     }
 

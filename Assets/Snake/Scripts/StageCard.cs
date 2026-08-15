@@ -16,6 +16,7 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [SerializeField] private string sceneName;
 
     private int highScore;
+    private string hoverText = "";
     private Coroutine blinkRoutine;
 
     private static readonly float BlinkInterval = 0.5f;
@@ -50,7 +51,8 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
         if (highScoreText != null)
         {
-            highScoreText.text = $"HIGH SCORE: {highScore}";
+            highScoreText.text = "0 - Be the first";
+            hoverText = "0 - Be the first";
             highScoreText.gameObject.SetActive(false);
         }
 
@@ -61,7 +63,15 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         highScore = score;
         if (highScoreText != null)
-            highScoreText.text = $"HIGH SCORE: {highScore}";
+        {
+            highScoreText.text = "0 - Be the first";
+            hoverText = "0 - Be the first";
+        }
+    }
+
+    public void SetLeaderboardTop(string name, int score)
+    {
+        hoverText = $"{name}   {score}";
     }
 
     private void OnEnable()
@@ -98,7 +108,10 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private void ShowHighlight()
     {
         if (highScoreText != null)
+        {
+            highScoreText.text = hoverText;
             highScoreText.gameObject.SetActive(true);
+        }
         StartBlinking(BlinkInterval);
     }
 

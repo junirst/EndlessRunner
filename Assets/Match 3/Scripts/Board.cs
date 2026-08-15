@@ -49,6 +49,8 @@ public class Board : MonoBehaviour
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
     [SerializeField] private AudioClip gameOverSfx;
+    private AudioManagerM3 audioManager;
+    private int lastMatchCount;
 
         // Start is called before the first frame update
         void Start()

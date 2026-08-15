@@ -317,10 +317,10 @@ public class LeaderboardUI : MonoBehaviour
         if (fetching) return;
         fetching = true;
 
-        _ = RefreshAsync();
+        RefreshAsync();
     }
 
-    private async System.Threading.Tasks.Task RefreshAsync()
+    private void RefreshAsync()
     {
         LeaderboardManager.Instance?.FetchTop(boardKey, TopLimit, entries =>
         {
