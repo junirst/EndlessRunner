@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+namespace Match3
+{
 public class ScoreManager : MonoBehaviour {
 
 	private Board board;
@@ -27,16 +29,17 @@ public class ScoreManager : MonoBehaviour {
 		UpdateBar();
 	}
 
-    private void UpdateBar()
+	private void UpdateBar()
 	{
 		if (board != null && scoreBar != null)
-        {
-			
-            int length = board.scoreGoals.Length;
-          
+		{
+
+			int length = board.scoreGoals.Length;
+
 			scoreBar.fillAmount = (float)score / (float)board.scoreGoals[length - 1];
 
 
-        }
+		}
 	}
+}
 }

@@ -39,6 +39,9 @@ public class Board : MonoBehaviour
 
     public GameObject destroyEffect;
 
+    // Score goals used by the UI ScoreManager. Exposed to the inspector.
+    public int[] scoreGoals = new int[] { 1000, 2000, 3000 };
+
     // --- Board Layout Section ---
     [NonReorderable] // This attribute forces the classic "Size" field to appear
     public tileType[] boardLayout;

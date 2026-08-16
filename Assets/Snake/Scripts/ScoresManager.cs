@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+namespace Snake
+{
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
@@ -79,4 +81,5 @@ public class ScoreManager : MonoBehaviour
         score = 0;
         ResetMultiplier();
     }
+}
 }
