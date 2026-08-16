@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1228254803973073654}
   - component: {fileID: 7773118035200165675}
   - component: {fileID: 1808086387303672307}
+  - component: {fileID: 5948230194231042201}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Bullet
@@ -30,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.52, y: 0.62, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
+  m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -76,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1061085958406d24aa3ff94f062b8c49, type: 3}
   m_Color: {r: 1, g: 0.84413767, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -143,11 +144,11 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 2}
+  m_Offset: {x: -0.0058313846, y: 0.0070630196}
+  m_Size: {x: 0.092429064, y: 0.119616106}
   m_Direction: 0
 --- !u!114 &1808086387303672307
 MonoBehaviour:
@@ -163,3 +164,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   lifetime: 3
+  damage: 50
+  targetTag: Enemy
+--- !u!114 &5948230194231042201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6498352366914950695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f6f1c7f9c7f4c2aa5b6dd2f3a8c2d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRenderer: {fileID: 3821667503653866288}
+  frames:
+  - {fileID: 21300000, guid: 82b6aa713dc6e334eb9f2179625aa2cd, type: 3}
+  - {fileID: 21300000, guid: 8ece6b35c5a64cd42a005cc4caf7a42e, type: 3}
+  - {fileID: 21300000, guid: 1061085958406d24aa3ff94f062b8c49, type: 3}
+  frameRate: 12

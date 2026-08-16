@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/MiniGolf/Scene/MiniGolf-Level1.unity
     guid: fa949e234f1f344429b642a76befacae
   - enabled: 1
+    path: Assets/Match 3/Scenes/Main.unity
+    guid: 792353dd6fdcd364092640c67f4651ee
+  - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level2.unity
     guid: de2bdd12c66ba674fa052e0b45a43c99
   - enabled: 1
@@ -33,6 +36,24 @@ EditorBuildSettings:
     path: Assets/Snake/Scenes/Infinite.unity
     guid: 3862e9655523f8b48b13ea38d2a236ce
   - enabled: 1
+    path: Assets/Snake/Scenes/SnakeMenu.unity
+    guid: 362aa7458da14c7982798e5ea6fed8f5
+  - enabled: 1
+    path: Assets/Snake/Scenes/Level1.unity
+    guid: fbe7dbe423a68424ba46238afb8d5523
+  - enabled: 1
+    path: Assets/Snake/Scenes/Level2.unity
+    guid: 7f2a5353f62901e409607a47777a1a78
+  - enabled: 1
+    path: Assets/Snake/Scenes/Level3.unity
+    guid: 3608fb5efbb56354aa3ef8438614e1a8
+  - enabled: 1
+    path: Assets/Snake/Scenes/Level4.unity
+    guid: 74901d4e6b4f2814c81be03e25afef5a
+  - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level5.unity
     guid: 00c44b8ce06b9354fbe0998b5c1d44cf
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Menu.unity
+    guid: 4bb017fd2486a8346bad6f3b5a74c9b7
   m_configObjects: {}

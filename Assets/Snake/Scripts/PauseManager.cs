@@ -8,6 +8,9 @@ public class PauseManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject settingsUI;
 
+    [SerializeField] private string mainMenuSceneName = "SnakeMenu";
+    public string MainMenuSceneName => mainMenuSceneName;
+
     public bool IsPaused { get; private set; }
 
     private void Awake()
@@ -36,9 +39,13 @@ public class PauseManager : MonoBehaviour
             {
                 SnakeAudioManager.Instance?.PlayButtonClickSfx();
                 Time.timeScale = 1f;
-                SceneManager.LoadScene("TitleScreen");
+                SceneManager.LoadScene(mainMenuSceneName);
                 return;
             }
+
+            if ((LevelManager.main != null && LevelManager.main.outOfStrokes) ||
+                (ShooterLevelManager.manager != null && ShooterLevelManager.manager.isGameOver))
+                return;
 
             if (IsPaused)
                 Resume();
@@ -50,6 +57,10 @@ public class PauseManager : MonoBehaviour
     public void Pause()
     {
         if (IsPaused) return;
+
+        if (CubeGameManager.Instance != null && !CubeGameManager.Instance.isPlaying)
+            return;
+
         IsPaused = true;
         Time.timeScale = 0f;
         if (pauseMenu != null)
@@ -57,11 +68,16 @@ public class PauseManager : MonoBehaviour
         ScoreUIManager.Instance?.SetVisible(false);
         if (PowerUpUI.Instance != null)
             PowerUpUI.Instance.gameObject.SetActive(false);
+        CubeGameManager.Instance?.PauseGame();
     }
 
     public void Resume()
     {
         if (!IsPaused) return;
+
+        if (settingsUI != null && settingsUI.activeSelf)
+            SettingsManager.Instance?.RevertToPlayerPrefs();
+
         IsPaused = false;
         Time.timeScale = 1f;
         if (pauseMenu != null)
@@ -71,6 +87,7 @@ public class PauseManager : MonoBehaviour
         ScoreUIManager.Instance?.SetVisible(true);
         if (PowerUpUI.Instance != null)
             PowerUpUI.Instance.gameObject.SetActive(true);
+        CubeGameManager.Instance?.ResumeGame();
     }
 
     public void ContinueButton()
@@ -81,6 +98,7 @@ public class PauseManager : MonoBehaviour
 
     public void ShowSettings()
     {
+        SettingsManager.Instance?.LoadFromPlayerPrefs();
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         if (pauseMenu != null)
             pauseMenu.SetActive(false);
@@ -96,10 +114,18 @@ public class PauseManager : MonoBehaviour
             settingsUI.SetActive(false);
     }
 
-    public void LoadMainMenu()
+    public void RestartGame()
     {
         SnakeAudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void LoadMainMenu()
+    {
+        SettingsManager.Instance?.RevertToPlayerPrefs();
+        SnakeAudioManager.Instance?.PlayButtonClickSfx();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }

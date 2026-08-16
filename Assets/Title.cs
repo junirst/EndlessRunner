@@ -11,7 +11,8 @@ public class TitleScript : MonoBehaviour
     [SerializeField] private string cubeDashSceneName = "CubeDash";
     [SerializeField] private string miniGolfSceneName = "MainMenu";
     [SerializeField] private string topDownShooterSceneName = "Menu";
-    [SerializeField] private string snakeSceneName = "SnakeGame";
+    [SerializeField] private string snakeSceneName = "SnakeMenu";
+    [SerializeField] private float sceneLoadDelay = 0.08f;
 
     private TextMeshProUGUI totalStarsText;
     private Image totalStarsImage;
@@ -19,9 +20,30 @@ public class TitleScript : MonoBehaviour
 
     private void Start()
     {
+        EnsureTitleButtonFeedbackComponents();
         CreateStarsDisplay();
         UpdateStarsDisplay();
         TitleAudioManager.Instance?.PlayBgm();
+    }
+
+    private void EnsureTitleButtonFeedbackComponents()
+    {
+        Button[] buttons = FindObjectsOfType<Button>(true);
+
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            Button button = buttons[i];
+            if (button == null)
+            {
+                continue;
+            }
+
+            TitleButtonFeedback feedback = button.GetComponent<TitleButtonFeedback>();
+            if (feedback == null)
+            {
+                feedback = button.gameObject.AddComponent<TitleButtonFeedback>();
+            }
+        }
     }
 
     private void CreateStarsDisplay()
@@ -146,34 +168,43 @@ public class TitleScript : MonoBehaviour
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
-        SceneManager.LoadScene(cubeDashSceneName);
+        StartCoroutine(LoadSceneAfterDelay(cubeDashSceneName));
     }
 
     public void PlayMiniGolf()
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
-        SceneManager.LoadScene(miniGolfSceneName);
+        StartCoroutine(LoadSceneAfterDelay(miniGolfSceneName));
     }
 
     public void PlayTopDownShooter()
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
-        SceneManager.LoadScene(topDownShooterSceneName);
+        StartCoroutine(LoadSceneAfterDelay(topDownShooterSceneName));
     }
 
-        public void PlaySnakeGame()
+    public void PlaySnakeGame()
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
-        SceneManager.LoadScene(snakeSceneName);
+        StartCoroutine(LoadSceneAfterDelay(snakeSceneName));
     }
+
     public void LoadSceneByName(string sceneName)
     {
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
-        SceneManager.LoadScene(sceneName);
+        StartCoroutine(LoadSceneAfterDelay(sceneName));
+    }
+
+    public void BackToTitleScreen()
+    {
+        TitleAudioManager.Instance?.PlayButtonClickSfx();
+        TitleAudioManager.Instance?.StopBgm();
+        Time.timeScale = 1f;
+        StartCoroutine(LoadSceneAfterDelay("TitleScreen"));
     }
 
     public void ExitGame()
@@ -181,10 +212,23 @@ public class TitleScript : MonoBehaviour
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
 
+        StartCoroutine(ExitAfterDelay());
+    }
+
+    private IEnumerator LoadSceneAfterDelay(string sceneName)
+    {
+        yield return new WaitForSecondsRealtime(sceneLoadDelay);
+        SceneManager.LoadScene(sceneName);
+    }
+
+    private IEnumerator ExitAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(sceneLoadDelay);
+
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
-#endif
+ #endif
     }
 }

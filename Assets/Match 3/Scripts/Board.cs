@@ -51,8 +51,9 @@ public class Board : MonoBehaviour
     private BackgroundTile[,] breakableTiles;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
-    private int lastMatchCount = 0;
+    [SerializeField] private AudioClip gameOverSfx;
     private AudioManagerM3 audioManager;
+    private int lastMatchCount;
 
         // Start is called before the first frame update
         void Start()
@@ -681,5 +682,11 @@ public class Board : MonoBehaviour
             // If the board is still deadlocked after shuffling once, try again.
             ShuffleBoard();
         }
+    }
+
+    // Call this when the match-3 game should trigger a game-over (assign clip per-scene in Inspector)
+    public void TriggerGameOver()
+    {
+        Match3AudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
     }
 }

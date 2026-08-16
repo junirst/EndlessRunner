@@ -15,6 +15,7 @@ public class TitleAudioManager : MonoBehaviour
 
     [Header("SFX")]
     [SerializeField] private AudioClip buttonClickSfx;
+    [SerializeField] private AudioClip buttonHoverSfx;
 
     private void Awake()
     {
@@ -69,6 +70,16 @@ public class TitleAudioManager : MonoBehaviour
         }
 
         sfxSource.PlayOneShot(buttonClickSfx);
+    }
+
+    public void PlayButtonHoverSfx()
+    {
+        if (sfxSource == null || buttonHoverSfx == null)
+        {
+            return;
+        }
+
+        sfxSource.PlayOneShot(buttonHoverSfx);
     }
 
     private IEnumerator InitializeTitleAudio()

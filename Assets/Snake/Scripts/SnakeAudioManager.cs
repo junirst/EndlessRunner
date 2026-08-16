@@ -18,23 +18,23 @@ public class SnakeAudioManager : MonoBehaviour
     public float BGMVolume
     {
         get => bgmSource.volume;
-        set
-        {
-            bgmSource.volume = value;
-            PlayerPrefs.SetFloat(BGMVolumeKey, value);
-            PlayerPrefs.Save();
-        }
+        set => bgmSource.volume = value;
     }
 
     public float SFXVolume
     {
         get => sfxSource.volume;
-        set
-        {
-            sfxSource.volume = value;
-            PlayerPrefs.SetFloat(SFXVolumeKey, value);
-            PlayerPrefs.Save();
-        }
+        set => sfxSource.volume = value;
+    }
+
+    public void SetBGMVolume(float value)
+    {
+        bgmSource.volume = value;
+    }
+
+    public void SetSFXVolume(float value)
+    {
+        sfxSource.volume = value;
     }
 
     private void Awake()
@@ -76,10 +76,17 @@ public class SnakeAudioManager : MonoBehaviour
             sfxSource.PlayOneShot(eatSfx);
     }
 
-    public void PlayGameOverSfx()
+    public void PlayGameOverSfx(AudioClip clipOverride = null)
     {
-        if (gameOverSfx != null && sfxSource != null)
-            sfxSource.PlayOneShot(gameOverSfx);
+        AudioClip clipToPlay = clipOverride != null ? clipOverride : gameOverSfx;
+
+        if (clipToPlay == null)
+        {
+            clipToPlay = Resources.Load<AudioClip>("snakegameover");
+        }
+
+        if (clipToPlay != null && sfxSource != null)
+            sfxSource.PlayOneShot(clipToPlay);
     }
 
     public void PlayButtonClickSfx()

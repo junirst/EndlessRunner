@@ -28,6 +28,7 @@ public class CubeGameManager : MonoBehaviour
 
     [SerializeField] private float scoreMultiplier = 1f;
     [SerializeField] private float scoreMultiplierTimeRemaining = 0f;
+    [SerializeField] private AudioClip gameOverSfx;
 
     public Data data;
     public bool isPlaying = false;
@@ -72,11 +73,6 @@ public class CubeGameManager : MonoBehaviour
             }
         }
 
-        if (isPlaying && Input.GetKeyDown(KeyCode.Escape))
-        {
-            TogglePause();
-        }
-
         if (isPlaying) 
         {
             currentScore += Time.deltaTime * scoreMultiplier;
@@ -97,7 +93,7 @@ public class CubeGameManager : MonoBehaviour
     {
         if (isPaused)
         {
-            ResumeGame();
+            PauseManager.Instance?.Resume();
         }
 
         if (data == null)
@@ -114,7 +110,7 @@ public class CubeGameManager : MonoBehaviour
         isPlaying = false;
         ResetScoreMultiplier();
         AudioManager.Instance?.StopBgm();
-        AudioManager.Instance?.PlayGameOverSfx();
+        AudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
         onGameOver.Invoke();
     }
 
@@ -166,7 +162,6 @@ public class CubeGameManager : MonoBehaviour
 
         isPaused = true;
         isPlaying = false;
-        Time.timeScale = 0f;
         onPause.Invoke();
     }
 
@@ -179,7 +174,6 @@ public class CubeGameManager : MonoBehaviour
 
         isPaused = false;
         isPlaying = true;
-        Time.timeScale = 1f;
         onResume.Invoke();
     }
 

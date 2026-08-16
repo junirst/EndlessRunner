@@ -18,6 +18,9 @@ public class LevelManager : MonoBehaviour
     [Space(10)]
     [SerializeField] private GameObject pauseMenuUI;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip gameOverSfx;
+
     [Header("Attributes")]
     [SerializeField] private int maxStrokes;
 
@@ -37,6 +40,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         Time.timeScale = 1f;
         if (pauseMenuUI != null)
         {
@@ -48,7 +53,7 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        if (CanTogglePause() && Input.GetKeyDown(KeyCode.Escape))
+        if (CanTogglePause() && Input.GetKeyDown(KeyCode.Escape) && PauseManager.Instance == null)
         {
             TogglePause();
         }
@@ -85,7 +90,23 @@ public class LevelManager : MonoBehaviour
             levelCompleteStrokeUI.text = string.IsNullOrEmpty(completionHint) ? strokeMessage : strokeMessage + "\n" + completionHint;
         }
 
-        levelCompleteUI.SetActive(true);
+        if (levelCompleteUI != null)
+        {
+            levelCompleteUI.SetActive(false);
+        }
+        ShowLevelLeaderboard(levelCompleteUI, strokes);
+    }
+
+    public static string LeaderboardStageId()
+    {
+        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        var match = System.Text.RegularExpressions.Regex.Match(scene, @"\d+$");
+        return match.Success ? "level" + match.Value : scene.ToLowerInvariant().Replace("-", "_");
+    }
+
+    private static void ShowLevelLeaderboard(GameObject screenToReveal, int strokes)
+    {
+        LeaderboardUI.ShowForGame(screenToReveal, "minigolf", LeaderboardStageId(), strokes);
     }
 
     public void GameOver()
@@ -101,7 +122,7 @@ public class LevelManager : MonoBehaviour
         }
 
         gameOver = true;
-        MiniGolfAudioManager.Instance?.PlayGameOverSfx();
+        MiniGolfAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
         GameOverUI.SetActive(true);
     }
 
