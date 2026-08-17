@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -13,6 +12,8 @@ public class SnakeMenuManager : MonoBehaviour
     [SerializeField] private Color infiniteColor = new Color(0.6f, 0.8f, 1f);
     [SerializeField] private Color level1Color = new Color(0.8f, 1f, 0.6f);
     [SerializeField] private Color level2Color = new Color(1f, 0.8f, 0.6f);
+    [SerializeField] private Color level3Color = new Color(0.7f, 0.6f, 1f);
+    [SerializeField] private Color level4Color = new Color(1f, 0.6f, 0.8f);
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI titleText;
@@ -34,6 +35,8 @@ public class SnakeMenuManager : MonoBehaviour
         ("Infinite", "Infinite"),
         ("Level1", "Level1"),
         ("Level2", "Level2"),
+        ("Level3", "Level3"),
+        ("Level4", "Level4"),
     };
 
     private Canvas canvas;
@@ -76,10 +79,9 @@ public class SnakeMenuManager : MonoBehaviour
     {
         LoadHighScores();
         SetupStageCards();
+        FetchLeaderboardHighScores();
         GenerateSnakeDivider();
         SnakeAudioManager.Instance?.PlayBgm();
-        if (stageCards.Length > 0 && EventSystem.current != null)
-            EventSystem.current.SetSelectedGameObject(stageCards[0].gameObject);
     }
 
     private void BuildStageCardsUI()
@@ -264,6 +266,25 @@ public class SnakeMenuManager : MonoBehaviour
         }
     }
 
+    private void FetchLeaderboardHighScores()
+    {
+        LeaderboardManager.EnsureInstance();
+        if (LeaderboardManager.Instance == null) return;
+
+        for (int i = 0; i < stageCards.Length && i < StageDefs.Length; i++)
+        {
+            string boardKey = LeaderboardManager.GetBoardKey(ScoreManager.GameKey, StageDefs[i].id);
+            if (!LeaderboardManager.Instance.IsValidBoard(boardKey)) continue;
+
+            int capturedIndex = i;
+            LeaderboardManager.Instance.FetchTop(boardKey, 1, entries =>
+            {
+                if (entries != null && entries.Count > 0)
+                    stageCards[capturedIndex].SetLeaderboardTop(entries[0].Name, entries[0].Score);
+            });
+        }
+    }
+
     private Color GetStageColor(int index)
     {
         return index switch
@@ -271,6 +292,8 @@ public class SnakeMenuManager : MonoBehaviour
             0 => infiniteColor,
             1 => level1Color,
             2 => level2Color,
+            3 => level3Color,
+            4 => level4Color,
             _ => Color.white
         };
     }

@@ -22,6 +22,8 @@ public class UIManager : MonoBehaviour
     CubeGameManager gm;
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         gm = CubeGameManager.Instance;
         gm.onGameOver.AddListener(ActivateGameOverUI);
         gm.onPause.AddListener(ActivatePauseUI);
@@ -41,9 +43,18 @@ public class UIManager : MonoBehaviour
     public void ActivateGameOverUI () 
     {
         HidePauseUI();
-        gameOverUi.SetActive(true);
-        gameOverScoreUI.text = "Score: " + gm.PrettyScore();
+        if (gameOverUi != null)
+        {
+            gameOverUi.SetActive(false);
+        }
+
+        if (gameOverScoreUI != null)
+        {
+            gameOverScoreUI.text = "Score: " + gm.PrettyScore();
+        }
+
         RefreshHighscoreText();
+        LeaderboardUI.ShowForGame(gameOverUi, "cubedash", null, Mathf.RoundToInt(gm.currentScore));
     }
 
     public void ActivatePauseUI()

@@ -70,6 +70,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         gameOverScreen.SetActive(false);
         ScoreManager.Instance.StageId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         ScoreManager.Instance.LoadHighScore();
@@ -89,8 +91,12 @@ public class GameManager : MonoBehaviour
         }
 
         finalScoreText.text = $"Score: {score}\nHigh Score: {ScoreManager.Instance.HighScore}";
-        gameOverScreen.SetActive(true);
+        // The leaderboard shows first; the game over screen activates only once
+        // the leaderboard is closed.
+        gameOverScreen.SetActive(false);
         snake.enabled = false;
+
+        ShowLeaderboard(score);
 
         if (PauseManager.Instance != null && PauseManager.Instance.IsPaused)
             PauseManager.Instance.Resume();
@@ -98,6 +104,26 @@ public class GameManager : MonoBehaviour
         PowerUpUI.Instance?.ClearAll();
         SnakeAudioManager.Instance?.StopBgm();
         SnakeAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
+    }
+
+    private void ShowLeaderboard(int score)
+    {
+        if (LeaderboardManager.Instance == null) return;
+
+        Canvas canvas = gameOverScreen != null ? gameOverScreen.GetComponentInParent<Canvas>() : null;
+        if (canvas == null) canvas = FindObjectOfType<Canvas>();
+        if (canvas == null) return;
+
+        string boardKey = LeaderboardManager.GetBoardKey(ScoreManager.GameKey, ScoreManager.Instance.StageId);
+        if (!LeaderboardManager.Instance.IsValidBoard(boardKey)) return;
+
+        LeaderboardUI ui = LeaderboardUI.Show(canvas, boardKey, score);
+        if (ui != null)
+            ui.onClose = () =>
+            {
+                gameOverScreen.SetActive(true);
+                ui.onClose = null;
+            };
     }
 
     public void Retry()

@@ -5,6 +5,8 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
+    public const string GameKey = "snake";
+
     [SerializeField] private int basePoints = 10;
 
     private int score;
