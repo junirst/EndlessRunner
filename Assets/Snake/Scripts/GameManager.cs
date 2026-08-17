@@ -76,6 +76,20 @@ public class GameManager : MonoBehaviour
         ScoreManager.Instance.StageId = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         ScoreManager.Instance.LoadHighScore();
         SnakeAudioManager.Instance?.PlayBgm();
+
+        EnsureLevel3MapGenerator();
+    }
+
+    private void EnsureLevel3MapGenerator()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName != "Level 3") return;
+
+        if (FindObjectOfType<Level3MapGenerator>() != null) return;
+
+        GameObject go = new GameObject("Level3MapGenerator");
+        Level3MapGenerator gen = go.AddComponent<Level3MapGenerator>();
+        gen.AutoConfigure(food);
     }
 
     public void GameOver()

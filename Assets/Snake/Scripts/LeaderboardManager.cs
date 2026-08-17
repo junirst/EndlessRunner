@@ -35,18 +35,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private const string DatabaseId = "(default)";
 
-    private static readonly string[] ValidBoards =
-    {
-        "snake_infinite", "snake_level1", "snake_level2",
-        "cubedash", "shooter",
-        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3"
-    };
-
-    // Boards where a LOWER score is better (e.g. minigolf strokes).
-    private static readonly string[] AscendingBoards =
-    {
-        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3"
-    };
+    private static readonly string[] StandaloneBoards = { "cubedash", "shooter" };
 
     #endregion
 
@@ -86,12 +75,14 @@ public class LeaderboardManager : MonoBehaviour
 
     public bool IsValidBoard(string boardKey)
     {
-        return Array.IndexOf(ValidBoards, boardKey) >= 0;
+        if (string.IsNullOrEmpty(boardKey)) return false;
+        if (Array.IndexOf(StandaloneBoards, boardKey) >= 0) return true;
+        return boardKey.StartsWith("snake_") || boardKey.StartsWith("minigolf_");
     }
 
     public bool IsAscendingBoard(string boardKey)
     {
-        return Array.IndexOf(AscendingBoards, boardKey) >= 0;
+        return !string.IsNullOrEmpty(boardKey) && boardKey.StartsWith("minigolf");
     }
 
     private string BaseUrl => $"https://firestore.googleapis.com/v1/projects/{ProjectId}/databases/{DatabaseId}";

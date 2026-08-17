@@ -9,11 +9,6 @@ public class SnakeMenuManager : MonoBehaviour
     [Header("Stage Cards")]
     [SerializeField] private StageCard[] stageCards;
     [SerializeField] private Sprite[] stageSprites;
-    [SerializeField] private Color infiniteColor = new Color(0.6f, 0.8f, 1f);
-    [SerializeField] private Color level1Color = new Color(0.8f, 1f, 0.6f);
-    [SerializeField] private Color level2Color = new Color(1f, 0.8f, 0.6f);
-    [SerializeField] private Color level3Color = new Color(0.7f, 0.6f, 1f);
-    [SerializeField] private Color level4Color = new Color(1f, 0.6f, 0.8f);
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI titleText;
@@ -33,10 +28,10 @@ public class SnakeMenuManager : MonoBehaviour
     private static readonly (string id, string scene)[] StageDefs = new (string, string)[]
     {
         ("Infinite", "Infinite"),
-        ("Level1", "Level1"),
-        ("Level2", "Level2"),
-        ("Level3", "Level3"),
-        ("Level4", "Level4"),
+        ("Level 1", "Level 1"),
+        ("Level 2", "Level 2"),
+        ("Level 3", "Level 3"),
+        ("Level 4", "Level 4"),
     };
 
     private Canvas canvas;
@@ -139,14 +134,11 @@ public class SnakeMenuManager : MonoBehaviour
     private StageCard CreateStageCard(Transform parent, int index)
     {
         string id = StageDefs[index].id;
-        Color color = GetStageColor(index);
 
         GameObject cardGO = new GameObject($"{id}_Card", typeof(RectTransform));
         cardGO.transform.SetParent(parent, false);
         RectTransform cardRT = cardGO.GetComponent<RectTransform>();
         cardRT.sizeDelta = new Vector2(240f, 240f);
-
-        Color frameColor = Color.Lerp(color, Color.white, 0.3f);
 
         GameObject frameGO = new GameObject("FrameImage", typeof(RectTransform), typeof(Image));
         frameGO.transform.SetParent(cardRT, false);
@@ -156,7 +148,7 @@ public class SnakeMenuManager : MonoBehaviour
         frameRT.anchoredPosition = new Vector2(0f, 15f);
         frameRT.sizeDelta = new Vector2(210f, 170f);
         Image frameImage = frameGO.GetComponent<Image>();
-        frameImage.color = frameColor;
+        frameImage.color = Color.white;
         frameImage.raycastTarget = false;
 
         GameObject imageGO = new GameObject("StageImage", typeof(RectTransform), typeof(Image));
@@ -167,11 +159,10 @@ public class SnakeMenuManager : MonoBehaviour
         imageRT.anchoredPosition = new Vector2(0f, 15f);
         imageRT.sizeDelta = new Vector2(200f, 160f);
         Image stageImage = imageGO.GetComponent<Image>();
-        stageImage.color = color;
+        stageImage.color = Color.white;
         if (stageSprites != null && index < stageSprites.Length && stageSprites[index] != null)
         {
             stageImage.sprite = stageSprites[index];
-            stageImage.color = Color.white;
         }
         stageImage.raycastTarget = true;
 
@@ -262,7 +253,7 @@ public class SnakeMenuManager : MonoBehaviour
         for (int i = 0; i < stageCards.Length && i < StageDefs.Length; i++)
         {
             int score = SnakeSaveSystem.GetHighScore(StageDefs[i].id);
-            stageCards[i].Setup(StageDefs[i].id, StageDefs[i].scene, score, GetStageColor(i));
+            stageCards[i].Setup(StageDefs[i].id, StageDefs[i].scene, score);
         }
     }
 
@@ -283,19 +274,6 @@ public class SnakeMenuManager : MonoBehaviour
                     stageCards[capturedIndex].SetLeaderboardTop(entries[0].Name, entries[0].Score);
             });
         }
-    }
-
-    private Color GetStageColor(int index)
-    {
-        return index switch
-        {
-            0 => infiniteColor,
-            1 => level1Color,
-            2 => level2Color,
-            3 => level3Color,
-            4 => level4Color,
-            _ => Color.white
-        };
     }
 
     private void SetupStageCards()

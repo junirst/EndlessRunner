@@ -1367,7 +1367,7 @@ MonoBehaviour:
   stageImage: {fileID: 719}
   frameImage: {fileID: 716}
   button: {fileID: 712}
-  stageColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  stageColor: {r: 1, g: 1, b: 1, a: 1}
   frameColor: {r: 0.72, g: 0.86, b: 1, a: 1}
   stageName: Infinite_Card
   sceneName: INFINITE
@@ -1874,10 +1874,10 @@ MonoBehaviour:
   stageImage: {fileID: 739}
   frameImage: {fileID: 736}
   button: {fileID: 732}
-  stageColor: {r: 0.8, g: 1, b: 0.6, a: 1}
+  stageColor: {r: 1, g: 1, b: 1, a: 1}
   frameColor: {r: 0.86, g: 1, b: 0.72, a: 1}
   stageName: Level1_Card
-  sceneName: LEVEL1
+  sceneName: LEVEL 1
 --- !u!1 &734
 GameObject:
   m_ObjectHideFlags: 0
@@ -2381,10 +2381,10 @@ MonoBehaviour:
   stageImage: {fileID: 759}
   frameImage: {fileID: 756}
   button: {fileID: 752}
-  stageColor: {r: 1, g: 0.8, b: 0.6, a: 1}
+  stageColor: {r: 1, g: 1, b: 1, a: 1}
   frameColor: {r: 1, g: 0.86, b: 0.72, a: 1}
   stageName: Level2_Card
-  sceneName: LEVEL2
+  sceneName: LEVEL 2
 --- !u!1 &754
 GameObject:
   m_ObjectHideFlags: 0
@@ -2888,10 +2888,10 @@ MonoBehaviour:
   stageImage: {fileID: 780}
   frameImage: {fileID: 776}
   button: {fileID: 772}
-  stageColor: {r: 0.7, g: 0.6, b: 1, a: 1}
+  stageColor: {r: 1, g: 1, b: 1, a: 1}
   frameColor: {r: 0.79, g: 0.72, b: 1, a: 1}
   stageName: Level3_Card
-  sceneName: LEVEL3
+  sceneName: LEVEL 3
 --- !u!1 &774
 GameObject:
   m_ObjectHideFlags: 0
@@ -3411,10 +3411,10 @@ MonoBehaviour:
   stageImage: {fileID: 800}
   frameImage: {fileID: 796}
   button: {fileID: 792}
-  stageColor: {r: 1, g: 0.6, b: 0.8, a: 1}
+  stageColor: {r: 1, g: 1, b: 1, a: 1}
   frameColor: {r: 1, g: 0.72, b: 0.86, a: 1}
   stageName: Level4_Card
-  sceneName: LEVEL4
+  sceneName: LEVEL 4
 --- !u!1 &794
 GameObject:
   m_ObjectHideFlags: 0

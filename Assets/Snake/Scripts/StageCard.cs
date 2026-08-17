@@ -33,21 +33,12 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         button = btn;
     }
 
-    public void Setup(string stageId, string scene, int score, Color color)
+    public void Setup(string stageId, string scene, int score)
     {
         stageName = stageId;
         sceneName = scene;
         highScore = score;
-        stageColor = color;
-        frameColor = Color.Lerp(color, Color.white, 0.3f);
-
-        if (stageImage != null)
-            stageImage.color = stageColor;
-        if (frameImage != null)
-        {
-            frameImage.color = frameColor;
-            frameImage.gameObject.SetActive(true);
-        }
+        ApplyColors();
 
         if (highScoreText != null)
         {
@@ -57,6 +48,17 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
 
         gameObject.name = $"{stageName}_Card";
+    }
+
+    public void ApplyColors()
+    {
+        if (stageImage != null)
+            stageImage.color = stageColor;
+        if (frameImage != null)
+        {
+            frameImage.color = frameColor;
+            frameImage.gameObject.SetActive(true);
+        }
     }
 
     public void UpdateHighScore(int score)
