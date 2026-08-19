@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour
         SnakeAudioManager.Instance?.PlayBgm();
 
         EnsureLevel3MapGenerator();
+        EnsureLevel4MapGenerator();
     }
 
     private void EnsureLevel3MapGenerator()
@@ -90,6 +91,17 @@ public class GameManager : MonoBehaviour
         GameObject go = new GameObject("Level3MapGenerator");
         Level3MapGenerator gen = go.AddComponent<Level3MapGenerator>();
         gen.AutoConfigure(food);
+    }
+
+    private void EnsureLevel4MapGenerator()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName != "Level 4") return;
+
+        if (FindObjectOfType<Level4MapGenerator>() != null) return;
+
+        GameObject go = new GameObject("Level4MapGenerator");
+        go.AddComponent<Level4MapGenerator>();
     }
 
     public void GameOver()
