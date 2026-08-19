@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   threeStarMaxStrokes: 6
-  twoStarMaxStrokes: 62
+  twoStarMaxStrokes: 12
   starParent: {fileID: 199602957}
   firstStar: {fileID: 199602954}
   secondStar: {fileID: 199602955}
@@ -1159,6 +1159,7 @@ MonoBehaviour:
   maxPower: 10
   power: 2
   maxGoalSpeed: 4
+  lineRendererSortingOrder: 1000
 --- !u!120 &328804711
 LineRenderer:
   serializedVersion: 2

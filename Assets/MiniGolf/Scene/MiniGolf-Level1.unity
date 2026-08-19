@@ -480,7 +480,7 @@ MonoBehaviour:
   GameOverUI: {fileID: 1338889504}
   pauseMenuUI: {fileID: 0}
   gameOverSfx: {fileID: 8300000, guid: 0aa03f0cfdff26440b99d90a4d851d96, type: 3}
-  maxStrokes: 1
+  maxStrokes: 5
   outOfStrokes: 0
   levelCompleted: 0
   isPaused: 0
@@ -524,7 +524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   threeStarMaxStrokes: 1
-  twoStarMaxStrokes: 2
+  twoStarMaxStrokes: 3
   starParent: {fileID: 199602957}
   firstStar: {fileID: 199602954}
   secondStar: {fileID: 199602955}
@@ -951,6 +951,7 @@ MonoBehaviour:
   maxPower: 10
   power: 2
   maxGoalSpeed: 4
+  lineRendererSortingOrder: 1000
 --- !u!120 &328804711
 LineRenderer:
   serializedVersion: 2
