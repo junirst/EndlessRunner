@@ -139,6 +139,7 @@ public class Dot : MonoBehaviour
         {
             transform.position = new Vector2(transform.position.x, targetY);
         }
+        if (Time.timeScale == 0f) return;
     }
 
     public IEnumerator CheckMoveCo()
@@ -210,6 +211,7 @@ public class Dot : MonoBehaviour
         {
             firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
+        if (Time.timeScale == 0f) return;
     }
 
     private void OnMouseUp()
@@ -218,6 +220,7 @@ public class Dot : MonoBehaviour
         {
             finalTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
+        if (Time.timeScale == 0f) return;
         CalculateAngle();
     }
 
