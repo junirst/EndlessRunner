@@ -312,6 +312,20 @@ public class LeaderboardUI : MonoBehaviour
 
     #region Data
 
+    [Header("Button Wiring")]
+    [SerializeField] private Canvas canvas;
+
+    public void OpenLeaderboard()
+    {
+        if (canvas == null)
+            canvas = GetComponentInParent<Canvas>();
+        if (canvas == null)
+            canvas = FindObjectOfType<Canvas>();
+        LeaderboardUI ui = Show(canvas, boardKey, playerScore);
+        if (ui != null && ui.rankText != null)
+            ui.rankText.gameObject.SetActive(false);
+    }
+
     private void FetchAndRender()
     {
         if (fetching) return;

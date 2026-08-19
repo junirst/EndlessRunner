@@ -12,6 +12,7 @@ public class TitleScript : MonoBehaviour
     [SerializeField] private string miniGolfSceneName = "MainMenu";
     [SerializeField] private string topDownShooterSceneName = "Menu";
     [SerializeField] private string snakeSceneName = "SnakeMenu";
+    [SerializeField] private string match3SceneName = "Main";
     [SerializeField] private float sceneLoadDelay = 0.08f;
 
     private TextMeshProUGUI totalStarsText;
@@ -190,6 +191,13 @@ public class TitleScript : MonoBehaviour
         TitleAudioManager.Instance?.PlayButtonClickSfx();
         TitleAudioManager.Instance?.StopBgm();
         StartCoroutine(LoadSceneAfterDelay(snakeSceneName));
+    }
+
+    public void PlayMatch3Game()
+    {
+        TitleAudioManager.Instance?.PlayButtonClickSfx();
+        TitleAudioManager.Instance?.StopBgm();
+        StartCoroutine(LoadSceneAfterDelay(match3SceneName));
     }
 
     public void LoadSceneByName(string sceneName)

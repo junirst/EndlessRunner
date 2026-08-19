@@ -2265,6 +2265,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
+--- !u!114 &981488980 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 783219734676126056, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
+  m_PrefabInstance: {fileID: 1460461041}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1c45bd664474a34084896fef9ba9b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1023727058
 GameObject:
   m_ObjectHideFlags: 0
@@ -3413,6 +3424,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 634654156}
     m_Modifications:
     - target: {fileID: 783219734676126056, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
+      propertyPath: boardKey
+      value: cubedash
+      objectReference: {fileID: 0}
+    - target: {fileID: 783219734676126056, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
       propertyPath: listText
       value: 
       objectReference: {fileID: 1091012818}
@@ -4284,9 +4299,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 634654152}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-        m_MethodName: BackToTitleScreen
+      - m_Target: {fileID: 981488980}
+        m_TargetAssemblyTypeName: LeaderboardUI, Assembly-CSharp
+        m_MethodName: OpenLeaderboard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
