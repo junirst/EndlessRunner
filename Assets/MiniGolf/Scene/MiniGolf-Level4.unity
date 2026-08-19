@@ -4165,6 +4165,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: PauseSystem
       objectReference: {fileID: 0}
+    - target: {fileID: 7744249403385374355, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
+      propertyPath: eatSfx
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7744249403385374355, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
+      propertyPath: bgmClip
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7744249403385374355, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
+      propertyPath: bgmSource
+      value: 
+      objectReference: {fileID: 874000274}
+    - target: {fileID: 7744249403385374355, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
+      propertyPath: sfxSource
+      value: 
+      objectReference: {fileID: 1093671670}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
