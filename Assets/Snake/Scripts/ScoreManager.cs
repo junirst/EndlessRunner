@@ -1,18 +1,27 @@
+using System.Collections;
 using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
+    public const string GameKey = "snake";
+
     [SerializeField] private int basePoints = 10;
-    [SerializeField] private float comboWindow = 3f;
 
     private int score;
-    private int combo;
-    private float timeSinceLastFood;
+    private int highScore;
+    private float multiplier = 1f;
+    private Coroutine multiplierCoroutine;
 
     public int Score => score;
-    public int Combo => combo;
+    public int HighScore
+    {
+        get => highScore;
+        set => highScore = value;
+    }
+
+    public string StageId { get; set; }
 
     private void Awake()
     {
@@ -24,37 +33,52 @@ public class ScoreManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Update()
+    public void AddScore(int points)
     {
-        if (combo <= 1) return;
-
-        timeSinceLastFood += Time.deltaTime;
-        if (timeSinceLastFood >= comboWindow)
-        {
-            combo = 1;
-            timeSinceLastFood = 0f;
-        }
+        score += Mathf.RoundToInt(points * multiplier);
     }
 
-    public void OnFoodEaten()
+    public void SetMultiplier(float value, float duration)
     {
-        if (timeSinceLastFood < comboWindow && timeSinceLastFood > 0f)
-        {
-            combo++;
-        }
-        else
-        {
-            combo = 1;
-        }
+        if (multiplierCoroutine != null)
+            StopCoroutine(multiplierCoroutine);
+        multiplierCoroutine = StartCoroutine(MultiplierRoutine(value, duration));
+    }
 
-        score += basePoints * combo;
-        timeSinceLastFood = 0f;
+    public void ResetMultiplier()
+    {
+        if (multiplierCoroutine != null)
+        {
+            StopCoroutine(multiplierCoroutine);
+            multiplierCoroutine = null;
+        }
+        multiplier = 1f;
+    }
+
+    private IEnumerator MultiplierRoutine(float value, float duration)
+    {
+        multiplier = value;
+        PowerUpUI.Instance?.ShowPowerUp(Food.FoodType.ScoreMultiplier, duration);
+        yield return new WaitForSeconds(duration);
+        multiplier = 1f;
+        multiplierCoroutine = null;
+    }
+
+    public void SaveHighScore()
+    {
+        if (string.IsNullOrEmpty(StageId)) return;
+        SnakeSaveSystem.SetHighScore(StageId, highScore);
+    }
+
+    public void LoadHighScore()
+    {
+        if (string.IsNullOrEmpty(StageId)) return;
+        highScore = SnakeSaveSystem.GetHighScore(StageId);
     }
 
     public void Reset()
     {
         score = 0;
-        combo = 1;
-        timeSinceLastFood = 0f;
+        ResetMultiplier();
     }
 }

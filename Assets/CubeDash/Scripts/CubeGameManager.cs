@@ -26,6 +26,10 @@ public class CubeGameManager : MonoBehaviour
 
     public float currentScore = 0f;
 
+    [SerializeField] private float scoreMultiplier = 1f;
+    [SerializeField] private float scoreMultiplierTimeRemaining = 0f;
+    [SerializeField] private AudioClip gameOverSfx;
+
     public Data data;
     public bool isPlaying = false;
     public bool isPaused = false;
@@ -59,18 +63,24 @@ public class CubeGameManager : MonoBehaviour
 
     private void Update() 
     {
-        if (isPlaying && Input.GetKeyDown(KeyCode.Escape))
+        if (scoreMultiplierTimeRemaining > 0f)
         {
-            TogglePause();
+            scoreMultiplierTimeRemaining -= Time.deltaTime;
+
+            if (scoreMultiplierTimeRemaining <= 0f)
+            {
+                ResetScoreMultiplier();
+            }
         }
 
         if (isPlaying) 
         {
-            currentScore += Time.deltaTime;
+            currentScore += Time.deltaTime * scoreMultiplier;
         }
     }
     public void StartGame () 
     {
+        ResetScoreMultiplier();
         onPlay.Invoke();
         isPlaying = true;
         isPaused = false;
@@ -83,7 +93,7 @@ public class CubeGameManager : MonoBehaviour
     {
         if (isPaused)
         {
-            ResumeGame();
+            PauseManager.Instance?.Resume();
         }
 
         if (data == null)
@@ -98,9 +108,32 @@ public class CubeGameManager : MonoBehaviour
             SaveSystem.Save("save", saveString);
         }
         isPlaying = false;
+        ResetScoreMultiplier();
         AudioManager.Instance?.StopBgm();
-        AudioManager.Instance?.PlayGameOverSfx();
+        AudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
         onGameOver.Invoke();
+    }
+
+    public void AddScore(float amount)
+    {
+        currentScore += amount;
+    }
+
+    public void ApplyScoreMultiplier(float multiplier, float duration)
+    {
+        if (multiplier <= 1f || duration <= 0f)
+        {
+            return;
+        }
+
+        scoreMultiplier = Mathf.Max(scoreMultiplier, multiplier);
+        scoreMultiplierTimeRemaining = Mathf.Max(scoreMultiplierTimeRemaining, duration);
+    }
+
+    private void ResetScoreMultiplier()
+    {
+        scoreMultiplier = 1f;
+        scoreMultiplierTimeRemaining = 0f;
     }
 
     public void TogglePause()
@@ -129,7 +162,6 @@ public class CubeGameManager : MonoBehaviour
 
         isPaused = true;
         isPlaying = false;
-        Time.timeScale = 0f;
         onPause.Invoke();
     }
 
@@ -142,7 +174,6 @@ public class CubeGameManager : MonoBehaviour
 
         isPaused = false;
         isPlaying = true;
-        Time.timeScale = 1f;
         onResume.Invoke();
     }
 

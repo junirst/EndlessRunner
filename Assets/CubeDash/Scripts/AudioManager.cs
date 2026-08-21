@@ -14,6 +14,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip crouchSfx;
     [SerializeField] private AudioClip gameOverSfx;
     [SerializeField] private AudioClip buttonClickSfx;
+    [SerializeField] private AudioClip buttonHoverSfx;
+    [SerializeField] private AudioClip powerUpPickupSfx;
 
     [Header("BGM")]
     [SerializeField] private AudioClip gameplayBgm;
@@ -54,14 +56,50 @@ public class AudioManager : MonoBehaviour
         PlaySfx(crouchSfx);
     }
 
-    public void PlayGameOverSfx()
+    public void PlayGameOverSfx(AudioClip clipOverride = null)
     {
-        PlaySfx(gameOverSfx);
+        PlaySfx(GetGameOverClip(clipOverride));
+    }
+
+    private AudioClip GetGameOverClip(AudioClip clipOverride)
+    {
+        if (clipOverride != null)
+        {
+            return clipOverride;
+        }
+
+        if (gameOverSfx != null)
+        {
+            return gameOverSfx;
+        }
+
+        AudioClip loadedClip = Resources.Load<AudioClip>("cubedashgameover");
+        if (loadedClip == null)
+        {
+            loadedClip = Resources.Load<AudioClip>("CubeDash/cubedashgameover");
+        }
+
+        if (loadedClip == null)
+        {
+            loadedClip = Resources.Load<AudioClip>("CubeDash/Resources/cubedashgameover");
+        }
+
+        return loadedClip;
     }
 
     public void PlayButtonClickSfx()
     {
         PlaySfx(buttonClickSfx);
+    }
+
+    public void PlayButtonHoverSfx()
+    {
+        PlaySfx(buttonHoverSfx);
+    }
+
+    public void PlayPowerUpPickupSfx()
+    {
+        PlaySfx(powerUpPickupSfx);
     }
 
     public void PlayBgm()

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d833e816accc6ca46a080210a02b1626
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - tilePrefab: {instanceID: 0}
+  - currentDot: {instanceID: 0}
+  - destroyEffect: {instanceID: 0}
+  - gameOverSfx: {fileID: 8300000, guid: e4ea12544763b9c44b1dcb911992fb8b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

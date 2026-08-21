@@ -12,6 +12,17 @@ TagManager:
   - EnemyBullet
   - Food
   - Wall
+  - Body
+  - Enemy
+  - teal dot
+  - yellow dot
+  - green dot
+  - orange dot
+  - purple dot
+  - red dot
+  - blue dot
+  - Audio
+  - pink dot
   layers:
   - Default
   - TransparentFX

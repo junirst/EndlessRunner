@@ -17,9 +17,13 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI gameOverHighscoreUI;
 
+    [SerializeField] private string mainMenuSceneName = "TitleScreen";
+
     CubeGameManager gm;
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         gm = CubeGameManager.Instance;
         gm.onGameOver.AddListener(ActivateGameOverUI);
         gm.onPause.AddListener(ActivatePauseUI);
@@ -39,9 +43,18 @@ public class UIManager : MonoBehaviour
     public void ActivateGameOverUI () 
     {
         HidePauseUI();
-        gameOverUi.SetActive(true);
-        gameOverScoreUI.text = "Score: " + gm.PrettyScore();
+        if (gameOverUi != null)
+        {
+            gameOverUi.SetActive(false);
+        }
+
+        if (gameOverScoreUI != null)
+        {
+            gameOverScoreUI.text = "Score: " + gm.PrettyScore();
+        }
+
         RefreshHighscoreText();
+        LeaderboardUI.ShowForGame(gameOverUi, "cubedash", null, Mathf.RoundToInt(gm.currentScore));
     }
 
     public void ActivatePauseUI()
@@ -75,11 +88,18 @@ public class UIManager : MonoBehaviour
         gm.ResumeGame();
     }
 
+    public void RestartGame()
+    {
+        AudioManager.Instance?.PlayButtonClickSfx();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     public void BackToTitleScreen()
     {
         AudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("TitleScreen");
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 
     private void OnGUI()

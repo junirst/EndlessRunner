@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+[RequireComponent(typeof(LevelStarRating))]
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager main;
@@ -17,10 +18,14 @@ public class LevelManager : MonoBehaviour
     [Space(10)]
     [SerializeField] private GameObject pauseMenuUI;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip gameOverSfx;
+
     [Header("Attributes")]
     [SerializeField] private int maxStrokes;
 
     private int strokes;
+    private LevelStarRating levelStarRating;
     [HideInInspector] public bool outOfStrokes;
     [HideInInspector] public bool levelCompleted;
     [HideInInspector] public bool isPaused;
@@ -30,21 +35,25 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         main = this;
+        levelStarRating = GetComponent<LevelStarRating>();
     }
 
     private void Start()
     {
+        LeaderboardManager.EnsureInstance();
+
         Time.timeScale = 1f;
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(false);
         }
+
         updateStrokeUI();
     }
 
     private void Update()
     {
-        if (CanTogglePause() && Input.GetKeyDown(KeyCode.Escape))
+        if (CanTogglePause() && Input.GetKeyDown(KeyCode.Escape) && PauseManager.Instance == null)
         {
             TogglePause();
         }
@@ -69,11 +78,35 @@ public class LevelManager : MonoBehaviour
         }
 
         levelCompleted = true;
+        int starRating = levelStarRating != null ? levelStarRating.GetStarRating(strokes) : 1;
+        levelStarRating?.SetStarDisplay(starRating);
+        global::MiniGolfTotalStarsManager.RegisterLevelStars(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, starRating);
         MiniGolfAudioManager.Instance?.PlayLevelCompleteSfx();
-        
-        levelCompleteStrokeUI.text = strokes > 1 ? "You putted in " + strokes + " strokes" : "You got a hole in one!";
 
-        levelCompleteUI.SetActive(true);
+        string strokeMessage = strokes > 1 ? "You putted in " + strokes + " strokes" : "You got a hole in one!";
+        string completionHint = levelStarRating != null ? levelStarRating.GetCompletionHintText(strokes) : string.Empty;
+        if (levelCompleteStrokeUI != null)
+        {
+            levelCompleteStrokeUI.text = string.IsNullOrEmpty(completionHint) ? strokeMessage : strokeMessage + "\n" + completionHint;
+        }
+
+        if (levelCompleteUI != null)
+        {
+            levelCompleteUI.SetActive(false);
+        }
+        ShowLevelLeaderboard(levelCompleteUI, strokes);
+    }
+
+    public static string LeaderboardStageId()
+    {
+        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        var match = System.Text.RegularExpressions.Regex.Match(scene, @"\d+$");
+        return match.Success ? "level" + match.Value : scene.ToLowerInvariant().Replace("-", "_");
+    }
+
+    private static void ShowLevelLeaderboard(GameObject screenToReveal, int strokes)
+    {
+        LeaderboardUI.ShowForGame(screenToReveal, "minigolf", LeaderboardStageId(), strokes);
     }
 
     public void GameOver()
@@ -89,7 +122,7 @@ public class LevelManager : MonoBehaviour
         }
 
         gameOver = true;
-        MiniGolfAudioManager.Instance?.PlayGameOverSfx();
+        MiniGolfAudioManager.Instance?.PlayGameOverSfx(gameOverSfx);
         GameOverUI.SetActive(true);
     }
 
@@ -147,6 +180,10 @@ public class LevelManager : MonoBehaviour
     {
         MiniGolfAudioManager.Instance?.PlayButtonClickSfx();
         Time.timeScale = 1f;
+        if (levelCompleteUI != null)
+        {
+            levelCompleteUI.SetActive(false);
+        }
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 

@@ -1,0 +1,18 @@
+{
+  "task": "Rename Match 3 ScoreManager file and update references",
+  "status": "completed",
+  "actions_taken": [
+    "Renamed Assets/Match 3/Scripts/ScoreManager.cs to Match3ScoreManager.cs",
+    "Updated class name from ScoreManager to Match3ScoreManager in the file",
+    "Updated static Instance property from ScoreManager to Match3ScoreManager",
+    "Verified no other Match 3 C# scripts reference the old ScoreManager name"
+  ],
+  "files_modified": [
+    "Assets/Match 3/Scripts/ScoreManager.cs -> Assets/Match 3/Scripts/Match3ScoreManager.cs"
+  ],
+  "references_updated": [
+    "Class declaration: public class Match3ScoreManager : MonoBehaviour",
+    "Static Instance property: public static Match3ScoreManager Instance"
+  ],
+  "remaining_snake_score_manager": "Assets/Snake/Scripts/ScoreManager.cs (unchanged - separate file)"
+}
