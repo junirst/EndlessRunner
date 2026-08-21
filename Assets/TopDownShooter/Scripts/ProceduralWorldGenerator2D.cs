@@ -103,6 +103,7 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
         EnsureInvisibleBorderWalls();
 
         targetTilemap.RefreshAllTiles();
+        EnsureTilemapCollider();
 
         if (placePlayerAtSpawn)
         {
@@ -307,10 +308,17 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
         }
 
         SmoothCameraFollow cameraFollow = Camera.main.GetComponent<SmoothCameraFollow>();
-        if (cameraFollow && cameraFollow.target == null)
+        if (!cameraFollow)
         {
-            cameraFollow.target = player;
+            return;
         }
+
+        cameraFollow.target = player;
+
+        Vector3 minimum = targetTilemap.CellToWorld(mapOriginCell);
+        Vector3 maximum = targetTilemap.CellToWorld(mapOriginCell + new Vector3Int(width, height, 0));
+        Bounds mapBounds = new Bounds((minimum + maximum) * 0.5f, maximum - minimum);
+        cameraFollow.SetMovementBounds(mapBounds);
     }
 
     private void SetRandomTile(Vector3Int cell, Sprite[] sprites)
@@ -324,18 +332,44 @@ public class ProceduralWorldGenerator2D : MonoBehaviour
         targetTilemap.SetTile(cell, GetTile(sprite));
     }
 
+    private void EnsureTilemapCollider()
+    {
+        if (!targetTilemap.GetComponent<TilemapCollider2D>())
+        {
+            targetTilemap.gameObject.AddComponent<TilemapCollider2D>();
+        }
+    }
+
     private Tile GetTile(Sprite sprite)
     {
         if (!tileCache.TryGetValue(sprite, out Tile tile))
         {
             tile = ScriptableObject.CreateInstance<Tile>();
             tile.sprite = sprite;
-            tile.colliderType = Tile.ColliderType.None;
+            tile.colliderType = IsWaterSprite(sprite) ? Tile.ColliderType.Grid : Tile.ColliderType.None;
             tile.hideFlags = HideFlags.HideAndDontSave;
             tileCache.Add(sprite, tile);
         }
 
         return tile;
+    }
+
+    private bool IsWaterSprite(Sprite sprite)
+    {
+        if (waterSprites == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < waterSprites.Length; i++)
+        {
+            if (waterSprites[i] == sprite)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Sprite PickBiomeSprite(float sample)
