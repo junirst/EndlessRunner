@@ -13,13 +13,14 @@ public class Dot : MonoBehaviour
     public bool isMatched = false;
     public GameObject otherDot;
 
+    private EndGameManager endGameManager;
     private HintManager hintManager;
     private FindMatches findMatches;
     private Board board;
     
     private Vector2 firstTouchPosition;
     private Vector2 finalTouchPosition;
-    private Vector2 tempPosition;
+    private const float MovementSpeed = 8f;
 
     [Header("Swipe Stuff")]
     public float swipeAngle = 0;
@@ -57,8 +58,9 @@ public class Dot : MonoBehaviour
         isColumnBomb = false;
         isRowBomb = false;
         isAdjacentBomb = false;
-        isColorBomb = false; 
+        isColorBomb = false;
         // Updated to the modern Unity method to find the Board script
+        endGameManager = FindObjectOfType<EndGameManager>();
         hintManager = FindObjectOfType<HintManager>();
         board = Object.FindFirstObjectByType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
@@ -115,31 +117,8 @@ public class Dot : MonoBehaviour
             }
         }
         */
-        targetX = column;
-        targetY = row;
-
-        // Smoothly slide horizontally to targetX
-        if (Mathf.Abs(targetX - transform.position.x) > .05f)
-        {
-            tempPosition = new Vector2(targetX, transform.position.y);
-            transform.position = Vector2.Lerp(transform.position, tempPosition, .100f);
-        }
-        else
-        {
-            transform.position = new Vector2(targetX, transform.position.y);
-        }
-
-        // Smoothly slide vertically to targetY
-        if (Mathf.Abs(targetY - transform.position.y) > .05f)
-        {
-            tempPosition = new Vector2(transform.position.x, targetY);
-            transform.position = Vector2.Lerp(transform.position, tempPosition, .100f);
-        }
-        else
-        {
-            transform.position = new Vector2(transform.position.x, targetY);
-        }
-        if (Time.timeScale == 0f) return;
+        Vector3 targetPosition = new Vector3(column, row, transform.position.z);
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, MovementSpeed * Time.deltaTime);
     }
 
     public IEnumerator CheckMoveCo()
@@ -195,6 +174,18 @@ public class Dot : MonoBehaviour
             }
             else
             {
+                if (endGameManager == null)
+                {
+                    endGameManager = FindObjectOfType<EndGameManager>();
+                }
+
+                if (endGameManager != null)
+                {
+                    if (endGameManager.requirements != null && endGameManager.requirements.gameType == GameType.Moves)
+                    {
+                        endGameManager.DecreaseCounterValue();
+                    }
+                }
                 board.DestroyMatches();
             }
         }

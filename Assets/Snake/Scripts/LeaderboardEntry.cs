@@ -9,6 +9,8 @@ public class LeaderboardEntry
     public string Game;
     public string Scene;
 
+    public string Breakdown;
+
     public bool IsPlayer { get; set; }
 
     public LeaderboardEntry() { }

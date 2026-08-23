@@ -57,8 +57,6 @@ EditorBuildSettings:
     path: Assets/MiniGolf/Scene/MiniGolf-Level54.unity
     guid: 00c44b8ce06b9354fbe0998b5c1d44cf
   - enabled: 1
-    path: Assets/Match 3/Scenes/Menu.unity
-    guid: 364b4a22cbb4a2448bf64179b519cdd8
     path: Assets/MiniGolf/Scene/MiniGolf-Level6.unity
     guid: a91305760ed37994eb7e5e0350f89d75
   - enabled: 1
@@ -73,4 +71,26 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level10.unity
     guid: 73a99d30f5fd5744fa30d4b0e8d9ba70
+    guid: 4bb017fd2486a8346bad6f3b5a74c9b7
+  - enabled: 1
+    path: Assets/Match 3/Scenes/LevelSelect.unity
+    guid: 0da84ee58940a2746964937f4174925c
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Level1.unity
+    guid: 92c60bb0e68b2f640854f0e058e55fb9
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Level2.unity
+    guid: fa5e03eccca668f458f8a90ca73bc00e
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Level3.unity
+    guid: 756ee6aa78c61ec45baeec4c0f009763
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Level4.unity
+    guid: 2fb1470ade0afd241a8575251c4ba669
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Level5.unity
+    guid: a9c35fca3f5ca224db318e9277c93574
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Level6.unity
+    guid: 546ab1a0e0a0b794db6529a16ed94548
   m_configObjects: {}
