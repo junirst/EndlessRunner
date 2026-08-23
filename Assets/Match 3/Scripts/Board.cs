@@ -39,6 +39,9 @@ public class Board : MonoBehaviour
 
     public GameObject destroyEffect;
 
+    // Score goals used by the UI ScoreManager. Exposed to the inspector.
+    public int[] scoreGoals;
+
     // --- Board Layout Section ---
     [NonReorderable] // This attribute forces the classic "Size" field to appear
     public tileType[] boardLayout;
@@ -48,6 +51,10 @@ public class Board : MonoBehaviour
     private BackgroundTile[,] breakableTiles;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
+    public int basePieceValue = 20; // Base score value for a single piece match
+    private int streakValue = 1; // Multiplier for consecutive matches
+    private Match3ScoreManager matchScoreManager;
+    public float refillDelay = 0.5f; // Delay before refilling the board after matches are destroyed
     [SerializeField] private AudioClip gameOverSfx;
     private AudioManagerM3 audioManager;
     private int lastMatchCount;
@@ -55,6 +62,7 @@ public class Board : MonoBehaviour
         // Start is called before the first frame update
         void Start()
     {
+        matchScoreManager = FindObjectOfType<Match3ScoreManager>();
         breakableTiles = new BackgroundTile[width, height];
         findMatches = FindObjectOfType<FindMatches>();
         audioManager = FindObjectOfType<AudioManagerM3>();
@@ -132,7 +140,9 @@ public class Board : MonoBehaviour
                 if (!blankSpaces[i, j])
                 {
                     // 1. Background tiles stay down at normal grid positions (No offset!)
+                    Vector2 tempPosition = new Vector2(i, j + offSet);
                     Vector2 tilePosition = new Vector2(i, j);
+                    
                     GameObject backgroundTile = Instantiate(tilePrefab, tilePosition, Quaternion.identity);
                     backgroundTile.transform.parent = this.transform;
                     backgroundTile.name = "( " + i + ", " + j + " )";
@@ -362,6 +372,7 @@ public class Board : MonoBehaviour
                 }
 
                 Destroy(allDots[column, row]);
+                matchScoreManager.IncreaseScore(basePieceValue * streakValue);
                 allDots[column, row] = null;
             }
         }
@@ -524,6 +535,7 @@ public class Board : MonoBehaviour
 
         while (MatchesOnBoard())
         {
+            streakValue ++;
             yield return new WaitForSeconds(.5f);
 
             DestroyMatches();
@@ -538,6 +550,7 @@ public class Board : MonoBehaviour
                 Debug.Log("Deadlock detected! Shuffling the board...");
             }   
             currentState = GameState.move;
+            streakValue = 1;
     }
 
     private void SwitchPieces(int column, int row, Vector2 direction)

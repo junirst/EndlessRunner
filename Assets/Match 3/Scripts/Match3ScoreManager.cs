@@ -1,43 +1,45 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class Match3ScoreManager : MonoBehaviour
 {
-public static Match3ScoreManager Instance { get; private set; }
-    
-    private void Awake()
+
+    private Board board;
+    public Text scoreText;
+    public int score;
+    public Image scoreBar;
+
+    // Use this for initialization
+    void Start()
     {
-        if (Instance != null && Instance != this)
+        board = FindObjectOfType<Board>();
+        UpdateBar();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        scoreText.text = "" + score;
+    }
+
+    public void IncreaseScore(int amountToIncrease)
+    {
+        score += amountToIncrease;
+        UpdateBar();
+    }
+
+    private void UpdateBar()
+    {
+        if (board != null && scoreBar != null)
         {
-            Destroy(gameObject);
-            return;
+
+            int length = board.scoreGoals.Length;
+
+            scoreBar.fillAmount = (float)score / (float)board.scoreGoals[length - 1];
+
+
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-    
-    public int Score { get; private set; }
-    public int HighScore { get; private set; }
-    
-    public void AddScore(int points)
-    {
-        Score += points;
-        Debug.Log("Score added: " + points + ", total: " + Score);
-    }
-    
-    public void Reset()
-    {
-        Score = 0;
-    }
-    
-    public void LoadHighScore()
-    {
-        // Load high score using PlayerPrefs or JSON serialization
-        HighScore = PlayerPrefs.GetInt("HighScore", 0);
-    }
-    
-    public void SaveHighScore()
-    {
-        PlayerPrefs.SetInt("HighScore", HighScore);
-        PlayerPrefs.Save();
     }
 }
