@@ -4641,7 +4641,7 @@ MonoBehaviour:
   segmentPrefab: {fileID: 835490339300656283, guid: e879d906bdb8786489d85b0c8868a5cb, type: 3}
   direction: {x: 1, y: 0}
   speed: 5
-  speedMultiplier: 1
+  speedMultiplier: 2
   initialSize: 4
   moveThroughWalls: 0
   verticalBound: 0
