@@ -2204,6 +2204,10 @@ PrefabInstance:
       propertyPath: settingsUI
       value: 
       objectReference: {fileID: 693427822}
+    - target: {fileID: 862981711113469093, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
+      propertyPath: mainMenuSceneName
+      value: CubeDash
+      objectReference: {fileID: 0}
     - target: {fileID: 5909289883630923185, guid: 14efdd336b50fa941ab1a72eafd915b5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 498.87228

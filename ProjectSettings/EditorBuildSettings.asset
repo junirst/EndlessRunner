@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/TitleScreen.unity
     guid: 35f15a171f47a364189c6610d080f1c9
   - enabled: 1
-    path: Assets/CubeDash/Scenes/CubeDash.unity
+    path: Assets/EndlessRunner/Scenes/CubeDash.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/MiniGolf/Scene/MainMenu.unity
@@ -59,8 +59,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Match 3/Scenes/Menu.unity
     guid: 364b4a22cbb4a2448bf64179b519cdd8
-    path: Assets/MiniGolf/Scene/MiniGolf-Level6.unity
-    guid: a91305760ed37994eb7e5e0350f89d75
   - enabled: 1
     path: Assets/MiniGolf/Scene/MiniGolf-Level7.unity
     guid: 548ded139a1351c4e94214bc7a27dc45
