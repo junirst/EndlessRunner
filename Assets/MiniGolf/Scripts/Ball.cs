@@ -13,9 +13,21 @@ public class Ball : MonoBehaviour
     [SerializeField] private float maxPower = 10f;
     [SerializeField] private float power = 2f;
     [SerializeField] private float maxGoalSpeed = 4f;
+    [SerializeField] private int lineRendererSortingOrder = 1000;
 
     private bool isDragging;
     private bool inHole;
+    private Vector2 strokeStartPosition;
+
+    private void Start()
+    {
+        strokeStartPosition = rb.position;
+
+        if (lr != null)
+        {
+            lr.sortingOrder = lineRendererSortingOrder;
+        }
+    }
 
     private void Update()
     {
@@ -73,12 +85,24 @@ public class Ball : MonoBehaviour
             return;
         }
 
+        strokeStartPosition = rb.position;
         LevelManager.main.IncreaseStroke();
         MiniGolfAudioManager.Instance?.PlayShotSfx();
 
         Vector2 dir = (Vector2)transform.position - pos;
 
         rb.velocity = Vector2.ClampMagnitude(dir * power, maxPower);
+    }
+
+    public void ResetToStrokeStart()
+    {
+        isDragging = false;
+        lr.positionCount = 0;
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.position = strokeStartPosition;
+        transform.position = strokeStartPosition;
+        rb.Sleep();
     }
 
     private void CheckWinState()
