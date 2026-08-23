@@ -39,13 +39,17 @@ public class LeaderboardManager : MonoBehaviour
     {
         "snake_infinite", "snake_level1", "snake_level2",
         "cubedash", "shooter",
-        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3"
+        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3",
+        "minigolf_level4", "minigolf_level5", "minigolf_level6",
+        "minigolf_level7", "minigolf_level8", "minigolf_level9", "minigolf_level10"
     };
 
     // Boards where a LOWER score is better (e.g. minigolf strokes).
     private static readonly string[] AscendingBoards =
     {
-        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3"
+        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3",
+        "minigolf_level4", "minigolf_level5", "minigolf_level6",
+        "minigolf_level7", "minigolf_level8", "minigolf_level9", "minigolf_level10"
     };
 
     #endregion
