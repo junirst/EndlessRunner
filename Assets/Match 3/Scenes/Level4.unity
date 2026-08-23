@@ -1705,7 +1705,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'Time left : 00'
+  m_Text: 'Time left :'
 --- !u!222 &567226429
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1800,7 +1800,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'MOVES LEFT: 44'
+  m_Text: 'MOVES LEFT:'
 --- !u!222 &572790723
 CanvasRenderer:
   m_ObjectHideFlags: 0
