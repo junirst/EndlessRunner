@@ -2233,9 +2233,10 @@ MonoBehaviour:
   food: {fileID: 289142869}
   wallsParent: {fileID: 1709362779}
   cellSize: 2
-  initialFillProbability: 0.5
-  smoothIterations: 4
-  spawnSafetyRadius: 3
+  initialFillProbability: 0.43
+  smoothIterations: 2
+  spawnSafetyRadius: 2
+  edgeClearance: 1
   maxPlacementAttempts: 50
   minReachableCells: 80
   persistSeed: 1

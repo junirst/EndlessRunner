@@ -6508,7 +6508,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snake: {fileID: 1804161495}
-  autoPlayEnabled: 0
+  autoPlayEnabled: 1
 --- !u!95 &1804161497
 Animator:
   serializedVersion: 5
