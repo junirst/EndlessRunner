@@ -13,6 +13,8 @@ public class LeaderboardUI : MonoBehaviour
     [SerializeField] private string boardKey;
     [SerializeField] private int playerScore;
 
+    [SerializeField] private string scoreBreakdown;
+
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private TextMeshProUGUI listText;
@@ -86,7 +88,7 @@ public class LeaderboardUI : MonoBehaviour
     /// Shows the leaderboard, reusing an existing instance in the scene if one
     /// exists (e.g. a prefab placed in the hierarchy), otherwise building one.
     /// </summary>
-    public static LeaderboardUI Show(Canvas canvas, string boardKey, int playerScore)
+    public static LeaderboardUI Show(Canvas canvas, string boardKey, int playerScore, string scoreBreakdown = null)
     {
         if (canvas == null) return null;
 
@@ -117,6 +119,7 @@ public class LeaderboardUI : MonoBehaviour
         ui.submitted = false;
         ui.boardKey = boardKey;
         ui.playerScore = playerScore;
+        ui.scoreBreakdown = scoreBreakdown ?? string.Empty;
         ui.fetching = false;
         ui.FetchAndRender();
         return ui;
@@ -304,7 +307,7 @@ public class LeaderboardUI : MonoBehaviour
     private async System.Threading.Tasks.Task SaveAndRenderAsync(string name)
     {
         if (LeaderboardManager.Instance != null)
-            await LeaderboardManager.Instance.SubmitScoreAndWaitAsync(boardKey, name, playerScore);
+            await LeaderboardManager.Instance.SubmitScoreAndWaitAsync(boardKey, name, playerScore, scoreBreakdown);
         FetchAndRender();
     }
 
@@ -364,7 +367,8 @@ public class LeaderboardUI : MonoBehaviour
             string rankCell = $"<mspace=0.7em>#{rank.PadLeft(2)}</mspace>";
             string nameCell = $"<mspace=0.52em>{name.PadRight(MaxNameLength)}</mspace>";
             string scoreCell = $"<mspace=0.52em>{e.Score,8}</mspace>";
-            output += rankCell + " " + nameCell + scoreCell + "\n";
+            string breakdownLine = boardKey == "match3" && !string.IsNullOrEmpty(e.Breakdown) ? $"\n<size=14><color=#B8F5FF>{e.Breakdown}</color></size>" : "";
+            output += rankCell + " " + nameCell + scoreCell + breakdownLine + "\n";
         }
         listText.text = output.TrimEnd('\n');
     }

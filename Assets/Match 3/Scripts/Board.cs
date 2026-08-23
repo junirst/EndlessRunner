@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum GameState
 {
     wait,
-    move
+    move,
+    win,
+    lose,
+    pause
 }
 
 public enum TileKind
@@ -51,6 +55,7 @@ public class Board : MonoBehaviour
     private BackgroundTile[,] breakableTiles;
     private BackgroundTile[,] allTiles;
     private FindMatches findMatches;
+    private GoalManager goalManager;
     public int basePieceValue = 20; // Base score value for a single piece match
     private int streakValue = 1; // Multiplier for consecutive matches
     private Match3ScoreManager matchScoreManager;
@@ -59,13 +64,82 @@ public class Board : MonoBehaviour
     private AudioManagerM3 audioManager;
     private int lastMatchCount;
 
-        // Start is called before the first frame update
-        void Start()
+    private void Awake()
+    {
+        ApplySceneLayout();
+        ConfigureScoreGoals();
+    }
+
+    private void ConfigureScoreGoals()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName.StartsWith("Level"))
+        {
+            scoreGoals = new[] { 300, 600, 1000 };
+        }
+    }
+
+    private void ApplySceneLayout()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        switch (sceneName)
+        {
+            case "Level1":
+                boardLayout = CreateLayout(
+                    new[] { new Vector2Int(0, 0), new Vector2Int(9, 0), new Vector2Int(0, 9), new Vector2Int(9, 9) },
+                    new[] { new Vector3Int(2, 2, 1), new Vector3Int(7, 7, 1) });
+                break;
+            case "Level2":
+                boardLayout = CreateLayout(
+                    new[] { new Vector2Int(4, 0), new Vector2Int(5, 0), new Vector2Int(4, 9), new Vector2Int(5, 9) },
+                    new[] { new Vector3Int(3, 4, 2), new Vector3Int(4, 4, 2), new Vector3Int(5, 5, 2) });
+                break;
+            case "Level3":
+                boardLayout = CreateLayout(
+                    new[] { new Vector2Int(0, 4), new Vector2Int(0, 5), new Vector2Int(9, 4), new Vector2Int(9, 5) },
+                    new[] { new Vector3Int(3, 4, 2), new Vector3Int(4, 4, 2), new Vector3Int(5, 4, 2), new Vector3Int(4, 5, 2), new Vector3Int(5, 5, 2) });
+                break;
+            case "Level4":
+                boardLayout = CreateLayout(
+                    new[] { new Vector2Int(0, 0), new Vector2Int(1, 1), new Vector2Int(2, 2), new Vector2Int(7, 7), new Vector2Int(8, 8), new Vector2Int(9, 9) },
+                    new[] { new Vector3Int(3, 3, 3), new Vector3Int(4, 3, 3), new Vector3Int(5, 3, 3), new Vector3Int(3, 4, 3), new Vector3Int(5, 4, 3), new Vector3Int(3, 5, 3), new Vector3Int(4, 5, 3), new Vector3Int(5, 5, 3) });
+                break;
+            case "Level5":
+                boardLayout = CreateLayout(
+                    new[] { new Vector2Int(3, 0), new Vector2Int(6, 0), new Vector2Int(0, 3), new Vector2Int(9, 3), new Vector2Int(0, 6), new Vector2Int(9, 6), new Vector2Int(3, 9), new Vector2Int(6, 9) },
+                    new[] { new Vector3Int(2, 2, 4), new Vector3Int(3, 2, 4), new Vector3Int(4, 2, 4), new Vector3Int(5, 2, 4), new Vector3Int(2, 3, 4), new Vector3Int(5, 3, 4), new Vector3Int(2, 4, 4), new Vector3Int(5, 4, 4), new Vector3Int(2, 5, 4), new Vector3Int(5, 5, 4), new Vector3Int(2, 6, 4), new Vector3Int(3, 6, 4), new Vector3Int(4, 6, 4), new Vector3Int(5, 6, 4) });
+                break;
+            case "Level6":
+                boardLayout = CreateLayout(
+                    new[] { new Vector2Int(1, 1), new Vector2Int(8, 1), new Vector2Int(1, 8), new Vector2Int(8, 8), new Vector2Int(4, 0), new Vector2Int(5, 0), new Vector2Int(4, 9), new Vector2Int(5, 9) },
+                    new[] { new Vector3Int(2, 2, 5), new Vector3Int(3, 2, 5), new Vector3Int(4, 2, 5), new Vector3Int(5, 2, 5), new Vector3Int(6, 2, 5), new Vector3Int(2, 3, 5), new Vector3Int(6, 3, 5), new Vector3Int(2, 4, 5), new Vector3Int(6, 4, 5), new Vector3Int(2, 5, 5), new Vector3Int(6, 5, 5), new Vector3Int(2, 6, 5), new Vector3Int(3, 6, 5), new Vector3Int(4, 6, 5), new Vector3Int(5, 6, 5), new Vector3Int(6, 6, 5) });
+                break;
+        }
+    }
+
+    private tileType[] CreateLayout(Vector2Int[] blankPositions, Vector3Int[] breakablePositions)
+    {
+        int layoutCount = blankPositions.Length + breakablePositions.Length;
+        tileType[] layout = new tileType[layoutCount];
+        int index = 0;
+        foreach (Vector2Int position in blankPositions)
+        {
+            layout[index++] = new tileType { x = position.x, y = position.y, tileKind = TileKind.Blank, breakableValue = 0 };
+        }
+        foreach (Vector3Int position in breakablePositions)
+        {
+            layout[index++] = new tileType { x = position.x, y = position.y, tileKind = TileKind.Breakable, breakableValue = position.z };
+        }
+        return layout;
+    }
+    private void Start()
     {
         matchScoreManager = FindObjectOfType<Match3ScoreManager>();
         breakableTiles = new BackgroundTile[width, height];
         findMatches = FindObjectOfType<FindMatches>();
+        goalManager = FindObjectOfType<GoalManager>();
         audioManager = FindObjectOfType<AudioManagerM3>();
+        currentState = GameState.pause;
 
         // Basic validation to catch inspector misconfiguration early
         if (width <= 0 || height <= 0)
@@ -93,6 +167,7 @@ public class Board : MonoBehaviour
         }
 
         SetUp();
+        currentState = GameState.move;
     }
 
     public void GenerateBlankSpaces()
@@ -171,6 +246,11 @@ public class Board : MonoBehaviour
                     {
                         dotComponent.column = i;
                         dotComponent.row = j;
+                        dotComponent.targetX = i;
+                        dotComponent.targetY = j;
+                        dotComponent.previousColumn = i;
+                        dotComponent.previousRow = j;
+                        dotComponent.enabled = true;
                     }
 
                     allDots[i, j] = dot;
@@ -365,6 +445,12 @@ public class Board : MonoBehaviour
                 }
 
 
+                if (goalManager != null)
+                {
+                    goalManager.CompareGoal(allDots[column, row].tag);
+                    goalManager.UpdateGoals();
+                }
+
                 if (destroyEffect != null)
                 {
                     GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
@@ -500,6 +586,11 @@ public class Board : MonoBehaviour
                     {
                         dotComponent.column = i;
                         dotComponent.row = j;
+                        dotComponent.targetX = i;
+                        dotComponent.targetY = j;
+                        dotComponent.previousColumn = i;
+                        dotComponent.previousRow = j;
+                        dotComponent.enabled = true;
                     }
 
                     allDots[i, j] = piece;
