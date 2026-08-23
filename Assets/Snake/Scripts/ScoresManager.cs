@@ -38,6 +38,12 @@ public class ScoreManager : MonoBehaviour
         score += Mathf.RoundToInt(points * multiplier);
     }
 
+    /// <summary>Adds the configured base score using the active multiplier.</summary>
+    public void AddBaseScore()
+    {
+        AddScore(basePoints);
+    }
+
     public void SetMultiplier(float value, float duration)
     {
         if (multiplierCoroutine != null)

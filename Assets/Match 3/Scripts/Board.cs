@@ -115,6 +115,35 @@ public class Board : MonoBehaviour
                     new[] { new Vector3Int(2, 2, 5), new Vector3Int(3, 2, 5), new Vector3Int(4, 2, 5), new Vector3Int(5, 2, 5), new Vector3Int(6, 2, 5), new Vector3Int(2, 3, 5), new Vector3Int(6, 3, 5), new Vector3Int(2, 4, 5), new Vector3Int(6, 4, 5), new Vector3Int(2, 5, 5), new Vector3Int(6, 5, 5), new Vector3Int(2, 6, 5), new Vector3Int(3, 6, 5), new Vector3Int(4, 6, 5), new Vector3Int(5, 6, 5), new Vector3Int(6, 6, 5) });
                 break;
         }
+
+        EnsureDimensionsFitLayout();
+    }
+
+    /// <summary>Ensures the runtime board arrays can contain every configured layout position.</summary>
+    private void EnsureDimensionsFitLayout()
+    {
+        if (boardLayout == null || boardLayout.Length == 0)
+        {
+            width = Mathf.Max(1, width);
+            height = Mathf.Max(1, height);
+            return;
+        }
+
+        int requiredWidth = 1;
+        int requiredHeight = 1;
+        foreach (tileType layoutEntry in boardLayout)
+        {
+            if (layoutEntry == null)
+            {
+                continue;
+            }
+
+            requiredWidth = Mathf.Max(requiredWidth, layoutEntry.x + 1);
+            requiredHeight = Mathf.Max(requiredHeight, layoutEntry.y + 1);
+        }
+
+        width = Mathf.Max(width, requiredWidth);
+        height = Mathf.Max(height, requiredHeight);
     }
 
     private tileType[] CreateLayout(Vector2Int[] blankPositions, Vector3Int[] breakablePositions)

@@ -21,8 +21,11 @@ public class AudioManagerM3 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        bgmSource.clip = gameplayBgm;
-        bgmSource.Play();
+        if (playBgmOnStart)
+        {
+            bgmSource.clip = gameplayBgm;
+            bgmSource.Play();
+        }
     }
 
     // Update is called once per frame
