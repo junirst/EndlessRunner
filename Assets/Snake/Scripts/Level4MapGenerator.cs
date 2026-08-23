@@ -6,7 +6,6 @@ public class Level4MapGenerator : MonoBehaviour
     #region Inspector Fields
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject wallPrefab;
     [SerializeField] private GameObject straightWallPrefab;
     [SerializeField] private GameObject lShapeWallPrefab;
 
@@ -26,6 +25,7 @@ public class Level4MapGenerator : MonoBehaviour
 
     [Header("Spawn Safety")]
     [SerializeField, Min(1)] private int spawnSafetyRadius = 3;
+    [SerializeField, Min(1)] private int edgeClearance = 1;
 
     [Header("Maze Validation")]
     [SerializeField, Min(1)] private int maxPlacementAttempts = 50;
@@ -49,16 +49,14 @@ public class Level4MapGenerator : MonoBehaviour
     {
         AutoConfigure();
 
-        if (wallPrefab == null)
-            wallPrefab = Resources.Load<GameObject>("Wall");
         if (straightWallPrefab == null)
             straightWallPrefab = Resources.Load<GameObject>("StraigthWall");
         if (lShapeWallPrefab == null)
             lShapeWallPrefab = Resources.Load<GameObject>("L-ShapeWall");
 
-        if (wallPrefab == null)
+        if (straightWallPrefab == null || lShapeWallPrefab == null)
         {
-            Debug.LogError("[Level4MapGenerator] No wall prefab assigned and could not load from Resources.");
+            Debug.LogError("[Level4MapGenerator] Wall prefabs not assigned and could not load from Resources.");
             return;
         }
 
@@ -127,7 +125,7 @@ public class Level4MapGenerator : MonoBehaviour
 
     private bool TryGenerateMaze()
     {
-        if (gridArea == null || wallPrefab == null)
+        if (gridArea == null || straightWallPrefab == null || lShapeWallPrefab == null)
             return false;
 
         for (int attempt = 0; attempt < maxPlacementAttempts; attempt++)
@@ -146,6 +144,7 @@ public class Level4MapGenerator : MonoBehaviour
                 grid = SmoothGrid(grid, width, height);
 
             ClearSpawnZone(grid, x0, y0, width, height);
+            ClearGridEdges(grid, width, height);
 
             if (!IsCaveNavigable(grid, x0, y0, width, height))
                 continue;
@@ -212,6 +211,21 @@ public class Level4MapGenerator : MonoBehaviour
         }
     }
 
+    private void ClearGridEdges(bool[,] grid, int width, int height)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (x < edgeClearance || x >= width - edgeClearance ||
+                    y < edgeClearance || y >= height - edgeClearance)
+                {
+                    grid[x, y] = false;
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Navigability Check
@@ -271,10 +285,7 @@ public class Level4MapGenerator : MonoBehaviour
                 if (TryPlaceStraight(grid, x, y, x0, y0, width, height, processed))
                     continue;
 
-                if (TryPlaceLShape(grid, x, y, x0, y0, width, height, processed))
-                    continue;
-
-                PlaceSingleWall(x, y, x0, y0);
+                TryPlaceLShape(grid, x, y, x0, y0, width, height, processed);
             }
         }
     }
@@ -287,10 +298,10 @@ public class Level4MapGenerator : MonoBehaviour
     private bool TryPlaceStraight(bool[,] grid, int cx, int cy, int x0, int y0,
         int width, int height, HashSet<Vector2Int> processed)
     {
-        Vector2Int[] offsets = { Vector2Int.right, Vector2Int.up };
-        float[] rotations = { 0f, 90f };
+        Vector2Int[] offsets = { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
+        float[] rotations = { 0f, 90f, 180f, 270f };
 
-        for (int d = 0; d < 2; d++)
+        for (int d = 0; d < 4; d++)
         {
             Vector2Int o = offsets[d];
             Vector2Int c1 = new Vector2Int(cx + o.x, cy + o.y);
@@ -353,12 +364,6 @@ public class Level4MapGenerator : MonoBehaviour
             return true;
         }
         return false;
-    }
-
-    private void PlaceSingleWall(int gx, int gy, int x0, int y0)
-    {
-        Vector3 pos = GridToWorld(gx, gy, x0, y0);
-        SpawnPrefab(wallPrefab, pos, 0f);
     }
 
     private Vector3 GridToWorld(int gx, int gy, int x0, int y0)

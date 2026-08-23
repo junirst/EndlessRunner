@@ -2192,7 +2192,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1398504898}
-  - component: {fileID: 1398504897}
+  - component: {fileID: 1398504899}
   m_Layer: 0
   m_Name: MapGenerator
   m_TagString: Untagged
@@ -2200,31 +2200,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1398504897
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1398504896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaff10555512feb40aede6c6711e2919, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wallPrefab: {fileID: 3711015469772371457, guid: 1486742d077e4b149ba88a38722d818a, type: 3}
-  gridArea: {fileID: 1177720460}
-  food: {fileID: 289142869}
-  wallsParent: {fileID: 1709362779}
-  cellSize: 2
-  minClusters: 8
-  maxClusters: 12
-  minWallsPerCluster: 2
-  maxWallsPerCluster: 3
-  spawnSafetyRadius: 3
-  maxPlacementAttempts: 100
-  minReachableCells: 80
-  persistSeed: 1
 --- !u!4 &1398504898
 Transform:
   m_ObjectHideFlags: 0
@@ -2240,6 +2215,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1398504899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398504896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee9faf87a2ebafc41a1e63bb45c0ef59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  straightWallPrefab: {fileID: 2435708079651344024, guid: c08569b81f8f19e4ab77f144c11cb227, type: 3}
+  lShapeWallPrefab: {fileID: 2846091922598172563, guid: cb713bf834d95464f887593ed21e70d5, type: 3}
+  gridArea: {fileID: 1177720460}
+  food: {fileID: 289142869}
+  wallsParent: {fileID: 1709362779}
+  cellSize: 2
+  initialFillProbability: 0.5
+  smoothIterations: 4
+  spawnSafetyRadius: 3
+  maxPlacementAttempts: 50
+  minReachableCells: 80
+  persistSeed: 1
 --- !u!1 &1709362778
 GameObject:
   m_ObjectHideFlags: 0

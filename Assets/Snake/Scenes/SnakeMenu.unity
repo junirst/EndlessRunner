@@ -320,7 +320,7 @@ MonoBehaviour:
   - {fileID: 733}
   - {fileID: 753}
   - {fileID: 773}
-  - {fileID: 0}
+  - {fileID: 342157622}
   stageSprites: []
   titleText: {fileID: 412}
   backButton: {fileID: 492}
@@ -1252,8 +1252,8 @@ RectTransform:
   - {fileID: 711}
   - {fileID: 731}
   - {fileID: 751}
-  - {fileID: 342157621}
   - {fileID: 771}
+  - {fileID: 342157621}
   m_Father: {fileID: 201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3657,7 +3657,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LEVEL 2
+  m_text: 'LEVEL 4
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e690d56c58654348a3a4fc213cb8ff2, type: 2}
   m_sharedMaterial: {fileID: 6282573208273132667, guid: 7e690d56c58654348a3a4fc213cb8ff2, type: 2}
