@@ -1662,7 +1662,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: blast shooter
+  m_text: SHOOTER
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7e690d56c58654348a3a4fc213cb8ff2, type: 2}
   m_sharedMaterial: {fileID: 6282573208273132667, guid: 7e690d56c58654348a3a4fc213cb8ff2, type: 2}
