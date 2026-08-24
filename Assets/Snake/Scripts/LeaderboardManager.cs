@@ -64,6 +64,8 @@ public class LeaderboardManager : MonoBehaviour
 
     #region Read-Only Helpers
 
+    public static bool IsOnline => Application.internetReachability != NetworkReachability.NotReachable;
+
     public bool IsInitialized => !string.IsNullOrEmpty(ProjectId) && !string.IsNullOrEmpty(ApiKey);
 
     public static string GetBoardKey(string gameKey, string stageId)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -334,7 +335,96 @@ public class LeaderboardUI : MonoBehaviour
         if (fetching) return;
         fetching = true;
 
+        if (boardKey.StartsWith("minigolf_") && playerScore > 0)
+        {
+            SaveMiniGolfStrokesLocally();
+        }
+
+        if (!LeaderboardManager.IsOnline)
+        {
+            fetching = false;
+            ShowOfflineLocalScores();
+            return;
+        }
+
         RefreshAsync();
+    }
+
+    private void SaveMiniGolfStrokesLocally()
+    {
+        string levelPart = boardKey.Substring("minigolf_".Length);
+        string sceneName = "MiniGolf-" + levelPart.Substring(0, 1).ToUpper() + levelPart.Substring(1);
+        string key = "MiniGolf_BestStrokes_" + sceneName;
+        int best = PlayerPrefs.GetInt(key, 0);
+        if (best == 0 || playerScore < best)
+        {
+            PlayerPrefs.SetInt(key, playerScore);
+            PlayerPrefs.Save();
+        }
+    }
+
+    private void ShowOfflineLocalScores()
+    {
+        if (statusText != null)
+            statusText.text = "No internet connection";
+
+        if (nameInputRoot != null)
+            nameInputRoot.SetActive(false);
+
+        if (rankText != null)
+            rankText.gameObject.SetActive(false);
+
+        List<LeaderboardEntry> localEntries = LoadLocalScores(boardKey);
+        RenderList(localEntries);
+    }
+
+    private List<LeaderboardEntry> LoadLocalScores(string boardKey)
+    {
+        List<LeaderboardEntry> entries = new List<LeaderboardEntry>();
+        int score = 0;
+
+        if (boardKey == "cubedash")
+        {
+            string cubeData = SaveSystem.Load("save");
+            if (!string.IsNullOrEmpty(cubeData))
+            {
+                Data d = JsonUtility.FromJson<Data>(cubeData);
+                if (d != null) score = Mathf.RoundToInt(d.highscore);
+            }
+        }
+        else if (boardKey == "shooter")
+        {
+            ShooterSaveSystem.Initialize();
+            string shooterData = ShooterSaveSystem.Load("save");
+            if (!string.IsNullOrEmpty(shooterData))
+            {
+                ShooterSaveData sd = JsonUtility.FromJson<ShooterSaveData>(shooterData);
+                if (sd != null) score = sd.highscore;
+            }
+        }
+        else if (boardKey == "match3")
+        {
+            score = Match3Progress.GetSavedTotalScore();
+        }
+        else if (boardKey.StartsWith("snake_"))
+        {
+            string stageId = boardKey.Substring("snake_".Length);
+            stageId = char.ToUpper(stageId[0]) + stageId.Substring(1);
+            score = SnakeSaveSystem.GetHighScore(stageId);
+        }
+        else if (boardKey.StartsWith("minigolf_"))
+        {
+            string levelPart = boardKey.Substring("minigolf_".Length);
+            string sceneName = "MiniGolf-" + levelPart.Substring(0, 1).ToUpper() + levelPart.Substring(1);
+            score = PlayerPrefs.GetInt("MiniGolf_BestStrokes_" + sceneName, 0);
+        }
+
+        if (score > 0)
+        {
+            entries.Add(new LeaderboardEntry("You", score, 0));
+        }
+
+        return entries;
     }
 
     private void RefreshAsync()

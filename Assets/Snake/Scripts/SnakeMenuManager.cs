@@ -259,6 +259,17 @@ public class SnakeMenuManager : MonoBehaviour
 
     private void FetchLeaderboardHighScores()
     {
+        if (!LeaderboardManager.IsOnline)
+        {
+            for (int i = 0; i < stageCards.Length && i < StageDefs.Length; i++)
+            {
+                int score = SnakeSaveSystem.GetHighScore(StageDefs[i].id);
+                if (score > 0)
+                    stageCards[i].SetLeaderboardTop("Your best", score);
+            }
+            return;
+        }
+
         LeaderboardManager.EnsureInstance();
         if (LeaderboardManager.Instance == null) return;
 
