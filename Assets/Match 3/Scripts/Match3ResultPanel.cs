@@ -157,6 +157,7 @@ public class Match3ResultPanel : MonoBehaviour
     private void BuildResultInterface()
     {
         resultCanvasObject = new GameObject(ResultCanvasName, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        resultCanvasObject.SetActive(false);
         Canvas canvas = resultCanvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = ResultCanvasSortingOrder;
@@ -239,7 +240,7 @@ public class Match3ResultPanel : MonoBehaviour
         rect.sizeDelta = size;
 
         Text text = textObject.GetComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         text.text = content;
         text.fontSize = fontSize;
         text.fontStyle = fontStyle;

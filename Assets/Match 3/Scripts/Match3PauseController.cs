@@ -366,7 +366,7 @@ public class Match3PauseController : MonoBehaviour
             return;
         }
 
-        Font defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        Font defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         Text[] textElements = pauseCanvasObject.GetComponentsInChildren<Text>(true);
         foreach (Text textElement in textElements)
         {
@@ -611,7 +611,7 @@ public class Match3PauseController : MonoBehaviour
     {
         GameObject textObject = CreateUiObject(objectName, parent, position, size);
         Text text = textObject.AddComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         text.text = content;
         text.fontSize = fontSize;
         text.color = color;

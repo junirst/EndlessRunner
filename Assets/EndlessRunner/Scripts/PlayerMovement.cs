@@ -153,6 +153,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (duration <= 0f)
         {
+            duration = doubleJumpDuration;
+        }
+
+        if (duration <= 0f)
+        {
             return;
         }
 

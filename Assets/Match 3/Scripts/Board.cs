@@ -115,6 +115,31 @@ public class Board : MonoBehaviour
                     new[] { new Vector3Int(2, 2, 5), new Vector3Int(3, 2, 5), new Vector3Int(4, 2, 5), new Vector3Int(5, 2, 5), new Vector3Int(6, 2, 5), new Vector3Int(2, 3, 5), new Vector3Int(6, 3, 5), new Vector3Int(2, 4, 5), new Vector3Int(6, 4, 5), new Vector3Int(2, 5, 5), new Vector3Int(6, 5, 5), new Vector3Int(2, 6, 5), new Vector3Int(3, 6, 5), new Vector3Int(4, 6, 5), new Vector3Int(5, 6, 5), new Vector3Int(6, 6, 5) });
                 break;
         }
+
+        EnsureDimensionsFitLayout();
+    }
+
+    /// <summary>Ensures the runtime arrays contain every coordinate in the active level layout.</summary>
+    private void EnsureDimensionsFitLayout()
+    {
+        width = Mathf.Max(1, width);
+        height = Mathf.Max(1, height);
+
+        if (boardLayout == null)
+        {
+            return;
+        }
+
+        foreach (tileType layoutEntry in boardLayout)
+        {
+            if (layoutEntry == null)
+            {
+                continue;
+            }
+
+            width = Mathf.Max(width, layoutEntry.x + 1);
+            height = Mathf.Max(height, layoutEntry.y + 1);
+        }
     }
 
     private tileType[] CreateLayout(Vector2Int[] blankPositions, Vector3Int[] breakablePositions)
