@@ -11,11 +11,18 @@ public class FadePanelController : MonoBehaviour
     public Animator panelAnim;
     public Animator gameInforAnim;
 
+    /// <summary>
+    /// Dismisses the goal introduction and unlocks the match-three interface.
+    /// </summary>
     public void Okay()
     {
-        if (panelAnim != null && gameInforAnim != null)
+        if (panelAnim != null)
         {
             panelAnim.SetBool("Out", true);
+        }
+
+        if (gameInforAnim != null)
+        {
             gameInforAnim.SetBool("Out", true);
         }
 
@@ -30,8 +37,60 @@ public class FadePanelController : MonoBehaviour
 
     private void Start()
     {
+        ResolveAnimationReferences();
+        WireOkayButton();
+        DisableTransparentRootRaycast();
         ApplyGoalPanelScale();
         SetPauseButtonVisible(false);
+    }
+
+    private void WireOkayButton()
+    {
+        Transform okayButtonTransform = transform.Find("Panel/OK Button");
+        if (okayButtonTransform == null)
+        {
+            okayButtonTransform = transform.Find("Panel/Okay Button");
+        }
+
+        if (okayButtonTransform == null)
+        {
+            return;
+        }
+
+        UnityEngine.UI.Button okayButton = okayButtonTransform.GetComponent<UnityEngine.UI.Button>();
+        if (okayButton == null)
+        {
+            return;
+        }
+
+        okayButton.onClick.RemoveListener(Okay);
+        okayButton.onClick.AddListener(Okay);
+    }
+
+    private void ResolveAnimationReferences()
+    {
+        if (panelAnim == null)
+        {
+            panelAnim = GetComponent<Animator>();
+        }
+
+        if (gameInforAnim == null)
+        {
+            Transform panel = transform.Find("Panel");
+            if (panel != null)
+            {
+                gameInforAnim = panel.GetComponent<Animator>();
+            }
+        }
+    }
+
+    private void DisableTransparentRootRaycast()
+    {
+        UnityEngine.UI.Image rootImage = GetComponent<UnityEngine.UI.Image>();
+        if (rootImage != null)
+        {
+            rootImage.raycastTarget = false;
+        }
     }
 
     private IEnumerator ShowPauseButtonAfterIntro()

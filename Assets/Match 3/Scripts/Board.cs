@@ -119,13 +119,14 @@ public class Board : MonoBehaviour
         EnsureDimensionsFitLayout();
     }
 
-    /// <summary>Ensures the runtime board arrays can contain every configured layout position.</summary>
+    /// <summary>Ensures the runtime arrays contain every coordinate in the active level layout.</summary>
     private void EnsureDimensionsFitLayout()
     {
+        width = Mathf.Max(1, width);
+        height = Mathf.Max(1, height);
+
         if (boardLayout == null || boardLayout.Length == 0)
         {
-            width = Mathf.Max(1, width);
-            height = Mathf.Max(1, height);
             return;
         }
 

@@ -308,7 +308,7 @@ public class LeaderboardUI : MonoBehaviour
     private async System.Threading.Tasks.Task SaveAndRenderAsync(string name)
     {
         if (LeaderboardManager.Instance != null)
-            await LeaderboardManager.Instance.SubmitScoreAndWaitAsync(boardKey, name, playerScore, scoreBreakdown);
+            await LeaderboardManager.Instance.SubmitScoreAndWaitAsync(boardKey, name, playerScore);
         FetchAndRender();
     }
 

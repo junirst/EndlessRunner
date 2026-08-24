@@ -162,6 +162,7 @@ public class Match3ResultPanel : MonoBehaviour
     private void BuildResultInterface()
     {
         resultCanvasObject = new GameObject(ResultCanvasName, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        resultCanvasObject.SetActive(false);
         Canvas canvas = resultCanvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = ResultCanvasSortingOrder;
