@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/TitleScreen.unity
+    path: Assets/HubMenu/TitleScreen.unity
     guid: 35f15a171f47a364189c6610d080f1c9
   - enabled: 1
     path: Assets/EndlessRunner/Scenes/CubeDash.unity
