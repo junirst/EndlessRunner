@@ -12,6 +12,9 @@ public class BlankGoal
 
 public class GoalManager : MonoBehaviour
 {
+    private const string BlueGoalTag = "blue dot";
+    private const string LegacyBlueCandyTag = "teal dot";
+
     public BlankGoal[] levelGoals;
     public List<GoalPanel> currentGoals = new List<GoalPanel>();
     public GameObject goalPrefab;
@@ -123,9 +126,11 @@ public class GoalManager : MonoBehaviour
             return;
         }
 
+        string normalizedTag = goalToCompare == LegacyBlueCandyTag ? BlueGoalTag : goalToCompare;
+
         foreach (BlankGoal goal in levelGoals)
         {
-            if (goal != null && goalToCompare == goal.matchValue)
+            if (goal != null && normalizedTag == goal.matchValue)
             {
                 goal.numberCollected = Mathf.Min(goal.numberCollected + 1, goal.numberNeeded);
             }

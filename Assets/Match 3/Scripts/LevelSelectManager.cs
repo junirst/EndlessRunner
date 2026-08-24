@@ -33,11 +33,13 @@ public class LevelSelectManager : MonoBehaviour
     private const string Match3ScenePathPrefix = "Assets/Match 3/Scenes/";
     private const string Match3MenuScenePath = "Assets/Match 3/Scenes/Menu.unity";
     private const string Match3LevelSelectScenePath = "Assets/Match 3/Scenes/LevelSelect.unity";
+    private const string SettingScreenResourcePath = "Match3UI/SettingScreen";
 
     private const string Match3LeaderboardBoardKey = "match3";
 
     public Sprite filledStarSprite;
     public Sprite blankStarSprite;
+    private GameObject settingScreenInstance;
     private bool cardSlideInStarted;
 
 
@@ -45,6 +47,7 @@ public class LevelSelectManager : MonoBehaviour
     {
         RefreshProgressDisplay();
         EnsureLeaderboardButton();
+        EnsureSettingButton();
     }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void CreateLevelSelectInterface()
@@ -120,6 +123,99 @@ public class LevelSelectManager : MonoBehaviour
             CreateButton(canvas.transform, "LEADERBOARD", new Vector2(385f, -225f), new Vector2(190f, 44f), OpenLeaderboard, new Color(0.09f, 0.53f, 0.72f, 1f));
         }
     }
+    private void EnsureSettingButton()
+    {
+        Canvas canvas = GetComponentInChildren<Canvas>(true);
+        if (canvas == null)
+        {
+            return;
+        }
+
+        Transform existingButton = canvas.transform.Find("SETTING Button");
+        if (existingButton == null)
+        {
+            CreateButton(canvas.transform, "SETTING", new Vector2(205f, -225f), new Vector2(150f, 44f), OpenSettings, new Color(0.09f, 0.53f, 0.72f, 1f));
+        }
+    }
+
+    /// <summary>Opens the shared settings screen from Match 3 Level Select.</summary>
+    public void OpenSettings()
+    {
+        Canvas canvas = GetComponentInChildren<Canvas>(true);
+        if (canvas == null)
+        {
+            return;
+        }
+
+        if (settingScreenInstance == null)
+        {
+            GameObject prefab = Resources.Load<GameObject>(SettingScreenResourcePath);
+            if (prefab == null)
+            {
+                Debug.LogWarning("Match3 settings prefab not found at Resources/" + SettingScreenResourcePath);
+                return;
+            }
+
+            settingScreenInstance = Instantiate(prefab, canvas.transform, false);
+            settingScreenInstance.name = "Match 3 Setting Screen";
+            ConfigureSettingScreen(settingScreenInstance);
+        }
+
+        settingScreenInstance.SetActive(true);
+    }
+
+    private void ConfigureSettingScreen(GameObject instance)
+    {
+        Canvas settingCanvas = instance.GetComponent<Canvas>();
+        if (settingCanvas != null)
+        {
+            settingCanvas.overrideSorting = true;
+            settingCanvas.sortingOrder = 300;
+        }
+
+        RectTransform rect = instance.GetComponent<RectTransform>();
+        if (rect != null)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            rect.localScale = Vector3.one;
+        }
+
+        WireSettingButton(instance, "Back", CloseSettings);
+        WireSettingButton(instance, "Save", SaveSettings);
+        WireSettingButton(instance, "MenuButton", BackToMenu);
+        instance.SetActive(false);
+    }
+
+    private void WireSettingButton(GameObject root, string buttonName, UnityEngine.Events.UnityAction action)
+    {
+        foreach (Button button in root.GetComponentsInChildren<Button>(true))
+        {
+            if (button.gameObject.name == buttonName)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(action);
+            }
+        }
+    }
+
+    private void SaveSettings()
+    {
+        PlayerPrefs.Save();
+        CloseSettings();
+    }
+
+    private void CloseSettings()
+    {
+        if (settingScreenInstance != null)
+        {
+            settingScreenInstance.SetActive(false);
+        }
+    }
+
+
 
     /// <summary>Opens the Match 3 leaderboard with the cumulative saved score.</summary>
     public void OpenLeaderboard()

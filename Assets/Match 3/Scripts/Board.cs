@@ -125,11 +125,13 @@ public class Board : MonoBehaviour
         width = Mathf.Max(1, width);
         height = Mathf.Max(1, height);
 
-        if (boardLayout == null)
+        if (boardLayout == null || boardLayout.Length == 0)
         {
             return;
         }
 
+        int requiredWidth = 1;
+        int requiredHeight = 1;
         foreach (tileType layoutEntry in boardLayout)
         {
             if (layoutEntry == null)
@@ -137,9 +139,12 @@ public class Board : MonoBehaviour
                 continue;
             }
 
-            width = Mathf.Max(width, layoutEntry.x + 1);
-            height = Mathf.Max(height, layoutEntry.y + 1);
+            requiredWidth = Mathf.Max(requiredWidth, layoutEntry.x + 1);
+            requiredHeight = Mathf.Max(requiredHeight, layoutEntry.y + 1);
         }
+
+        width = Mathf.Max(width, requiredWidth);
+        height = Mathf.Max(height, requiredHeight);
     }
 
     private tileType[] CreateLayout(Vector2Int[] blankPositions, Vector3Int[] breakablePositions)

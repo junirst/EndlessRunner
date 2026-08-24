@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(LevelStarRating))]
 public class LevelManager : MonoBehaviour
@@ -48,6 +49,7 @@ public class LevelManager : MonoBehaviour
             pauseMenuUI.SetActive(false);
         }
 
+        EnsureCompletionButtonLabels();
         updateStrokeUI();
     }
 
@@ -92,6 +94,7 @@ public class LevelManager : MonoBehaviour
 
         if (levelCompleteUI != null)
         {
+            EnsureCompletionButtonLabels();
             levelCompleteUI.SetActive(false);
         }
         ShowLevelLeaderboard(levelCompleteUI, strokes);
@@ -207,5 +210,46 @@ public class LevelManager : MonoBehaviour
     private void updateStrokeUI()
     {
         strokeUI.text = strokes + "/" + maxStrokes;
+    }
+
+    private void EnsureCompletionButtonLabels()
+    {
+        if (levelCompleteUI == null)
+        {
+            return;
+        }
+
+        foreach (Button button in levelCompleteUI.GetComponentsInChildren<Button>(true))
+        {
+            TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (label == null)
+            {
+                continue;
+            }
+
+            if (button.name.IndexOf("Continue", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                label.text = "Continue";
+            }
+            else if (button.name.IndexOf("Next", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                label.text = "Next Level";
+            }
+            else if (button.name.IndexOf("Replay", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                label.text = "Replay";
+            }
+
+            Image buttonImage = button.GetComponent<Image>();
+            if (buttonImage != null)
+            {
+                buttonImage.color = new Color(0.12f, 0.55f, 0.72f, 1f);
+            }
+
+            label.enabled = true;
+            label.gameObject.SetActive(true);
+            label.color = Color.white;
+            label.transform.SetAsLastSibling();
+        }
     }
 }

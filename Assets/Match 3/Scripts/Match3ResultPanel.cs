@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,8 @@ public class Match3ResultPanel : MonoBehaviour
     private const string WinPanelName = "Win Panel";
     private const string LostPanelName = "Lost Panel";
     private const string LevelSelectSceneName = "LevelSelect";
+    private const string MenuSceneName = "Menu";
+    private const string GameOverResourcePath = "Match3UI/GameOver";
     private const string StarText = "★★★";
     private const string HollowStarText = "☆☆☆";
     private static readonly Color ShadeColor = new Color(0f, 0f, 0f, 0.72f);
@@ -34,6 +37,8 @@ public class Match3ResultPanel : MonoBehaviour
     private GameObject winPanel;
     private GameObject lostPanel;
     private GameObject resultCanvasObject;
+    private GameObject gameOverScreenInstance;
+    private TextMeshProUGUI gameOverScoreText;
     private Text winScoreText;
     private Text lostScoreText;
     private Text winStarsText;
@@ -175,9 +180,107 @@ public class Match3ResultPanel : MonoBehaviour
 
         winPanel = CreateResultPanel(WinPanelName, resultCanvasObject.transform, WinPanelColor, "LEVEL COMPLETE!", true, out winScoreText, out winStarsText);
         lostPanel = CreateResultPanel(LostPanelName, resultCanvasObject.transform, LostPanelColor, "LEVEL FAILED", false, out lostScoreText, out lostStarsText);
+        gameOverScreenInstance = BuildGameOverScreen();
         winPanel.SetActive(false);
         lostPanel.SetActive(false);
+        if (gameOverScreenInstance != null)
+        {
+            gameOverScreenInstance.SetActive(false);
+        }
         resultCanvasObject.SetActive(false);
+    }
+
+    private GameObject BuildGameOverScreen()
+    {
+        GameObject prefab = Resources.Load<GameObject>(GameOverResourcePath);
+        if (prefab == null)
+        {
+            Debug.LogWarning("Match3 GameOver prefab not found at Resources/" + GameOverResourcePath);
+            return null;
+        }
+
+        GameObject instance = Instantiate(prefab, resultCanvasObject.transform, false);
+        instance.name = "Match 3 GameOver Screen";
+        Canvas canvas = instance.GetComponent<Canvas>();
+        if (canvas != null)
+        {
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = ResultCanvasSortingOrder + 1;
+        }
+
+        RectTransform rootRect = instance.GetComponent<RectTransform>();
+        if (rootRect != null)
+        {
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.offsetMin = Vector2.zero;
+            rootRect.offsetMax = Vector2.zero;
+            rootRect.localScale = Vector3.one;
+        }
+
+        foreach (MonoBehaviour behaviour in instance.GetComponentsInChildren<MonoBehaviour>(true))
+        {
+            if (behaviour.GetType().Name == "GameOverMenu")
+            {
+                behaviour.enabled = false;
+            }
+        }
+
+        gameOverScoreText = FindTextMeshPro(instance.transform, "Score");
+        GameObject highScoreObject = FindChildObject(instance.transform, "HighScore");
+        if (highScoreObject != null)
+        {
+            highScoreObject.SetActive(false);
+        }
+
+        TextMeshProUGUI titleText = FindTextMeshPro(instance.transform, "Text (TMP)");
+        if (titleText != null)
+        {
+            titleText.text = "LEVEL FAILED";
+        }
+
+        WirePrefabButton(instance.transform, "StartButton", OpenLevelSelect);
+        WirePrefabButton(instance.transform, "BackToMenuButton", OpenMainMenu);
+        return instance;
+    }
+
+    private TextMeshProUGUI FindTextMeshPro(Transform root, string objectName)
+    {
+        foreach (TextMeshProUGUI text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+        {
+            if (text.gameObject.name == objectName)
+            {
+                return text;
+            }
+        }
+
+        return null;
+    }
+
+    private GameObject FindChildObject(Transform root, string objectName)
+    {
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (child.gameObject.name == objectName)
+            {
+                return child.gameObject;
+            }
+        }
+
+        return null;
+    }
+
+    private void WirePrefabButton(Transform root, string objectName, UnityEngine.Events.UnityAction action)
+    {
+        foreach (Button button in root.GetComponentsInChildren<Button>(true))
+        {
+            if (button.gameObject.name == objectName)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(action);
+                return;
+            }
+        }
     }
 
     private GameObject CreateResultPanel(string panelName, Transform parent, Color panelColor, string title, bool isWinPanel, out Text scoreText, out Text starsText)
@@ -281,18 +384,32 @@ public class Match3ResultPanel : MonoBehaviour
 
         if (didWin)
         {
+            if (gameOverScreenInstance != null)
+            {
+                gameOverScreenInstance.SetActive(false);
+            }
+            winPanel.SetActive(true);
+            lostPanel.SetActive(false);
             winScoreText.text = "SCORE: " + score;
             winStarsText.text = BuildStarText(stars);
         }
         else
         {
+            winPanel.SetActive(false);
+            lostPanel.SetActive(gameOverScreenInstance == null);
             lostScoreText.text = "SCORE: " + score;
             lostStarsText.text = HollowStarText;
+            if (gameOverScreenInstance != null)
+            {
+                if (gameOverScoreText != null)
+                {
+                    gameOverScoreText.text = "Score: " + score;
+                }
+                gameOverScreenInstance.SetActive(true);
+            }
         }
 
         resultCanvasObject.SetActive(true);
-        winPanel.SetActive(didWin);
-        lostPanel.SetActive(!didWin);
         Time.timeScale = 0f;
     }
 
@@ -306,5 +423,11 @@ public class Match3ResultPanel : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(LevelSelectSceneName);
+    }
+
+    private void OpenMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(MenuSceneName);
     }
 }

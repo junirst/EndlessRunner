@@ -21,6 +21,7 @@ public class Match3PauseController : MonoBehaviour
     private GameObject pausePanelObject;
     private Text pauseCounterText;
     private Text pauseScoreText;
+    private Match3PrefabUiController prefabUiController;
     private bool pauseShown;
     private string currentSceneName;
 
@@ -83,6 +84,11 @@ public class Match3PauseController : MonoBehaviour
         WireGameplayNavigationButtons();
         BuildPauseButton();
         BuildPauseInterface();
+        prefabUiController = FindObjectOfType<Match3PrefabUiController>();
+        if (prefabUiController != null)
+        {
+            prefabUiController.Initialize(this);
+        }
         SetPauseButtonVisible(false);
         UpdatePauseStats();
         if (pauseCanvasObject != null)
@@ -518,6 +524,14 @@ public class Match3PauseController : MonoBehaviour
         }
 
         pauseCanvasObject.SetActive(true);
+        if (prefabUiController == null)
+        {
+            prefabUiController = FindObjectOfType<Match3PrefabUiController>();
+        }
+        if (prefabUiController != null)
+        {
+            prefabUiController.ShowPauseScreen();
+        }
         Time.timeScale = 0f;
     }
 
@@ -533,6 +547,11 @@ public class Match3PauseController : MonoBehaviour
         if (pauseButtonCanvasObject != null)
         {
             pauseButtonCanvasObject.SetActive(true);
+        }
+
+        if (prefabUiController != null)
+        {
+            prefabUiController.HidePauseScreen();
         }
 
         Time.timeScale = 1f;
