@@ -355,7 +355,7 @@ MonoBehaviour:
   speed: 3
   rotationSpeed: 0.01
   contactDamage: 25
-  scoreValue: 3
+  scoreValue: 10
   bulletPrefab: {fileID: 6498352366914950695, guid: 65c14a45342e3314396d4e11bc0927da, type: 3}
   distanceToShoot: 16
   distanceToStop: 5
