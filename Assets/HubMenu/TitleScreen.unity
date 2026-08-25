@@ -382,7 +382,7 @@ MonoBehaviour:
   miniGolfSceneName: MainMenu
   topDownShooterSceneName: Menu
   snakeSceneName: SnakeMenu
-  match3SceneName: Main
+  match3SceneName: Match3Menu
   sceneLoadDelay: 0.08
 --- !u!1 &208786534
 GameObject:
@@ -821,7 +821,7 @@ GameObject:
   - component: {fileID: 281412394}
   - component: {fileID: 281412393}
   m_Layer: 5
-  m_Name: MiniGolf (1)
+  m_Name: Match 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

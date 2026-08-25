@@ -42,8 +42,7 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
         if (highScoreText != null)
         {
-            highScoreText.text = "0 - Be the first";
-            hoverText = "0 - Be the first";
+            hoverText = score > 0 ? $"Your best   {score}" : "0 - Be the first";
             highScoreText.gameObject.SetActive(false);
         }
 
@@ -66,8 +65,7 @@ public class StageCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         highScore = score;
         if (highScoreText != null)
         {
-            highScoreText.text = "0 - Be the first";
-            hoverText = "0 - Be the first";
+            hoverText = score > 0 ? $"Your best   {score}" : "0 - Be the first";
         }
     }
 

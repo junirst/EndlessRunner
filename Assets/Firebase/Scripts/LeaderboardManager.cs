@@ -35,22 +35,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private const string DatabaseId = "(default)";
 
-    private static readonly string[] ValidBoards =
-    {
-        "snake_infinite", "snake_level1", "snake_level2",
-        "cubedash", "shooter",
-        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3",
-        "minigolf_level4", "minigolf_level5", "minigolf_level6",
-        "minigolf_level7", "minigolf_level8", "minigolf_level9", "minigolf_level10"
-    };
-
-    // Boards where a LOWER score is better (e.g. minigolf strokes).
-    private static readonly string[] AscendingBoards =
-    {
-        "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3",
-        "minigolf_level4", "minigolf_level5", "minigolf_level6",
-        "minigolf_level7", "minigolf_level8", "minigolf_level9", "minigolf_level10"
-    };
+    private static readonly string[] StandaloneBoards = { "cubedash", "shooter" };
 
     #endregion
 
@@ -79,6 +64,8 @@ public class LeaderboardManager : MonoBehaviour
 
     #region Read-Only Helpers
 
+    public static bool IsOnline => Application.internetReachability != NetworkReachability.NotReachable;
+
     public bool IsInitialized => !string.IsNullOrEmpty(ProjectId) && !string.IsNullOrEmpty(ApiKey);
 
     public static string GetBoardKey(string gameKey, string stageId)
@@ -90,12 +77,14 @@ public class LeaderboardManager : MonoBehaviour
 
     public bool IsValidBoard(string boardKey)
     {
-        return Array.IndexOf(ValidBoards, boardKey) >= 0;
+        if (string.IsNullOrEmpty(boardKey)) return false;
+        if (Array.IndexOf(StandaloneBoards, boardKey) >= 0) return true;
+        return boardKey.StartsWith("snake_") || boardKey.StartsWith("minigolf_");
     }
 
     public bool IsAscendingBoard(string boardKey)
     {
-        return Array.IndexOf(AscendingBoards, boardKey) >= 0;
+        return !string.IsNullOrEmpty(boardKey) && boardKey.StartsWith("minigolf");
     }
 
     private string BaseUrl => $"https://firestore.googleapis.com/v1/projects/{ProjectId}/databases/{DatabaseId}";
@@ -108,7 +97,7 @@ public class LeaderboardManager : MonoBehaviour
     /// Submit a score as a brand-new leaderboard entry. Every call creates a new
     /// document, so the same machine/name can hold many rows (arcade style).
     /// </summary>
-    public async System.Threading.Tasks.Task SubmitScoreAndWaitAsync(string boardKey, string name, int score)
+    public async System.Threading.Tasks.Task SubmitScoreAndWaitAsync(string boardKey, string name, int score, string breakdown = null)
     {
         if (!IsValidBoard(boardKey))
         {
@@ -123,7 +112,7 @@ public class LeaderboardManager : MonoBehaviour
         if (score <= 0 || string.IsNullOrWhiteSpace(name))
             return;
 
-        await SubmitNewEntryAsync(boardKey, name.Trim(), score);
+        await SubmitNewEntryAsync(boardKey, name.Trim(), score, breakdown);
     }
 
     /// <summary>
@@ -161,12 +150,12 @@ public class LeaderboardManager : MonoBehaviour
 
     #region Firestore REST Requests
 
-    private async Task SubmitNewEntryAsync(string boardKey, string name, int score)
+    private async Task SubmitNewEntryAsync(string boardKey, string name, int score, string breakdown)
     {
         try
         {
             string docId = Guid.NewGuid().ToString("N");
-            bool ok = await WriteScoreAsync(boardKey, name, score, docId);
+            bool ok = await WriteScoreAsync(boardKey, name, score, docId, breakdown);
             if (ok)
             {
                 Debug.Log($"Leaderboard: submitted {score} for '{boardKey}' as '{name}'.");
@@ -182,7 +171,7 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    private async Task<bool> WriteScoreAsync(string boardId, string name, int score, string docId)
+    private async Task<bool> WriteScoreAsync(string boardId, string name, int score, string docId, string breakdown)
     {
         string[] parts = boardId.Split('_');
         string game = parts[0];
@@ -196,7 +185,13 @@ public class LeaderboardManager : MonoBehaviour
             { "Scene", new Dictionary<string, object> { { "stringValue", scene } } },
             { "Timestamp", new Dictionary<string, object> { { "timestampValue", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") } } }
         };
+        if (!string.IsNullOrWhiteSpace(breakdown))
+        {
+            fields["Breakdown"] = new Dictionary<string, object> { { "stringValue", breakdown } };
+        }
         var document = new Dictionary<string, object> { { "fields", fields } };
+
+
 
         string url = $"{BaseUrl}/documents/{boardId}/{docId}?key={ApiKey}&currentDocument.exists=false";
         string body = Json.Serialize(document);
@@ -325,15 +320,23 @@ public class LeaderboardManager : MonoBehaviour
 
             int score = 0;
             string name = "";
+            string breakdown = "";
             if (fields.TryGetValue("Score", out object s) && s is Dictionary<string, object> sv &&
                 sv.TryGetValue("integerValue", out object iv))
                 int.TryParse((string)iv, out score);
+
+            if (fields.TryGetValue("Breakdown", out object b) && b is Dictionary<string, object> bv &&
+                bv.TryGetValue("stringValue", out object breakdownValue))
+                breakdown = breakdownValue?.ToString() ?? "";
+
 
             if (fields.TryGetValue("Name", out object n) && n is Dictionary<string, object> nv &&
                 nv.TryGetValue("stringValue", out object str))
                 name = str?.ToString() ?? "";
 
-            entries.Add(new LeaderboardEntry(name, score, 0));
+            LeaderboardEntry entry = new LeaderboardEntry(name, score, 0);
+            entry.Breakdown = breakdown;
+            entries.Add(entry);
         }
         return entries;
     }

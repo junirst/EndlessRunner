@@ -92,4 +92,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Match 3/Scenes/Level6.unity
     guid: 546ab1a0e0a0b794db6529a16ed94548
+  - enabled: 1
+    path: Assets/Match 3/Scenes/Match3Menu.unity
+    guid: 364b4a22cbb4a2448bf64179b519cdd8
   m_configObjects: {}
