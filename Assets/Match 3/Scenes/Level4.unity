@@ -2148,8 +2148,8 @@ MonoBehaviour:
   counter: {fileID: 1529832192}
   requirements:
     gameType: 1
-    counterValue: 99
-  currentCounterValue: 99
+    counterValue: 200
+  currentCounterValue: 200
 --- !u!1 &768631568
 GameObject:
   m_ObjectHideFlags: 0

@@ -34,6 +34,15 @@ public class Board : MonoBehaviour
     public int width;
     public int height;
     public int offSet;
+    private const int Level1And2MovesPerShuffle = 5;
+    private const int Level3And4MovesPerShuffle = 10;
+    private const int Level5And6MovesPerShuffle = 20;
+    private int movesPerShuffle;
+    private int movesSinceShuffle;
+    private bool moveShufflePending;
+    private bool shuffleInProgress;
+
+
     public GameObject tilePrefab;
     public GameObject BreakableTilePrefab;
 
@@ -82,6 +91,7 @@ public class Board : MonoBehaviour
     private void ApplySceneLayout()
     {
         string sceneName = SceneManager.GetActiveScene().name;
+        ConfigureShuffleForScene(sceneName);
         ConfigureBoardDimensions(sceneName);
 
         switch (sceneName)
@@ -119,6 +129,30 @@ public class Board : MonoBehaviour
         }
 
         EnsureDimensionsFitLayout();
+    }
+
+    private void ConfigureShuffleForScene(string sceneName)
+    {
+        movesPerShuffle = 0;
+        switch (sceneName)
+        {
+            case "Level1":
+            case "Level2":
+                movesPerShuffle = Level1And2MovesPerShuffle;
+                break;
+            case "Level3":
+            case "Level4":
+                movesPerShuffle = Level3And4MovesPerShuffle;
+                break;
+            case "Level5":
+            case "Level6":
+                movesPerShuffle = Level5And6MovesPerShuffle;
+                break;
+        }
+
+        movesSinceShuffle = 0;
+        moveShufflePending = false;
+        shuffleInProgress = false;
     }
 
     private void ConfigureBoardDimensions(string sceneName)
@@ -322,10 +356,61 @@ public class Board : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
+        TryStartPendingShuffle();
+    }
 
+    /// <summary>Records a player swap and schedules the level shuffle at its configured move interval.</summary>
+    public void RegisterPlayerMove()
+    {
+        if (movesPerShuffle <= 0 || shuffleInProgress)
+        {
+            return;
+        }
+
+        movesSinceShuffle++;
+        if (movesSinceShuffle >= movesPerShuffle)
+        {
+            movesSinceShuffle = 0;
+            moveShufflePending = true;
+            Debug.Log($"Move shuffle queued after {movesPerShuffle} moves.");
+            TryStartPendingShuffle();
+        }
+    }
+
+    private void TryStartPendingShuffle()
+    {
+        if (movesPerShuffle <= 0 || !moveShufflePending || shuffleInProgress)
+        {
+            return;
+        }
+
+        if (currentState == GameState.win || currentState == GameState.lose)
+        {
+            moveShufflePending = false;
+            return;
+        }
+
+        if (currentState != GameState.move)
+        {
+            return;
+        }
+
+        moveShufflePending = false;
+        StartCoroutine(MoveCountShuffleCo());
+    }
+
+    private IEnumerator MoveCountShuffleCo()
+    {
+        shuffleInProgress = true;
+        currentState = GameState.wait;
+        ShuffleBoard();
+        Debug.Log($"Move-based shuffle triggered after {movesPerShuffle} moves.");
+        yield return new WaitForSeconds(0.75f);
+        currentDot = null;
+        currentState = GameState.move;
+        shuffleInProgress = false;
     }
 
     private bool MatchesAt(int column, int row, GameObject piece)
@@ -699,13 +784,15 @@ public class Board : MonoBehaviour
             currentDot = null;
             yield return new WaitForSeconds(.5f);
 
-            if (isDeadLocked())
+            if (movesPerShuffle > 0 && isDeadLocked())
             {
+                moveShufflePending = false;
                 ShuffleBoard();
                 Debug.Log("Deadlock detected! Shuffling the board...");
-            }   
+            }
             currentState = GameState.move;
             streakValue = 1;
+            TryStartPendingShuffle();
     }
 
     private void SwitchPieces(int column, int row, Vector2 direction)

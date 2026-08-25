@@ -2370,8 +2370,8 @@ MonoBehaviour:
   timeLabel: {fileID: 771023920}
   counter: {fileID: 227105433}
   requirements:
-    gameType: 0
-    counterValue: 70
+    gameType: 1
+    counterValue: 200
   currentCounterValue: 0
 --- !u!1 &720228072
 GameObject:
