@@ -4035,7 +4035,7 @@ MonoBehaviour:
   - numberNeeded: 15
     numberCollected: 0
     goalSprite: {fileID: 21300000, guid: d4c383b72dd3ee243a742db78328a073, type: 3}
-    matchValue: teal dot
+    matchValue: blue dot
   - numberNeeded: 15
     numberCollected: 0
     goalSprite: {fileID: 21300000, guid: c8464234a25447946b88653a1936b845, type: 3}

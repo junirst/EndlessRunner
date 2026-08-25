@@ -21,8 +21,7 @@ public class Match3ResultPanel : MonoBehaviour
     private const string StarText = "★★★";
     private const string HollowStarText = "☆☆☆";
     private static readonly Color ShadeColor = new Color(0f, 0f, 0f, 0.72f);
-    private static readonly Color WinPanelColor = new Color(0.05f, 0.34f, 0.32f, 0.98f);
-    private static readonly Color LostPanelColor = new Color(0.38f, 0.11f, 0.16f, 0.98f);
+    private static readonly Color ResultPanelColor = new Color(0.05f, 0.34f, 0.32f, 0.98f);
     private static readonly Color ButtonColor = new Color(0.08f, 0.53f, 0.72f, 1f);
     private static readonly Color ScoreColor = new Color(1f, 0.9f, 0.48f, 1f);
     private static readonly Color FilledStarColor = new Color(1f, 0.82f, 0.2f, 1f);
@@ -178,15 +177,10 @@ public class Match3ResultPanel : MonoBehaviour
         GameObject shade = CreateImage("Result Shade", resultCanvasObject.transform, ShadeColor, Vector2.zero, new Vector2(CanvasWidth, CanvasHeight));
         SetFullScreen(shade.GetComponent<RectTransform>());
 
-        winPanel = CreateResultPanel(WinPanelName, resultCanvasObject.transform, WinPanelColor, "LEVEL COMPLETE!", true, out winScoreText, out winStarsText);
-        lostPanel = CreateResultPanel(LostPanelName, resultCanvasObject.transform, LostPanelColor, "LEVEL FAILED", false, out lostScoreText, out lostStarsText);
-        gameOverScreenInstance = BuildGameOverScreen();
+        winPanel = CreateResultPanel(WinPanelName, resultCanvasObject.transform, ResultPanelColor, "LEVEL COMPLETE!", true, out winScoreText, out winStarsText);
+        lostPanel = CreateResultPanel(LostPanelName, resultCanvasObject.transform, ResultPanelColor, "GAME OVER", false, out lostScoreText, out lostStarsText);
         winPanel.SetActive(false);
         lostPanel.SetActive(false);
-        if (gameOverScreenInstance != null)
-        {
-            gameOverScreenInstance.SetActive(false);
-        }
         resultCanvasObject.SetActive(false);
     }
 
@@ -297,7 +291,8 @@ public class Match3ResultPanel : MonoBehaviour
         Color initialStarColor = isWinPanel ? FilledStarColor : HollowStarColor;
         starsText = CreateText("Stars", panel.transform, initialStars, 54, initialStarColor, new Vector2(0f, 62f), new Vector2(560f, 70f), FontStyle.Bold);
         scoreText = CreateText("Score", panel.transform, "SCORE: 0", 30, ScoreColor, new Vector2(0f, -18f), new Vector2(560f, 48f), FontStyle.Bold);
-        CreateButton("Back To Level Button", panel.transform, "BACK TO LEVEL", new Vector2(0f, -100f), OpenLevelSelect);
+        CreateButton("Restart Button", panel.transform, "RESTART", new Vector2(-100f, -100f), RestartLevel);
+        CreateButton("Next Level Button", panel.transform, "NEXT LEVEL", new Vector2(100f, -100f), NextLevel);
         return panel;
     }
 
@@ -384,10 +379,6 @@ public class Match3ResultPanel : MonoBehaviour
 
         if (didWin)
         {
-            if (gameOverScreenInstance != null)
-            {
-                gameOverScreenInstance.SetActive(false);
-            }
             winPanel.SetActive(true);
             lostPanel.SetActive(false);
             winScoreText.text = "SCORE: " + score;
@@ -396,17 +387,9 @@ public class Match3ResultPanel : MonoBehaviour
         else
         {
             winPanel.SetActive(false);
-            lostPanel.SetActive(gameOverScreenInstance == null);
+            lostPanel.SetActive(true);
             lostScoreText.text = "SCORE: " + score;
             lostStarsText.text = HollowStarText;
-            if (gameOverScreenInstance != null)
-            {
-                if (gameOverScoreText != null)
-                {
-                    gameOverScoreText.text = "Score: " + score;
-                }
-                gameOverScreenInstance.SetActive(true);
-            }
         }
 
         resultCanvasObject.SetActive(true);
@@ -417,6 +400,45 @@ public class Match3ResultPanel : MonoBehaviour
     {
         int clampedStars = Mathf.Clamp(filledStars, 0, 3);
         return new string('★', clampedStars) + new string('☆', 3 - clampedStars);
+    }
+
+    /// <summary>Restarts the currently active Match 3 level.</summary>
+    private void RestartLevel()
+    {
+        Time.timeScale = 1f;
+        string sceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(sceneName);
+    }
+
+    /// <summary>Loads the next Match 3 level, or returns to level select after the final level.</summary>
+    private void NextLevel()
+    {
+        Time.timeScale = 1f;
+        int currentLevel = GetCurrentLevelNumber();
+        int nextLevel = currentLevel + 1;
+        if (nextLevel < 1 || nextLevel > TotalLevels)
+        {
+            OpenLevelSelect();
+            return;
+        }
+
+        SceneManager.LoadScene("Level" + nextLevel);
+    }
+
+    private int GetCurrentLevelNumber()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "Main")
+        {
+            return PlayerPrefs.GetInt("Match3SelectedLevel", 1);
+        }
+
+        if (sceneName.StartsWith("Level") && int.TryParse(sceneName.Substring("Level".Length), out int levelNumber))
+        {
+            return levelNumber;
+        }
+
+        return 0;
     }
 
     private void OpenLevelSelect()
