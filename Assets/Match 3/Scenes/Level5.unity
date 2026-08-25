@@ -3053,7 +3053,7 @@ MonoBehaviour:
   counter: {fileID: 1486775420}
   requirements:
     gameType: 0
-    counterValue: 80
+    counterValue: 150
   currentCounterValue: 0
 --- !u!1 &1258056614
 GameObject:

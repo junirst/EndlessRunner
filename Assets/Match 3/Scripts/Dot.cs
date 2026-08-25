@@ -171,6 +171,20 @@ public class Dot : MonoBehaviour
                 yield return new WaitForSeconds(.5f);
                 board.currentDot = null;
                 board.currentState = GameState.move;
+                if (endGameManager == null)
+                {
+                    endGameManager = FindObjectOfType<EndGameManager>();
+                }
+
+                if (endGameManager != null)
+                {
+                    if (endGameManager.requirements != null && endGameManager.requirements.gameType == GameType.Moves)
+                    {
+                        endGameManager.DecreaseCounterValue();
+                    }
+                }
+
+                board.RegisterPlayerMove();
             }
             else
             {
@@ -187,6 +201,7 @@ public class Dot : MonoBehaviour
                     }
                 }
                 board.DestroyMatches();
+                board.RegisterPlayerMove();
             }
         }
     }
