@@ -517,6 +517,7 @@ public class Board : MonoBehaviour
                 if (destroyEffect != null)
                 {
                     GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
+                    Match3VfxController.ConfigureExplosion(particle);
                     Destroy(particle, .5f);
                 }
 

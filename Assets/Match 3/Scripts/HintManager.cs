@@ -105,6 +105,7 @@ public class HintManager : MonoBehaviour
         {
             currentHint = Instantiate(hintParticle, move.transform.position, Quaternion.identity);
             currentHint.transform.parent = move.transform;
+            Match3VfxController.ConfigureHint(currentHint);
         }
         else
         {
