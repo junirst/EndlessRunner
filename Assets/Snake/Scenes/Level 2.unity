@@ -1219,7 +1219,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 783219734676126056, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
       propertyPath: boardKey
-      value: Snake Level 1
+      value: Snake Level 2
       objectReference: {fileID: 0}
     - target: {fileID: 783219734676126056, guid: f38e2c2dda4cbc54680006bf8f161c89, type: 3}
       propertyPath: listText
