@@ -822,31 +822,7 @@ MonoBehaviour:
   - {fileID: 5672745417645662302, guid: f096e7d3cde6bb544a3cc768c89c43c7, type: 3}
   destroyEffect: {fileID: 8906777064576354654, guid: d2247ac48d6c28d4088fad6c771a5c09, type: 3}
   scoreGoals: d0070000a00f000088130000
-  boardLayout:
-  - x: 0
-    y: 0
-    tileKind: 0
-    breakableValue: 0
-  - x: 5
-    y: 0
-    tileKind: 2
-    breakableValue: 0
-  - x: 6
-    y: 7
-    tileKind: 2
-    breakableValue: 0
-  - x: 0
-    y: 7
-    tileKind: 2
-    breakableValue: 0
-  - x: 3
-    y: 3
-    tileKind: 2
-    breakableValue: 0
-  - x: 3
-    y: 4
-    tileKind: 2
-    breakableValue: 0
+  boardLayout: []
   currentDot: {fileID: 0}
   basePieceValue: 20
   refillDelay: 0.5
@@ -1602,7 +1578,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.2548504, y: 0.13700001}
   m_AnchorMax: {x: 0.7454016, y: 0.3014983}
-  m_AnchoredPosition: {x: -0.0345459, y: -1.1674805}
+  m_AnchoredPosition: {x: -0.044204712, y: 6.8325043}
   m_SizeDelta: {x: 3.5149002, y: 13.665001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &607128499
@@ -1782,7 +1758,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.0096835, y: -162}
+  m_AnchoredPosition: {x: -0.000000046566, y: -101}
   m_SizeDelta: {x: 296.2035, y: 154.432}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &682181522
@@ -2392,8 +2368,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.31562397, y: 0.45918685}
   m_AnchorMax: {x: 0.675, y: 0.82770336}
-  m_AnchoredPosition: {x: 5.6383057, y: -120.297}
-  m_SizeDelta: {x: -81.3907, y: 158.44}
+  m_AnchoredPosition: {x: 5.6383057, y: -102}
+  m_SizeDelta: {x: -81.3907, y: 72.489}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1021385316
 MonoBehaviour:
@@ -3592,7 +3568,7 @@ MonoBehaviour:
   - numberNeeded: 5
     numberCollected: 0
     goalSprite: {fileID: 21300000, guid: d4c383b72dd3ee243a742db78328a073, type: 3}
-    matchValue: teal dot
+    matchValue: blue dot
   - numberNeeded: 5
     numberCollected: 0
     goalSprite: {fileID: 21300000, guid: 9cc5356c731a3b34298618a3c058c51a, type: 3}
@@ -4470,7 +4446,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0.00001049, y: 99}
+  m_AnchoredPosition: {x: 0.000061161, y: 136}
   m_SizeDelta: {x: 228.2313, y: 91.961}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1967562814

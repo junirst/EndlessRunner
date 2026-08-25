@@ -5,6 +5,9 @@ using UnityEngine;
 public class FadePanelController : MonoBehaviour
 {
     private const string PauseButtonCanvasName = "Match 3 Pause Button Canvas";
+    private const string FadePanelPath = "Top UI/Fade Panel";
+    private const string GoalPanelPath = FadePanelPath + "/Panel";
+    private const string OkayButtonPath = GoalPanelPath + "/OK Button";
     private const float IntroAnimationDuration = 0.6f;
     private static readonly Vector3 EnlargedGoalPanelScale = new Vector3(0.7299449f, 0.47283104f, 0.466698f);
 
@@ -46,23 +49,33 @@ public class FadePanelController : MonoBehaviour
 
     private void WireOkayButton()
     {
-        Transform okayButtonTransform = transform.Find("Panel/OK Button");
-        if (okayButtonTransform == null)
+        GameObject okayButtonObject = GameObject.Find(OkayButtonPath);
+        if (okayButtonObject == null)
         {
-            okayButtonTransform = transform.Find("Panel/Okay Button");
+            Transform okayButtonTransform = transform.Find("Panel/OK Button");
+            if (okayButtonTransform == null)
+            {
+                okayButtonTransform = transform.Find("Panel/Okay Button");
+            }
+
+            if (okayButtonTransform != null)
+            {
+                okayButtonObject = okayButtonTransform.gameObject;
+            }
         }
 
-        if (okayButtonTransform == null)
+        if (okayButtonObject == null)
         {
             return;
         }
 
-        UnityEngine.UI.Button okayButton = okayButtonTransform.GetComponent<UnityEngine.UI.Button>();
+        UnityEngine.UI.Button okayButton = okayButtonObject.GetComponent<UnityEngine.UI.Button>();
         if (okayButton == null)
         {
             return;
         }
 
+        okayButton.interactable = true;
         okayButton.onClick.RemoveListener(Okay);
         okayButton.onClick.AddListener(Okay);
     }
@@ -71,7 +84,25 @@ public class FadePanelController : MonoBehaviour
     {
         if (panelAnim == null)
         {
+            GameObject fadePanel = GameObject.Find(FadePanelPath);
+            if (fadePanel != null)
+            {
+                panelAnim = fadePanel.GetComponent<Animator>();
+            }
+        }
+
+        if (panelAnim == null)
+        {
             panelAnim = GetComponent<Animator>();
+        }
+
+        if (gameInforAnim == null)
+        {
+            GameObject goalPanel = GameObject.Find(GoalPanelPath);
+            if (goalPanel != null)
+            {
+                gameInforAnim = goalPanel.GetComponent<Animator>();
+            }
         }
 
         if (gameInforAnim == null)
@@ -86,7 +117,10 @@ public class FadePanelController : MonoBehaviour
 
     private void DisableTransparentRootRaycast()
     {
-        UnityEngine.UI.Image rootImage = GetComponent<UnityEngine.UI.Image>();
+        GameObject fadePanel = GameObject.Find(FadePanelPath);
+        UnityEngine.UI.Image rootImage = fadePanel != null
+            ? fadePanel.GetComponent<UnityEngine.UI.Image>()
+            : GetComponent<UnityEngine.UI.Image>();
         if (rootImage != null)
         {
             rootImage.raycastTarget = false;
@@ -117,7 +151,7 @@ public class FadePanelController : MonoBehaviour
 
     private void ApplyGoalPanelScale()
     {
-        GameObject goalPanel = GameObject.Find("Top UI/Fade Panel/Panel");
+        GameObject goalPanel = GameObject.Find(GoalPanelPath);
         if (goalPanel == null)
         {
             return;

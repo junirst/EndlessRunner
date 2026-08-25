@@ -82,27 +82,29 @@ public class Board : MonoBehaviour
     private void ApplySceneLayout()
     {
         string sceneName = SceneManager.GetActiveScene().name;
+        ConfigureBoardDimensions(sceneName);
+
         switch (sceneName)
         {
             case "Level1":
                 boardLayout = CreateLayout(
-                    new[] { new Vector2Int(0, 0), new Vector2Int(9, 0), new Vector2Int(0, 9), new Vector2Int(9, 9) },
-                    new[] { new Vector3Int(2, 2, 1), new Vector3Int(7, 7, 1) });
+                    new[] { new Vector2Int(0, 0), new Vector2Int(4, 0), new Vector2Int(0, 4), new Vector2Int(4, 4) },
+                    new[] { new Vector3Int(1, 1, 1), new Vector3Int(3, 3, 1) });
                 break;
             case "Level2":
                 boardLayout = CreateLayout(
-                    new[] { new Vector2Int(4, 0), new Vector2Int(5, 0), new Vector2Int(4, 9), new Vector2Int(5, 9) },
-                    new[] { new Vector3Int(3, 4, 2), new Vector3Int(4, 4, 2), new Vector3Int(5, 5, 2) });
+                    new[] { new Vector2Int(2, 0), new Vector2Int(3, 0), new Vector2Int(2, 5), new Vector2Int(3, 5) },
+                    new[] { new Vector3Int(2, 2, 2), new Vector3Int(3, 2, 2), new Vector3Int(3, 3, 2) });
                 break;
             case "Level3":
                 boardLayout = CreateLayout(
-                    new[] { new Vector2Int(0, 4), new Vector2Int(0, 5), new Vector2Int(9, 4), new Vector2Int(9, 5) },
-                    new[] { new Vector3Int(3, 4, 2), new Vector3Int(4, 4, 2), new Vector3Int(5, 4, 2), new Vector3Int(4, 5, 2), new Vector3Int(5, 5, 2) });
+                    new[] { new Vector2Int(0, 3), new Vector2Int(0, 4), new Vector2Int(6, 3), new Vector2Int(6, 4) },
+                    new[] { new Vector3Int(2, 3, 2), new Vector3Int(3, 3, 2), new Vector3Int(4, 3, 2), new Vector3Int(3, 4, 2), new Vector3Int(4, 4, 2) });
                 break;
             case "Level4":
                 boardLayout = CreateLayout(
-                    new[] { new Vector2Int(0, 0), new Vector2Int(1, 1), new Vector2Int(2, 2), new Vector2Int(7, 7), new Vector2Int(8, 8), new Vector2Int(9, 9) },
-                    new[] { new Vector3Int(3, 3, 3), new Vector3Int(4, 3, 3), new Vector3Int(5, 3, 3), new Vector3Int(3, 4, 3), new Vector3Int(5, 4, 3), new Vector3Int(3, 5, 3), new Vector3Int(4, 5, 3), new Vector3Int(5, 5, 3) });
+                    new[] { new Vector2Int(0, 0), new Vector2Int(1, 1), new Vector2Int(2, 2), new Vector2Int(5, 5), new Vector2Int(6, 6), new Vector2Int(7, 7) },
+                    new[] { new Vector3Int(3, 2, 3), new Vector3Int(4, 2, 3), new Vector3Int(5, 2, 3), new Vector3Int(3, 3, 3), new Vector3Int(5, 3, 3), new Vector3Int(3, 4, 3), new Vector3Int(4, 4, 3), new Vector3Int(5, 4, 3) });
                 break;
             case "Level5":
                 boardLayout = CreateLayout(
@@ -111,12 +113,43 @@ public class Board : MonoBehaviour
                 break;
             case "Level6":
                 boardLayout = CreateLayout(
-                    new[] { new Vector2Int(1, 1), new Vector2Int(8, 1), new Vector2Int(1, 8), new Vector2Int(8, 8), new Vector2Int(4, 0), new Vector2Int(5, 0), new Vector2Int(4, 9), new Vector2Int(5, 9) },
-                    new[] { new Vector3Int(2, 2, 5), new Vector3Int(3, 2, 5), new Vector3Int(4, 2, 5), new Vector3Int(5, 2, 5), new Vector3Int(6, 2, 5), new Vector3Int(2, 3, 5), new Vector3Int(6, 3, 5), new Vector3Int(2, 4, 5), new Vector3Int(6, 4, 5), new Vector3Int(2, 5, 5), new Vector3Int(6, 5, 5), new Vector3Int(2, 6, 5), new Vector3Int(3, 6, 5), new Vector3Int(4, 6, 5), new Vector3Int(5, 6, 5), new Vector3Int(6, 6, 5) });
+                    new[] { new Vector2Int(2, 2), new Vector2Int(9, 2), new Vector2Int(2, 9), new Vector2Int(9, 9), new Vector2Int(5, 1), new Vector2Int(6, 1), new Vector2Int(5, 10), new Vector2Int(6, 10) },
+                    new[] { new Vector3Int(3, 3, 5), new Vector3Int(4, 3, 5), new Vector3Int(5, 3, 5), new Vector3Int(6, 3, 5), new Vector3Int(7, 3, 5), new Vector3Int(3, 4, 5), new Vector3Int(7, 4, 5), new Vector3Int(3, 5, 5), new Vector3Int(7, 5, 5), new Vector3Int(3, 6, 5), new Vector3Int(7, 6, 5), new Vector3Int(3, 7, 5), new Vector3Int(4, 7, 5), new Vector3Int(5, 7, 5), new Vector3Int(6, 7, 5), new Vector3Int(7, 7, 5) });
                 break;
         }
 
         EnsureDimensionsFitLayout();
+    }
+
+    private void ConfigureBoardDimensions(string sceneName)
+    {
+        switch (sceneName)
+        {
+            case "Level1":
+                width = 5;
+                height = 5;
+                break;
+            case "Level2":
+                width = 6;
+                height = 6;
+                break;
+            case "Level3":
+                width = 7;
+                height = 7;
+                break;
+            case "Level4":
+                width = 8;
+                height = 8;
+                break;
+            case "Level5":
+                width = 10;
+                height = 10;
+                break;
+            case "Level6":
+                width = 12;
+                height = 12;
+                break;
+        }
     }
 
     /// <summary>Ensures the runtime arrays contain every coordinate in the active level layout.</summary>

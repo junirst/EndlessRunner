@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class HintManager : MonoBehaviour
 {
+    private const float HintDelaySeconds = 15f;
     private Board board;
     public float hintDelay;
     private float hintDelaySeconds;
@@ -18,6 +19,7 @@ public class HintManager : MonoBehaviour
         {
             Debug.LogWarning("HintManager could not find a Board in the scene. Hints will be disabled.");
         }
+        hintDelay = HintDelaySeconds;
         hintDelaySeconds = hintDelay;
         if (hintParticle == null)
         {
