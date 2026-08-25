@@ -382,7 +382,7 @@ MonoBehaviour:
   miniGolfSceneName: MainMenu
   topDownShooterSceneName: Menu
   snakeSceneName: SnakeMenu
-  match3SceneName: Main
+  match3SceneName: Match3Menu
   sceneLoadDelay: 0.08
 --- !u!1 &208786534
 GameObject:
