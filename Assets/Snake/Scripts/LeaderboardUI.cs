@@ -11,10 +11,9 @@ public class LeaderboardUI : MonoBehaviour
     private const int TopLimit = 10;
     private const int MaxNameLength = 16;
 
-    [SerializeField] private string boardKey;
-    [SerializeField] private int playerScore;
-
-    [SerializeField] private string scoreBreakdown;
+    private string boardKey;
+    private int playerScore;
+    private string scoreBreakdown;
 
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private TextMeshProUGUI statusText;

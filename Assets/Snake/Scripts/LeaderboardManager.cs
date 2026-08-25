@@ -37,7 +37,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private static readonly string[] ValidBoards =
     {
-        "snake_infinite", "snake_level1", "snake_level2",
+        "snake_infinite", "snake_level 1", "snake_level 2", "snake_level 3", "snake_level 4",
         "cubedash", "shooter",
         "minigolf", "minigolf_level1", "minigolf_level2", "minigolf_level3",
         "minigolf_level4", "minigolf_level5", "minigolf_level6",
