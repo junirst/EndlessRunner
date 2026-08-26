@@ -1595,7 +1595,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 12, y: -22.299}
-  m_SizeDelta: {x: 273.2086, y: 60.7004}
+  m_SizeDelta: {x: 476.4469, y: 60.7004}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &420000003
 MonoBehaviour:
@@ -1644,8 +1644,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 66
+  m_fontSizeBase: 66
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3148,6 +3148,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: LoadMainMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 686745057229371504, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2493173229606494848, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -3299,6 +3303,14 @@ PrefabInstance:
     - target: {fileID: 7472394980237290543, guid: 04013a9e304a77545a8941e478060265, type: 3}
       propertyPath: pressedScale.y
       value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376667436081757799, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 3.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376667436081757799, guid: 04013a9e304a77545a8941e478060265, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.000023358
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4458,7 +4470,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -402, y: 483}
+  m_AnchoredPosition: {x: -176, y: 483}
   m_SizeDelta: {x: -1425.8967, y: -1010.5972}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1153943714
