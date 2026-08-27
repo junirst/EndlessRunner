@@ -14,9 +14,6 @@ public class SnakeMenuManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private Button backButton;
 
-    [Header("Loading")]
-    [SerializeField] private LoadingScreen loadingScreen;
-
     [Header("Snake Divider")]
     [SerializeField] private RectTransform dividerRoot;
     [SerializeField] private int segmentCount = 18;
@@ -61,13 +58,6 @@ public class SnakeMenuManager : MonoBehaviour
 
         if (backButton == null)
             backButton = GetComponentInChildren<Button>(true);
-
-        if (loadingScreen == null)
-        {
-            loadingScreen = GetComponentInChildren<LoadingScreen>(true);
-            if (loadingScreen == null && canvas != null)
-                BuildLoadingScreen();
-        }
     }
 
     private void Start()
@@ -214,40 +204,6 @@ public class SnakeMenuManager : MonoBehaviour
         return card;
     }
 
-    private void BuildLoadingScreen()
-    {
-        GameObject lsGO = new GameObject("LoadingScreen", typeof(RectTransform));
-        lsGO.transform.SetParent(canvas.transform, false);
-        RectTransform lsRT = lsGO.GetComponent<RectTransform>();
-        lsRT.anchorMin = Vector2.zero;
-        lsRT.anchorMax = Vector2.one;
-        lsRT.offsetMin = Vector2.zero;
-        lsRT.offsetMax = Vector2.zero;
-
-        CanvasGroup cg = lsGO.AddComponent<CanvasGroup>();
-        cg.alpha = 0f;
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-
-        Image bg = lsGO.AddComponent<Image>();
-        bg.color = new Color(0f, 0f, 0f, 0.85f);
-        bg.raycastTarget = true;
-
-        GameObject snakeGO = new GameObject("SnakeContainer", typeof(RectTransform));
-        snakeGO.transform.SetParent(lsRT, false);
-        RectTransform snakeRT = snakeGO.GetComponent<RectTransform>();
-        snakeRT.anchorMin = new Vector2(1f, 0f);
-        snakeRT.anchorMax = new Vector2(1f, 0f);
-        snakeRT.anchoredPosition = new Vector2(-40f, 40f);
-        snakeRT.sizeDelta = new Vector2(250f, 60f);
-        snakeRT.pivot = new Vector2(1f, 0f);
-
-        LoadingScreen ls = lsGO.AddComponent<LoadingScreen>();
-        ls.Configure(cg, snakeRT);
-
-        loadingScreen = ls;
-    }
-
     private void LoadHighScores()
     {
         for (int i = 0; i < stageCards.Length && i < StageDefs.Length; i++)
@@ -330,13 +286,8 @@ public class SnakeMenuManager : MonoBehaviour
         {
             if (backButton != null)
                 backButton.interactable = false;
-            if (loadingScreen != null)
-                loadingScreen.ShowAndLoad(StageDefs[index].scene);
-            else
-            {
-                Time.timeScale = 1f;
-                SceneManager.LoadScene(StageDefs[index].scene);
-            }
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(StageDefs[index].scene);
         });
     }
 
