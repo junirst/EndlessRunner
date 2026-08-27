@@ -17,6 +17,10 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private ProceduralWorldGenerator2D worldGenerator;
     [SerializeField] private bool spawnInsideGeneratedMap = true;
 
+    [Header("Debug")]
+    [SerializeField] private bool debugForceBossSpawnKey = true;
+    [SerializeField] private KeyCode debugForceBossSpawnKeyCode = KeyCode.B;
+
     private void Start()
     {
         if (!worldGenerator)
@@ -29,6 +33,14 @@ public class EnemySpawner : MonoBehaviour
         if (bossPrefabs != null && bossPrefabs.Length > 0)
         {
             StartCoroutine(BossSpawner());
+        }
+    }
+
+    private void Update()
+    {
+        if (debugForceBossSpawnKey && Input.GetKeyDown(debugForceBossSpawnKeyCode))
+        {
+            TrySpawnBoss();
         }
     }
 
