@@ -31,7 +31,7 @@ public class LevelSelectManager : MonoBehaviour
     private const float CardSlideDuration = 0.45f;
     private const float CardSlideStagger = 0.08f;
     private const string Match3ScenePathPrefix = "Assets/Match 3/Scenes/";
-    private const string Match3MenuScenePath = "Assets/Match 3/Scenes/Menu.unity";
+    private const string Match3MenuScenePath = "Assets/Match 3/Scenes/Match3Menu.unity";
     private const string Match3LevelSelectScenePath = "Assets/Match 3/Scenes/LevelSelect.unity";
     private const string SettingScreenResourcePath = "Match3UI/SettingScreen";
 
